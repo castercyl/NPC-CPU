@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+vluint64_t main_time = 0; // 仿真初始时间为0 
+
+
 int main(int argc, char** argv, char** env) {
 	VerilatedContext* contextp = new VerilatedContext;
 	contextp->commandArgs(argc, argv);
@@ -20,8 +23,10 @@ int main(int argc, char** argv, char** env) {
 		top->a = a;
 		top->b = b;
 		top->eval();
+		tfp->dump(main_time);   // 波形文件写入步进
 		printf("a = %d, b = %d, f = %d\n", a, b, top->f);
 		assert(top->f == a ^ b);
+		main_time++;
 	}
 	delete top;
 	delete contextp;
