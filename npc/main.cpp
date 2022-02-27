@@ -10,8 +10,10 @@ int main(int argc, char** argv, char** env) {
 	contextp->commandArgs(argc, argv);
 	Verilated::traceEverOn(true);
 	VerilatedVcdC* tfp = new VerilatedVcdC;
+	topp->trace(tfp, 99);
 	Vexample* top = new Vexample{contextp};
-	while (!contextp->gotFinish()) {
+	while (!contextp->got Finish()) {
+		contextp->timeInc(1);
 		int a = rand() & 1;
 		int b = rand() & 1;
 		top->a = a;
