@@ -12,7 +12,7 @@ int main(int argc, char** argv, char** env) {
 	VerilatedVcdC* tfp = new VerilatedVcdC;
 	Vexample* top = new Vexample{contextp};
 	top->trace(tfp, 99);
-	while (!contextp->got Finish()) {
+	while (!contextp->gotFinish()) {
 		contextp->timeInc(1);
 		int a = rand() & 1;
 		int b = rand() & 1;
