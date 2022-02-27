@@ -1,3 +1,4 @@
+#include "verilated_vcd_c.h"
 #include "Vexample.h"
 #include "verilated.h"
 #include <stdio.h>
