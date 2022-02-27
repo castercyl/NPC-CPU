@@ -8,6 +8,8 @@
 int main(int argc, char** argv, char** env) {
 	VerilatedContext* contextp = new VerilatedContext;
 	contextp->commandArgs(argc, argv);
+	Verilated::traceEverOn(true);
+	VerilatedVcdC* tfp = new VerilatedVcdC;
 	Vexample* top = new Vexample{contextp};
 	while (!contextp->gotFinish()) {
 		int a = rand() & 1;
