@@ -25,7 +25,7 @@ int main(int argc, char** argv, char** env) {
 	while (!contextp->gotFinish()) {
 		contextp->timeInc(1);
 		
-		single-cycle();
+		single_cycle();
 
 		top->eval();
 		tfp->dump(main_time);   // 波形文件写入步进
