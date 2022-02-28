@@ -31,7 +31,7 @@ VL_ATTR_COLD void Vwaterlight___024root___ctor_var_reset(Vwaterlight___024root* 
     Vwaterlight__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vwaterlight___024root___ctor_var_reset\n"); );
     // Body
-    vlSelf->reset = VL_RAND_RESET_I(1);
+    vlSelf->rst = VL_RAND_RESET_I(1);
     vlSelf->clk = VL_RAND_RESET_I(1);
     vlSelf->led = VL_RAND_RESET_I(16);
     vlSelf->waterlight__DOT__count = VL_RAND_RESET_I(32);

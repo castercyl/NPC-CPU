@@ -23,7 +23,7 @@ void Vwaterlight___024root__trace_chg_sub_0(Vwaterlight___024root* vlSelf, Veril
     // Init
     vluint32_t* const oldp VL_ATTR_UNUSED = tracep->oldp(vlSymsp->__Vm_baseCode + 1);
     // Body
-    tracep->chgBit(oldp+0,(vlSelf->reset));
+    tracep->chgBit(oldp+0,(vlSelf->rst));
     tracep->chgBit(oldp+1,(vlSelf->clk));
     tracep->chgSData(oldp+2,(vlSelf->led),16);
     tracep->chgIData(oldp+3,(vlSelf->waterlight__DOT__count),32);

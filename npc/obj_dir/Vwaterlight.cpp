@@ -11,7 +11,7 @@
 Vwaterlight::Vwaterlight(VerilatedContext* _vcontextp__, const char* _vcname__)
     : vlSymsp{new Vwaterlight__Syms(_vcontextp__, _vcname__, this)}
     , clk{vlSymsp->TOP.clk}
-    , reset{vlSymsp->TOP.reset}
+    , rst{vlSymsp->TOP.rst}
     , led{vlSymsp->TOP.led}
     , rootp{&(vlSymsp->TOP)}
 {

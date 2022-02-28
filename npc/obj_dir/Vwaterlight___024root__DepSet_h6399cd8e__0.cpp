@@ -16,7 +16,7 @@ VL_INLINE_OPT void Vwaterlight___024root___sequent__TOP__0(Vwaterlight___024root
     // Body
     __Vdly__waterlight__DOT__count = vlSelf->waterlight__DOT__count;
     __Vdly__led = vlSelf->led;
-    if (vlSelf->reset) {
+    if (vlSelf->rst) {
         __Vdly__led = 1U;
         __Vdly__waterlight__DOT__count = 0U;
     } else {
@@ -53,8 +53,8 @@ void Vwaterlight___024root___eval_debug_assertions(Vwaterlight___024root* vlSelf
     Vwaterlight__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vwaterlight___024root___eval_debug_assertions\n"); );
     // Body
-    if (VL_UNLIKELY((vlSelf->reset & 0xfeU))) {
-        Verilated::overWidthError("reset");}
+    if (VL_UNLIKELY((vlSelf->rst & 0xfeU))) {
+        Verilated::overWidthError("rst");}
     if (VL_UNLIKELY((vlSelf->clk & 0xfeU))) {
         Verilated::overWidthError("clk");}
 }

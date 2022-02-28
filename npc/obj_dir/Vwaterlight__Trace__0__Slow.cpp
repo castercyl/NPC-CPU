@@ -11,11 +11,11 @@ VL_ATTR_COLD void Vwaterlight___024root__trace_init_sub__TOP__0(Vwaterlight___02
     // Init
     const int c = vlSymsp->__Vm_baseCode;
     // Body
-    tracep->declBit(c+1,"reset", false,-1);
+    tracep->declBit(c+1,"rst", false,-1);
     tracep->declBit(c+2,"clk", false,-1);
     tracep->declBus(c+3,"led", false,-1, 15,0);
     tracep->pushNamePrefix("waterlight ");
-    tracep->declBit(c+1,"reset", false,-1);
+    tracep->declBit(c+1,"rst", false,-1);
     tracep->declBit(c+2,"clk", false,-1);
     tracep->declBus(c+3,"led", false,-1, 15,0);
     tracep->declBus(c+4,"count", false,-1, 31,0);
@@ -62,7 +62,7 @@ VL_ATTR_COLD void Vwaterlight___024root__trace_full_sub_0(Vwaterlight___024root*
     // Init
     vluint32_t* const oldp VL_ATTR_UNUSED = tracep->oldp(vlSymsp->__Vm_baseCode);
     // Body
-    tracep->fullBit(oldp+1,(vlSelf->reset));
+    tracep->fullBit(oldp+1,(vlSelf->rst));
     tracep->fullBit(oldp+2,(vlSelf->clk));
     tracep->fullSData(oldp+3,(vlSelf->led),16);
     tracep->fullIData(oldp+4,(vlSelf->waterlight__DOT__count),32);
