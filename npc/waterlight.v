@@ -1,4 +1,4 @@
-module light(
+module waterlight(
 	input reset,
 	input clk,
 	output reg [15:0] led
