@@ -34,5 +34,5 @@ VL_ATTR_COLD void Vwaterlight___024root___ctor_var_reset(Vwaterlight___024root* 
     vlSelf->reset = VL_RAND_RESET_I(1);
     vlSelf->clk = VL_RAND_RESET_I(1);
     vlSelf->led = VL_RAND_RESET_I(16);
-    vlSelf->light__DOT__count = VL_RAND_RESET_I(32);
+    vlSelf->waterlight__DOT__count = VL_RAND_RESET_I(32);
 }

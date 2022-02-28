@@ -12,26 +12,27 @@ VL_INLINE_OPT void Vwaterlight___024root___sequent__TOP__0(Vwaterlight___024root
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vwaterlight___024root___sequent__TOP__0\n"); );
     // Init
     SData/*15:0*/ __Vdly__led;
-    IData/*31:0*/ __Vdly__light__DOT__count;
+    IData/*31:0*/ __Vdly__waterlight__DOT__count;
     // Body
-    __Vdly__light__DOT__count = vlSelf->light__DOT__count;
+    __Vdly__waterlight__DOT__count = vlSelf->waterlight__DOT__count;
     __Vdly__led = vlSelf->led;
     if (vlSelf->reset) {
         __Vdly__led = 1U;
-        __Vdly__light__DOT__count = 0U;
+        __Vdly__waterlight__DOT__count = 0U;
     } else {
-        if ((0U == vlSelf->light__DOT__count)) {
+        if ((0U == vlSelf->waterlight__DOT__count)) {
             __Vdly__led = ((0xfffeU & ((IData)(vlSelf->led) 
                                        << 1U)) | (1U 
                                                   & ((IData)(vlSelf->led) 
                                                      >> 0xfU)));
         }
-        __Vdly__light__DOT__count = ((0x1388U <= vlSelf->light__DOT__count)
-                                      ? 0U : ((IData)(1U) 
-                                              + vlSelf->light__DOT__count));
+        __Vdly__waterlight__DOT__count = ((0x1388U 
+                                           <= vlSelf->waterlight__DOT__count)
+                                           ? 0U : ((IData)(1U) 
+                                                   + vlSelf->waterlight__DOT__count));
     }
     vlSelf->led = __Vdly__led;
-    vlSelf->light__DOT__count = __Vdly__light__DOT__count;
+    vlSelf->waterlight__DOT__count = __Vdly__waterlight__DOT__count;
 }
 
 void Vwaterlight___024root___eval(Vwaterlight___024root* vlSelf) {

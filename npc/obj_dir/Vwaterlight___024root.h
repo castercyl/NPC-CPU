@@ -16,7 +16,7 @@ VL_MODULE(Vwaterlight___024root) {
     VL_IN8(reset,0,0);
     CData/*0:0*/ __Vclklast__TOP__clk;
     VL_OUT16(led,15,0);
-    IData/*31:0*/ light__DOT__count;
+    IData/*31:0*/ waterlight__DOT__count;
 
     // INTERNAL VARIABLES
     Vwaterlight__Syms* vlSymsp;  // Symbol table

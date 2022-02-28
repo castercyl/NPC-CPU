@@ -7,16 +7,9 @@
 
 vluint64_t main_time = 0; // 仿真初始时间为0 
 
-void single_cycle() {
-	  top->clk = 0; top->eval();
-	    top->clk = 1; top->eval();
-}
+void single_cycle();
 
-void rst(int n) {
-	  top->reset = 1;
-	    while (n -- > 0) single_cycle();
-		  top->reset = 0;
-}
+void rst(int n);
 
 int main(int argc, char** argv, char** env) {
 	VerilatedContext* contextp = new VerilatedContext;
@@ -42,4 +35,15 @@ int main(int argc, char** argv, char** env) {
 	delete top;
 	delete contextp;
 	return 0;
+}
+
+void single_cycle() {
+	  top->clk = 0; top->eval();
+	    top->clk = 1; top->eval();
+}
+
+void reset(int n) {
+	  top->rst = 1;
+	    while (n -- > 0) single_cycle();
+		  top->rst = 0;
 }
