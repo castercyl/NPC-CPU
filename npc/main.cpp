@@ -7,6 +7,7 @@
 
 vluint64_t main_time = 0; // 仿真初始时间为0 
 
+VerilatedContext* contextp = new VerilatedContext;
 Vwaterlight* top = new Vwaterlight{contextp};
 
 void single_cycle();
@@ -14,7 +15,6 @@ void single_cycle();
 void reset(int n);
 
 int main(int argc, char** argv, char** env) {
-	VerilatedContext* contextp = new VerilatedContext;
 	contextp->commandArgs(argc, argv);
 	Verilated::traceEverOn(true); //打开波形追踪
 	//VerilatedVcdC* tfp = new VerilatedVcdC;
