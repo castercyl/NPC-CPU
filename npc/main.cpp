@@ -23,10 +23,10 @@ int main(int argc, char** argv, char** env) {
 	tfp->open("waterlight-wave.vcd");
 
 	reset(10);                     //复位10个周期
+contextp->timeInc(1);
 
 	while (!contextp->gotFinish()) {
-		contextp->timeInc(1);
-		
+				
 		single_cycle();
 
 		top->eval();
