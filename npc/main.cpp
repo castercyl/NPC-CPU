@@ -7,15 +7,17 @@
 
 vluint64_t main_time = 0; // 仿真初始时间为0 
 
+VerilatedVcdC* tfp = new VerilatedVcdC;
+
 void single_cycle();
 
-void rst(int n);
+void reset(int n);
 
 int main(int argc, char** argv, char** env) {
 	VerilatedContext* contextp = new VerilatedContext;
 	contextp->commandArgs(argc, argv);
 	Verilated::traceEverOn(true); //打开波形追踪
-	VerilatedVcdC* tfp = new VerilatedVcdC;
+	//VerilatedVcdC* tfp = new VerilatedVcdC;
 	Vwaterlight* top = new Vwaterlight{contextp};
 	top->trace(tfp, 99);
 	tfp->open("waterlight-wave.vcd");
