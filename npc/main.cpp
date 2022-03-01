@@ -1,11 +1,9 @@
 #include "verilated_vcd_c.h"     //生成波形.vcd所需要的文件
 #include "Vwaterlight.h"         //目标verilog文件
 #include "verilated.h"           //Verilator所包含的基本规则的文件
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <memory>
-
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 
 void single_cycle();
@@ -25,7 +23,9 @@ int main(int argc, char** argv, char** env) {
 	//tfp->open("waterlight-wave.vcd");
 
 	Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名，需要在创建任何模块之前使用！ 
-
+	
+	Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
+	
 	reset(10);                     //复位10个周期
 
 	while (!contextp->gotFinish()) {
@@ -35,7 +35,7 @@ int main(int argc, char** argv, char** env) {
 
 		top->eval();
 		//tfp->dump(main_time);
-		printf("time = % , clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
+		printf("time = %d clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
 		//main_time++;
 	}
 
