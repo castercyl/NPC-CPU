@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <memory>
 
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 
@@ -34,9 +35,15 @@ int main(int argc, char** argv, char** env) {
 
 		top->eval();
 		//tfp->dump(main_time);
-		printf("time = %x clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
+		printf("time = % , clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
 		//main_time++;
 	}
+csrc
+main.cpp
+Makefile
+obj_dir
+vsrc
+waterlight.v
 
 	top->final();          // ?
 
