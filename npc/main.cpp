@@ -4,7 +4,6 @@
 #include <memory>
 #include <stdio.h>
 #include <stdlib.h>
-Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 
 void single_cycle();
 
