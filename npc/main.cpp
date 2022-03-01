@@ -34,7 +34,7 @@ int main(int argc, char** argv, char** env) {
 
 		top->eval();
 		//tfp->dump(main_time);
-		printf("time = %x; clk = % ; rst = %x; led = %x\n",top->time(),top->clk,top->rst,top->led);
+		printf("time = %x; clk = % ; rst = %x; led = %x\n",contextp->time(),top->clk,top->rst,top->led);
 		//main_time++;
 	}
 
