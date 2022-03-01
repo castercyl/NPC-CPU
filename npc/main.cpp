@@ -21,8 +21,6 @@ int main(int argc, char** argv, char** env) {
 	//top->trace(tfp, 99);
 	//tfp->open("waterlight-wave.vcd");
 
-	Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名，需要在创建任何模块之前使用！ 
-	
 	Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 	
 	reset(10);                     //复位10个周期
