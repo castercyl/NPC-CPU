@@ -9,20 +9,22 @@ void single_cycle();
 
 void reset(int n);
 
+VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
+
+contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
+
+Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
+
 int main(int argc, char** argv, char** env) {
 
 	Verilated::mkdir("logs");       //创建一个目录来存放波形文件
 
-	VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
 	Verilated::traceEverOn(true);                      //打开波形追踪
-	contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
 	//VerilatedVcdC* tfp = new VerilatedVcdC;
 	//VerilatedVcdC* tfp = new VerilatedVcdC; 
 	//top->trace(tfp, 99);
 	//tfp->open("waterlight-wave.vcd");
 
-	Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
-	
 	reset(10);                     //复位10个周期
 
 	while (!contextp->gotFinish()) {
