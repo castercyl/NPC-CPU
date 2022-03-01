@@ -38,7 +38,7 @@ int main(int argc, char** argv, char** env) {
 		//main_time++;
 	}
 
-	top->final()          // ?
+	top->final();          // ?
 
 	delete top;           //运行结束，删除中间模型
 	delete contextp;
