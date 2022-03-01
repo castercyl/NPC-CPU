@@ -34,14 +34,18 @@ int main(int argc, char** argv, char** env) {
 
 		top->eval();
 		//tfp->dump(main_time);
-		printf("time = %x; clk = % ; rst = %x; led = %x\n",contextp->time(),top->clk,top->rst,top->led);
+		printf("time = %x clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
 		//main_time++;
 	}
 
 	top->final();          // ?
 
-	delete top;           //运行结束，删除中间模型
-	delete contextp;
+	//delete top;           //运行结束，删除中间模型
+	//delete contextp;
+#if VM_COVERAGE
+	    Verilated::mkdir("logs");
+		contextp->coveragep()->write("logs/coverage.dat");
+#endif
 	return 0;
 }
 
