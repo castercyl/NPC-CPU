@@ -38,12 +38,6 @@ int main(int argc, char** argv, char** env) {
 		printf("time = % , clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
 		//main_time++;
 	}
-csrc
-main.cpp
-Makefile
-obj_dir
-vsrc
-waterlight.v
 
 	top->final();          // ?
 
