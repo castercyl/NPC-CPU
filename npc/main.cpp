@@ -32,7 +32,7 @@ int main(int argc, char** argv, char** env) {
 	while (!contextp->gotFinish()) {
 	//到结束标志之前会一直进行此循环
 		contextp->timeInc(1);      //经过1个时间精度周期
-		tfp->dump(contextp->time();
+		tfp->dump(contextp->time());
 
 		single_cycle();
 
