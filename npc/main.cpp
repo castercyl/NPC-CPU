@@ -9,17 +9,19 @@ void single_cycle();
 
 void reset(int n);
 
-VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
-
-contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
-
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 
 int main(int argc, char** argv, char** env) {
 
 	Verilated::mkdir("logs");       //创建一个目录来存放波形文件
+	VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
+	contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
 
 	Verilated::traceEverOn(true);                      //打开波形追踪
+	VerilatedVcdC* tfp = new VerilatedVcdC;
+	top->trace(tfp, 99); // Trace 99 levels of hierarchy
+	tfp->open("wave.vcd");
+
 	//VerilatedVcdC* tfp = new VerilatedVcdC;
 	//VerilatedVcdC* tfp = new VerilatedVcdC; 
 	//top->trace(tfp, 99);
@@ -29,7 +31,9 @@ int main(int argc, char** argv, char** env) {
 
 	while (!contextp->gotFinish()) {
 	//到结束标志之前会一直进行此循环
-		contextp->timeInc(1);      //经过1个时间精度周期				
+		contextp->timeInc(1);      //经过1个时间精度周期
+		tfp->dump(contextp->time();
+
 		single_cycle();
 
 		top->eval();
@@ -39,7 +43,7 @@ int main(int argc, char** argv, char** env) {
 	}
 
 	top->final();          // ?
-
+	tfp->close();
 	//delete top;           //运行结束，删除中间模型
 	//delete contextp;
 #if VM_COVERAGE
