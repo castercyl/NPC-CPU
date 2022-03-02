@@ -18,10 +18,9 @@ Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件
 
 int main(int argc, char** argv, char** env) {
 
+	Verilated::traceEverOn(true);                      //打开波形追踪 
 	VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
 	//contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
-
-	Verilated::traceEverOn(true);                      //打开波形追踪
 	//VerilatedVcdC* tfp = new VerilatedVcdC;
 	top->trace(tfp, 99); // Trace 99 levels of hierarchy
 	tfp->open("wave.vcd");
