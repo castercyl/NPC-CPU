@@ -13,13 +13,12 @@ void single_cycle();
 void reset(int n);
 
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
-
- VerilatedVcdC* tfp = new VerilatedVcdC; 
+Verilated::traceEverOn(true);                      //打开波形追踪 
+VerilatedVcdC* tfp = new VerilatedVcdC; 
 
 int main(int argc, char** argv, char** env) {
 
-	Verilated::traceEverOn(true);                      //打开波形追踪 
-	VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
+	//VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
 	//contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
 	//VerilatedVcdC* tfp = new VerilatedVcdC;
 	top->trace(tfp, 99); // Trace 99 levels of hierarchy
@@ -34,11 +33,10 @@ int main(int argc, char** argv, char** env) {
 
 	while ((!contextp->gotFinish())&& (main_time < sim_time)) {
 	//到结束标志之前会一直进行此循环
-		contextp->timeInc(1);      //经过1个时间精度周期
+	//	contextp->timeInc(1);      //经过1个时间精度周期
 		//tfp->dump(contextp->time());
 		single_cycle();
 
-		top->eval();
 		//tfp->dump(main_time);
 		//printf("time = %d clk = %x rst = %x led = %x\n",contextp->time(),top->clk,top->rst,top->led);
 		main_time++;
@@ -46,13 +44,12 @@ int main(int argc, char** argv, char** env) {
 
 	tfp->close();
 	delete top;           //运行结束，删除中间模型
-	delete contextp;
 	return 0;
 }
 
 void single_cycle() {
 	  top->clk = 0; top->eval(); tfp->dump(main_time);
-	  top->clk = 1; top->eval(); tfp->dump(main_time);
+	  top->clk = 1; top->eval(); tfp->dump(++main_time);
 }
 
 void reset(int n) {
