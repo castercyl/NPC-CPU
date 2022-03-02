@@ -14,12 +14,11 @@ void reset(int n);
 
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 //Verilated::traceEverOn(true);                      //打开波形追踪 
-Verilated::traceEverOn(true);
 
 VerilatedVcdC* tfp = new VerilatedVcdC; 
 
 int main(int argc, char** argv, char** env) {
-
+	Verilated::traceEverOn(true); 
 	//VerilatedContext* contextp = new VerilatedContext;  //构建contextp用来保存仿真时间
 	//contextp->commandArgs(argc, argv);        //？传递参数，让verilator代码看到
 	//VerilatedVcdC* tfp = new VerilatedVcdC;
