@@ -13,7 +13,8 @@ void single_cycle();
 void reset(int n);
 
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
-Verilated::traceEverOn(true);                      //打开波形追踪 
+//Verilated::traceEverOn(true);                      //打开波形追踪 
+Verilated::traceEverOn(true);
 
 VerilatedVcdC* tfp = new VerilatedVcdC; 
 
