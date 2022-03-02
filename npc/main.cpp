@@ -14,6 +14,7 @@ void reset(int n);
 
 Vwaterlight* top = new Vwaterlight;  //通过指针的方式从目标的.v文件构建Verilator模型，之后top将指代.v文件中的module名
 Verilated::traceEverOn(true);                      //打开波形追踪 
+
 VerilatedVcdC* tfp = new VerilatedVcdC; 
 
 int main(int argc, char** argv, char** env) {
@@ -31,7 +32,7 @@ int main(int argc, char** argv, char** env) {
 
 	reset(10);                     //复位10个周期
 
-	while ((!contextp->gotFinish())&& (main_time < sim_time)) {
+	while (main_time < sim_time) {
 	//到结束标志之前会一直进行此循环
 	//	contextp->timeInc(1);      //经过1个时间精度周期
 		//tfp->dump(contextp->time());
