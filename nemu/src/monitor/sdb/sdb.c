@@ -43,10 +43,13 @@ static int cmd_si(char *args) {       //简易调试中的si指令
 	int n;
 	char *N = strtok(args, " ");
 	if (N) {
-		cpu_exec(1);
+		//cpu_exec(1);
+		printf("N = %d",*N);
 	}
 	else {
 		n = atoi(N);
+		printf("N = %d",*N);
+		printf("n = %d",n);
 		cpu_exec(n);
 	}
 	return 0;
