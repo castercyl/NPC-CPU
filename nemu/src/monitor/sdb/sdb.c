@@ -40,14 +40,22 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 
 static int cmd_si(char *args) {       //简易调试中的si指令
-	int n;
-	if (args == NULL) {
+	int n;                            
+	if (args == NULL) {               //此时的args指向输入的第二个参宿，若没有则args == NULL
 		cpu_exec(1);
 	}
 	else {
-		n = atoi(args);
+		n = atoi(args);             //由于第二个参数是字符串，所以将其转换为整型才能放入cpu执行的函数中
 		cpu_exec(n);
 	}
+	return 0;
+}
+
+static int cmd_info(char *args) {
+	if (*args == 'r') {
+		isa_reg_display();
+	}
+	else printf("Please input r or w !");
 	return 0;
 }
 
@@ -60,6 +68,7 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "Single stp", cmd_si},
+  {"info", "Display regs or watchpoints", cmd_info},
 
   /* TODO: Add more commands */
 
