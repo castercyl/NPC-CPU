@@ -59,6 +59,23 @@ static int cmd_info(char *args) {
 	return 0;
 }
 
+static int cmd_x(char *args) {
+	int n;
+	uint8_t* guest_to_host(paddr_t paddr);
+	if (args == NULL) {
+		printf("Please input N !");
+	}
+	else {
+		n = atoi(args);
+		int i;
+		for(i = 0; i <= n; i++) {
+			printf("%d",*guest_to_host(i));
+		}
+	}
+	return 0;
+}
+
+
 static struct {
   const char *name;
   const char *description;
@@ -69,6 +86,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "Single stp", cmd_si},
   {"info", "Display regs or watchpoints", cmd_info},
+  {"x", "Scanning memory", cmd_x},
 
   /* TODO: Add more commands */
 
