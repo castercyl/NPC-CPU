@@ -60,17 +60,15 @@ static int cmd_info(char *args) {
 }
 
 static int cmd_x(char *args) {
+	word_t vaddr_read(vaddr_t addr, int len);
 	int n;
-	uint8_t* guest_to_host(paddr_t paddr);
-	if (args == NULL) {
-		printf("Please input N !");
-	}
-	else {
-		n = atoi(args);
-		int i;
-		for(i = 0; i <= n; i++) {
-			printf("%d",*guest_to_host(i));
-		}
+	int i;
+	char *args_1 = strtok(NULL, " ");
+	char *args_2 = strtok(NULL, " ");
+	n = atoi(args_1);
+	vaddr_t add = strtoul(args_2, NULL, 16);
+	for(i = 0; i < n; i++) {
+		printf("%s : %lx\n",args_2,vaddr_read(add+i, 4));
 	}
 	return 0;
 }
@@ -125,7 +123,7 @@ void sdb_mainloop() {
   if (is_batch_mode) {
     cmd_c(NULL);
     return;
-  }
+  } 
 
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
@@ -136,9 +134,9 @@ void sdb_mainloop() {
 
     /* treat the remaining string as the arguments,
      * which may need further parsing
-     */
+      */
     char *args = cmd + strlen(cmd) + 1;
-    if (args >= str_end) {
+    if  (args >= str_end) {
       args = NULL;
     }
 
