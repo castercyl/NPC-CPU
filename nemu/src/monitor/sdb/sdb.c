@@ -69,7 +69,7 @@ static int cmd_x(char *args) {
 	for(i = 0; i < n; i++) {
 		printf("0x%lx:",add + 4*i);
 		for(j = 0; j < 4; j++) {
-			printf(" %lx ",vaddr_read(add+i*4+j, 1));
+			printf(" %02lx ",vaddr_read(add+i*4+j, 1));
 		}
 		printf("\n");
 	}
