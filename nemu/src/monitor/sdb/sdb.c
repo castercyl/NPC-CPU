@@ -61,14 +61,15 @@ static int cmd_info(char *args) {
 
 static int cmd_x(char *args) {
 	word_t vaddr_read(vaddr_t addr, int len);
-	int n;
-	int i;
+	int n,i,j;
 	char *args_1 = strtok(NULL, " ");
 	char *args_2 = strtok(NULL, " ");
 	n = atoi(args_1);
 	vaddr_t add = strtoul(args_2, NULL, 16);
 	for(i = 0; i < n; i++) {
-		printf("%s : %lx\n",args_2,vaddr_read(add+i, 4));
+		for(j = 0; j < 4; j++) {
+			printf("%s : %lx\n",args_2,vaddr_read(add+i, 1));
+		}
 	}
 	return 0;
 }
