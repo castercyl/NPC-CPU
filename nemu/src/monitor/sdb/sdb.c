@@ -67,9 +67,11 @@ static int cmd_x(char *args) {
 	n = atoi(args_1);
 	vaddr_t add = strtoul(args_2, NULL, 16);
 	for(i = 0; i < n; i++) {
+		printf("0x%lx:",add + 4*i);
 		for(j = 0; j < 4; j++) {
-			printf("%s : %lx\n",args_2,vaddr_read(add+i*4+j, 1));
+			printf(" %lx ",vaddr_read(add+i*4+j, 1));
 		}
+		printf("\n");
 	}
 	return 0;
 }
