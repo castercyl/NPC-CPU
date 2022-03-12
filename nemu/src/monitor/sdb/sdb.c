@@ -52,6 +52,7 @@ static int cmd_si(char *args) {       //简易调试中的si指令
 }
 
 static int cmd_info(char *args) {
+	void isa_reg_display();
 	if (*args == 'r') {
 		isa_reg_display();
 	}
