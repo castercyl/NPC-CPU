@@ -56,7 +56,7 @@ static int cmd_info(char *args) {
 	if (*args == 'r') {
 		isa_reg_display();
 	}
-	else printf("Please input r or w !");
+	else printf("Please input r or w !\n");
 	return 0;
 }
 
