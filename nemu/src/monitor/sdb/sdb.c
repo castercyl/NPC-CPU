@@ -81,7 +81,7 @@ static int cmd_p(char *args) {
 	word_t expr(char *e, bool *success);
 	bool i = true;
 	bool *success = &i;
-	expr(args, success);
+	printf("%ld\n",expr(args, success));
 	return 0;
 }
 
