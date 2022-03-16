@@ -131,12 +131,12 @@ bool check_parentheses(int p, int q) {
 		for (i = p; i < q; i++) {
 			if (tokens[i].type == '(') count = count + 1;
 			if (tokens[i].type == ')') count = count - 1;
-			if (count == 0) return false;
+			//if (count == 0) return false;
 			if (count < 0 ) assert(0);
 		}
 		if ((count - 1) == 0) return true;
 		else 
-			return false;
+			assert(0);
 	}
 	else
 		return false;
