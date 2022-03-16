@@ -125,16 +125,18 @@ bool check_parentheses(int p, int q) {
 	//最终(count-1)==0,则括号匹配；防止出现（2+3))这种情况；
 	//一旦count == 0，则括号不匹配；?
 	//依据中途是否出现count < 0的情况，区分(4 + 3)) * ((2 - 1)和(4 + 3) * (2 - 1);
-	int count = 0;
+	int count_left = 0;
+	int count_right = 0;
 	if ((tokens[p].type == '(') & (tokens[q].type == ')')) {
 		int i;
 		for (i = p; i < q; i++) {
-			if (tokens[i].type == '(') count = count + 1;
-			if (tokens[i].type == ')') count = count - 1;
+			if (tokens[i].type == '(') count_left = count_left + 1;
+			if (tokens[i].type == ')') count_right = count_right + 1;
 			//if (count == 0) return false;
-			if (count < 0 ) assert(0);
+			if (count_left < count_right ) assert(0);
+			if (count_left == count_right ) return false;
 		}
-		if ((count - 1) == 0) return true;
+		if ((count_left - count_right - 1) == 0) return true;
 		else 
 			assert(0);
 	}
@@ -173,9 +175,7 @@ int find_op(int p, int q) {
 
 uint32_t eval(int p, int q) {
 	if (p > q) {
-		//assert(0);
-		printf("1");
-		return 0;
+		assert(0);
 	}
 	else if (p == q) {
 		return atoi(tokens[p].str);
