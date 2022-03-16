@@ -77,6 +77,13 @@ static int cmd_x(char *args) {
 	return 0;
 }
 
+static int cmd_p(char *args) {
+	word_t expr(char *e, bool *success);
+	bool i = true;
+	bool *success = &i;
+	expr(args, success);
+	return 0;
+}
 
 static struct {
   const char *name;
@@ -89,7 +96,8 @@ static struct {
   { "si", "Single stp", cmd_si},
   {"info", "Display regs or watchpoints", cmd_info},
   {"x", "Scanning memory", cmd_x},
-
+  {"p", "Evaluates the value of an expression", cmd_p},
+	
   /* TODO: Add more commands */
 
 };
