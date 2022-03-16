@@ -152,7 +152,7 @@ int find_op(int p, int q) {
 	int i;
 	int op = p;
 	int left = 0;
-	int rank = 0;
+	int rank = 100;
 	for (i = p; i < q; i++) {
 		if (tokens[i].type == '(') {
 			left = 1;
@@ -160,13 +160,14 @@ int find_op(int p, int q) {
 		}
 		if (tokens[i].type == '(') {
 			left = 0;
+			continue;
 		}
 		if (left == 1) continue;
 		switch (tokens[i].type) {
-			case '+': if(rank <= 10) {rank = 10; op = i;} break;
-			case '-': if(rank <= 10) {rank = 10; op = i;} break;
-			case '*': if(rank <= 20) {rank = 20; op = i;} break;
-			case '/': if(rank <= 20) {rank = 20; op = i;} break;
+			case '+': if(rank >= 10) {rank = 10; op = i;} break;
+			case '-': if(rank >= 10) {rank = 10; op = i;} break;
+			case '*': if(rank >= 20) {rank = 20; op = i;} break;
+			case '/': if(rank >= 20) {rank = 20; op = i;} break;
 			default: break;
 		}
 	}
