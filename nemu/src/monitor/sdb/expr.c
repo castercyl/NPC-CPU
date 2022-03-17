@@ -6,7 +6,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, NUM,
+  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE,
 
   /* TODO: Add more token types */
 
@@ -114,8 +114,13 @@ static bool make_token(char *e) {
       printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
       return false;
     }
-  } 
+  }
 
+  for (i = 0; i < nr_token; i++) {
+	  if ((i == 0) && (tokens[i].type == '-')) tokens[i].type = TK_NEGATIVE;
+	  if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type == '+') || (tokens[i-1].type == '-') || (tokens[i-1].type == '*') || (tokens[i-1].type == '/')))
+		  tokens[i].type = TK_NEGATIVE;
+  }
   return true;
 }
 
@@ -168,6 +173,7 @@ int find_op(int p, int q) {
 			case '-': if(rank >= 10) {rank = 10; op = i;} break;
 			case '*': if(rank >= 20) {rank = 20; op = i;} break;
 			case '/': if(rank >= 20) {rank = 20; op = i;} break;
+			case TK_NEGATIVE: if(rank >= 30) {rank = 30; op = i;} break;
 			default: break;
 		}
 	}
@@ -194,6 +200,7 @@ uint32_t eval(int p, int q) {
 			case '-': return (val1 - val2);
 			case '*': return (val1 * val2);
 			case '/': return (val1 / val2);
+			case TK_NEGATIVE: return (-1 * val2);
 			default : assert(0);
 		}
 	}
