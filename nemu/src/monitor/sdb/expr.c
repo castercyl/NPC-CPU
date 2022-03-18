@@ -185,6 +185,7 @@ int find_op(int p, int q) {
 			case TK_NEQ: if(rank >= 20) {rank = 20; op = i;} break;
 			case TK_AND: if(rank >= 10) {rank = 10; op = i;} break;
 			case DEREF:  if(rank >= 50) {rank = 50; op = i;} break;
+			case TK_EQ:  if(rank >= 20) {rank = 20; op = i;} break;
 			default: break;
 		}
 	}
@@ -221,6 +222,7 @@ uint32_t eval(int p, int q) {
 			case TK_NEQ: return (val1 != val2);
 			case TK_AND: return (val1 && val2);
 			case DEREF: return vaddr_read(val2, 4);
+			case TK_EQ: return val1 == val2;
 			default : assert(0);
 		}
 	}
