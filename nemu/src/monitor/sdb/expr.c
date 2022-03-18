@@ -5,6 +5,8 @@
  */
 #include <regex.h>
 
+word_t vaddr_read(vaddr_t addr, int len);  // I DO
+
 enum {
   TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE, TK_NEQ, TK_AND, DEREF,
   //TK_NEGATIVE:负号； DEREF: 指针；
@@ -124,7 +126,7 @@ static bool make_token(char *e) {
   for (i = 0; i < nr_token; i++) {
 	  if ((i == 0) && (tokens[i].type == '-')) tokens[i].type = TK_NEGATIVE;
 	 // if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type == '+') || (tokens[i-1].type == TK_NEGATIVE) || (tokens[i-1].type == '*') || (tokens[i-1].type == '/')))
-	 if ((i > 0) && (tokens[i].type == '-') &&(tokens[i-1].type != NUM))
+	 if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type != NUM) || (tokens[i-1].type != ')')))
 		  tokens[i].type = TK_NEGATIVE;
   }
   return true;
@@ -202,7 +204,7 @@ uint32_t eval(int p, int q) {
 	else  {
 		int op = find_op(p,q);
 		uint32_t val1,val2;
-		if (tokens[op].type == TK_NEGATIVE) {
+		if ((tokens[op].type == TK_NEGATIVE) || (tokens[op].type == DEREF)) {   //单目运算符
 			val1 = 1;
 			val2 = eval(op+1,q);
 		}
@@ -218,6 +220,7 @@ uint32_t eval(int p, int q) {
 			case TK_NEGATIVE: return (-1 * val2);
 			case TK_NEQ: return (val1 != val2);
 			case TK_AND: return (val1 && val2);
+			case DEREF: return vaddr_read(val2, 4);
 			default : assert(0);
 		}
 	}
@@ -230,6 +233,11 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
+  int i;
+  for (i = 0; i < nr_token; i++) {                //判别是否是指针，*位于最左边或者*号左边不是数字或者右括号‘）’
+	  if ((tokens[i].type == '*') && ((i==0) || ((tokens[i-1].type != NUM) && (tokens[i-1].type != ')'))))
+		  tokens[i].type = DEREF;
+  }
   //TODO();
   return eval(0, nr_token - 1); 
  // return 0;
