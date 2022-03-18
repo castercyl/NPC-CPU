@@ -193,7 +193,7 @@ uint32_t eval(int p, int q) {
 	else  {
 		int op = find_op(p,q);
 		uint32_t val1 = eval(p,op-1);
-		uint32_t val2 = eval(op,op+1);
+		uint32_t val2 = eval(op+1,q);
 
 		switch (tokens[op].type) {
 			case '+': return (val1 + val2);
