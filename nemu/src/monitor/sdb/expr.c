@@ -8,7 +8,7 @@
 word_t vaddr_read(vaddr_t addr, int len);  // I DO
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE, TK_NEQ, TK_AND, DEREF,
+  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE, TK_NEQ, TK_AND, DEREF, TK_HEX,
   //TK_NEGATIVE:负号； DEREF: 指针；
   /* TODO: Add more token types */
 
@@ -35,6 +35,7 @@ static struct rule {
   {"/", '/'},          // division
   {"\\(", '('},         // Left parenthesis
   {"\\)", ')'},         // Right parenthesis
+  {"0x[0-9,A-F,a-f]*", TK_HEX},  // hexadecimal-number,要放在十进制数之前
   {"0|[1-9][0-9]*", NUM},         // decimal,不要写成[0-9]*会匹配到奇奇怪怪的东西
   //{"!=", TK_NEQ},       // not equal
   //{"&&", TK_AND},      // logic and
@@ -112,6 +113,7 @@ static bool make_token(char *e) {
 			//case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
 			case TK_AND: tokens[nr_token].type = TK_AND; nr_token = nr_token + 1; break;
 			case DEREF: tokens[nr_token].type = DEREF; nr_token = nr_token + 1; break;
+			case TK_HEX: tokens[nr_token].type = TK_HEX; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break; 
         // above I DO
           default: assert(0);  //TODO();
         }
@@ -200,7 +202,14 @@ uint32_t eval(int p, int q) {
 		assert(0);
 	}
 	else if (p == q) {
-		return atoi(tokens[p].str);
+		uint32_t temp;
+		if (tokens[p].type == NUM)
+			temp = atoi(tokens[p].str);
+		else if (tokens[p].type == TK_HEX)
+			temp = sscanf(tokens[p].str,"%x",&temp);
+		else
+			assert(0);
+		return temp;
 	}
 	else if (check_parentheses(p,q) == true) {
 		return eval(p+1, q-1);
