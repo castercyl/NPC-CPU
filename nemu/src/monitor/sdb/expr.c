@@ -35,7 +35,7 @@ static struct rule {
   {"\\)", ')'},         // Right parenthesis
   {"[0-9]*", NUM},         // decimal
   {"!=", TK_NEQ},       // not equal
-  {"&&", TK_AND},      // logic and
+  {"\\&\\&", TK_AND},      // logic and
 };
 
 #define NR_REGEX ARRLEN(rules)
