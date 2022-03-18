@@ -173,7 +173,7 @@ int find_op(int p, int q) {
 			case '-': if(rank >= 10) {rank = 10; op = i;} break;
 			case '*': if(rank >= 20) {rank = 20; op = i;} break;
 			case '/': if(rank >= 20) {rank = 20; op = i;} break;
-			case TK_NEGATIVE: if(rank >= 30) {rank = 30; op = i;} break;
+			case TK_NEGATIVE: if(rank > 30) {rank = 30; op = i;} break;
 			default: break;
 		}
 	}
@@ -192,15 +192,8 @@ uint32_t eval(int p, int q) {
 	}
 	else  {
 		int op = find_op(p,q);
-		uint32_t val1,val2 = 1;
-		if (tokens[op].type == TK_NEGATIVE) {
-			val2 = eval(op+1, q);
-			val1 = eval(op+1, q);
-		}
-		else {
-			val1 = eval(p, op-1);
-			val2 = eval(op+1, q);
-		}
+		uint32_t val1 = eval(p,op-1);
+		uint32_t val2 = eval(op,op+1);
 
 		switch (tokens[op].type) {
 			case '+': return (val1 + val2);
