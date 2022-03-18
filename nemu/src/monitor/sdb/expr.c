@@ -34,8 +34,8 @@ static struct rule {
   {"\\(", '('},         // Left parenthesis
   {"\\)", ')'},         // Right parenthesis
   {"[0-9]*", NUM},         // decimal
-  {"\\!=", TK_NEQ},       // not equal
-  {"\\&&", TK_AND},      // logic and
+  {"!=", TK_NEQ},       // not equal
+  {"&&", TK_AND},      // logic and
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -100,13 +100,14 @@ static bool make_token(char *e) {
 			case TK_NOTYPE: break;
 			case '+': tokens[nr_token].type = '+'; nr_token = nr_token + 1; break;
 			case TK_EQ: tokens[nr_token].type = TK_EQ; nr_token = nr_token + 1; break;
+			case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
 			case '-': tokens[nr_token].type = '-'; nr_token = nr_token + 1; break;
 			case '*': tokens[nr_token].type = '*'; nr_token = nr_token + 1; break;
 			case '/': tokens[nr_token].type = '/'; nr_token = nr_token + 1; break;
 			case '(': tokens[nr_token].type = '('; nr_token = nr_token + 1; break;
 			case ')': tokens[nr_token].type = ')'; nr_token = nr_token + 1; break;
 			case NUM: tokens[nr_token].type = NUM; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break;
-			case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
+			//case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
 			case TK_AND: tokens[nr_token].type = TK_AND; nr_token = nr_token + 1; break;
 			case DEREF: tokens[nr_token].type = DEREF; nr_token = nr_token + 1; break;
         // above I DO
