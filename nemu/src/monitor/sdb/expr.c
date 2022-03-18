@@ -206,7 +206,7 @@ uint32_t eval(int p, int q) {
 		if (tokens[p].type == NUM)
 			temp = atoi(tokens[p].str);
 		else if (tokens[p].type == TK_HEX)
-			temp = sscanf(tokens[p].str,"%x",&temp);
+			sscanf(tokens[p].str,"%x",&temp);
 		else
 			assert(0);
 		return temp;
