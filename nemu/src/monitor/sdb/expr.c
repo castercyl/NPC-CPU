@@ -6,8 +6,8 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE,
-
+  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE, TK_NEQ, TK_AND, DEREF,
+  //TK_NEGATIVE:负号； DEREF: 指针；
   /* TODO: Add more token types */
 
 };
@@ -32,6 +32,8 @@ static struct rule {
   {"\\(", '('},         // Left parenthesis
   {"\\)", ')'},         // Right parenthesis
   {"[0-9]*", NUM},         // decimal
+  {"!=", TK_NEQ},       // not equal
+  {"&&", TK_AND},      // logic and
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -102,8 +104,11 @@ static bool make_token(char *e) {
 			case '(': tokens[nr_token].type = '('; nr_token = nr_token + 1; break;
 			case ')': tokens[nr_token].type = ')'; nr_token = nr_token + 1; break;
 			case NUM: tokens[nr_token].type = NUM; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break;
+			case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
+			case TK_AND: tokens[nr_token].type = TK_AND; nr_token = nr_token + 1; break;
+			case DEREF: tokens[nr_token].type = DEREF; nr_token = nr_token + 1; break;
         // above I DO
-          default: TODO();
+          default: assert(0);  //TODO();
         }
 
         break;
@@ -169,11 +174,14 @@ int find_op(int p, int q) {
 		}
 		if (left == 1) continue;
 		switch (tokens[i].type) {
-			case '+': if(rank >= 10) {rank = 10; op = i;} break;
-			case '-': if(rank >= 10) {rank = 10; op = i;} break;
-			case '*': if(rank >= 20) {rank = 20; op = i;} break;
-			case '/': if(rank >= 20) {rank = 20; op = i;} break;
-			case TK_NEGATIVE: if(rank > 30) {rank = 30; op = i;} break;
+			case '+': if(rank >= 30) {rank = 30; op = i;} break;
+			case '-': if(rank >= 30) {rank = 30; op = i;} break;
+			case '*': if(rank >= 40) {rank = 40; op = i;} break;
+			case '/': if(rank >= 40) {rank = 40; op = i;} break;
+			case TK_NEGATIVE: if(rank > 50) {rank = 50; op = i;} break;
+			case TK_NEQ: if(rank >= 20) {rank = 20; op = i;} break;
+			case TK_AND: if(rank >= 10) {rank = 10; op = i;} break;
+			case DEREF:  if(rank >= 50) {rank = 50; op = i;} break;
 			default: break;
 		}
 	}
@@ -207,6 +215,8 @@ uint32_t eval(int p, int q) {
 			case '*': return (val1 * val2);
 			case '/': return (val1 / val2);
 			case TK_NEGATIVE: return (-1 * val2);
+			case TK_NEQ: return (val1 != val2);
+			case TK_AND: return (val1 && val2);
 			default : assert(0);
 		}
 	}
