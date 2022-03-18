@@ -28,14 +28,14 @@ static struct rule {
   {"==", TK_EQ},        // equal
 
   //I DO
-  {"!=", TK_NEQ},
-  {"&&", TK_AND},
+  {"!=", TK_NEQ},       // 要放在[0-9]*之前
+  {"&&", TK_AND},       // 要放在[0-9]*之前
   {"\\-", '-'},           // subtraction
   {"\\*", '*'},          // multiplication
   {"/", '/'},          // division
   {"\\(", '('},         // Left parenthesis
   {"\\)", ')'},         // Right parenthesis
-  {"[0-9]*", NUM},         // decimal
+  {"0|[1-9][0-9]*", NUM},         // decimal,不要写成[0-9]*会匹配到奇奇怪怪的东西
   //{"!=", TK_NEQ},       // not equal
   //{"&&", TK_AND},      // logic and
 };
