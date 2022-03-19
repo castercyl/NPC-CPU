@@ -127,12 +127,6 @@ static bool make_token(char *e) {
       return false;
     }
   }
-
-  for (i = 0; i < nr_token; i++) {
-	  if ((i == 0) && (tokens[i].type == '-')) tokens[i].type = TK_NEGATIVE;
-	 if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type != NUM) || (tokens[i-1].type != ')')))
-		  tokens[i].type = TK_NEGATIVE;
-  }
   return true;
 }
 
