@@ -4,6 +4,8 @@
 #include <readline/history.h>
 #include "sdb.h"
 
+word_t expr(char *e, bool *success); //I DO
+
 static int is_batch_mode = false;
 
 void init_regex();
@@ -20,7 +22,7 @@ static char* rl_gets() {
 
   line_read = readline("(nemu) ");
 
-  if (line_read && *line_read) {
+  if (line_read && *line_read) { 
     add_history(line_read);
   }
 
@@ -63,13 +65,15 @@ static int cmd_info(char *args) {
 static int cmd_x(char *args) {
 	word_t vaddr_read(vaddr_t addr, int len);
 	int n,i,j;
+	bool success =true;
 	char *args_1 = strtok(NULL, " ");
 	char *args_2 = strtok(NULL, " ");
 	n = atoi(args_1);
-	vaddr_t add = strtoul(args_2, NULL, 16);
+	//vaddr_t add = strtoul(args_2, NULL, 16);
+	vaddr_t add = expr(args_2, &success); 
 	for(i = 0; i < n; i++) {
 		printf("0x%lx:",add + 4*i);
-		for(j = 0; j < 4; j++) {
+		for(j = 0; j < 4; j++) { 
 			printf(" %02lx ",vaddr_read(add+i*4+j, 1));
 		}
 		printf("\n");
@@ -78,7 +82,7 @@ static int cmd_x(char *args) {
 }
 
 static int cmd_p(char *args) {
-	word_t expr(char *e, bool *success);
+	//word_t expr(char *e, bool *success);
 	bool i = true;
 	bool *success = &i;
 	printf("%ld\n",expr(args, success));
