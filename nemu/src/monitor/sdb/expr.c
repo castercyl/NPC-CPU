@@ -6,9 +6,10 @@
 #include <regex.h>
 
 word_t vaddr_read(vaddr_t addr, int len);  // I DO
+word_t isa_reg_str2val(const char *s, bool *success);
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE, TK_NEQ, TK_AND, DEREF, TK_HEX,
+  TK_NOTYPE = 256, TK_EQ, NUM, TK_NEGATIVE, TK_NEQ, TK_AND, DEREF, TK_HEX, TK_REG,
   //TK_NEGATIVE:负号； DEREF: 指针；
   /* TODO: Add more token types */
 
@@ -28,6 +29,7 @@ static struct rule {
   {"==", TK_EQ},        // equal
 
   //I DO
+  {"\\$((\\$0)|(ra)|(sp)|(gp)|(tp)|(t0)|(t1)|(t2)|(s0)|(s1)|(a0)|(a1)|(a2)|(a3)|(a4)|(a5)|(a6)|(a7)|(s2)|(s3)|(s4)|(s5)|(s6)|(s7)|(s8)|(s9)|(s10)|(s11)|(t3)|(t4)|(t5)|(t6))", TK_REG},            // regs
   {"!=", TK_NEQ},       // 要放在[0-9]*之前
   {"&&", TK_AND},       // 要放在[0-9]*之前
   {"\\-", '-'},           // subtraction
@@ -113,7 +115,8 @@ static bool make_token(char *e) {
 			//case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
 			case TK_AND: tokens[nr_token].type = TK_AND; nr_token = nr_token + 1; break;
 			case DEREF: tokens[nr_token].type = DEREF; nr_token = nr_token + 1; break;
-			case TK_HEX: tokens[nr_token].type = TK_HEX; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break; 
+			case TK_HEX: tokens[nr_token].type = TK_HEX; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break;
+			case TK_REG: tokens[nr_token].type = TK_REG; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break; 
         // above I DO
           default: assert(0);  //TODO();
         }
@@ -190,16 +193,19 @@ int find_op(int p, int q) {
 	return op;
 }
 
-uint32_t eval(int p, int q) {
+uint64_t eval(int p, int q) {
 	if (p > q) {
 		assert(0);
 	}
 	else if (p == q) {
-		uint32_t temp;
+		uint64_t temp;
+		bool flag_s = true;
 		if (tokens[p].type == NUM)
 			temp = atoi(tokens[p].str);
 		else if (tokens[p].type == TK_HEX)
-			sscanf(tokens[p].str,"%x",&temp);
+			sscanf(tokens[p].str,"%lx",&temp);
+		else if (tokens[p].type == TK_REG)
+			temp = isa_reg_str2val(tokens[p].str, &flag_s);
 		else
 			assert(0);
 		return temp;
@@ -209,7 +215,7 @@ uint32_t eval(int p, int q) {
 	}
 	else  {
 		int op = find_op(p,q);
-		uint32_t val1,val2;
+		uint64_t val1,val2;
 		if ((tokens[op].type == TK_NEGATIVE) || (tokens[op].type == DEREF)) {   //单目运算符
 			val1 = 1;
 			val2 = eval(op+1,q);
