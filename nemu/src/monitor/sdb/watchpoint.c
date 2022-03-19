@@ -2,9 +2,12 @@
 
 #define NR_WP 32
 
+word_t expr(char *e, bool *success); //I DO
+
 typedef struct watchpoint {
   int NO;
-  uint64_t expr;  //用于存储表达式的值
+  char *expr;  //用于存储表达式
+  uint64_t in_val; //用于存储表达式的初值
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
@@ -114,4 +117,21 @@ void free_wp(WP *wp) {
 		wp->next = current_p;
 	}
 
+}
+
+bool check_watchpoints() {
+	WP *tmp = head;
+	bool success = true;
+	bool changed = false;
+	uint64_t tmp_val;
+	while(tmp->next != NULL) {
+		tmp_val = expr(tmp->expr, &success);
+		if (tmp->in_val != tmp_val) {
+			changed = true;
+			printf("watchpoint %d has changed, from 0x%lx to 0x%lx", tmp->NO, tmp->in_val, tmp_val);
+			tmp->in_val = tmp_val;
+		}
+		tmp = tmp->next;
+	}
+	return changed;
 }
