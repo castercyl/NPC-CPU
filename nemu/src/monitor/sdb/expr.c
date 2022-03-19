@@ -130,7 +130,6 @@ static bool make_token(char *e) {
 
   for (i = 0; i < nr_token; i++) {
 	  if ((i == 0) && (tokens[i].type == '-')) tokens[i].type = TK_NEGATIVE;
-	 // if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type == '+') || (tokens[i-1].type == TK_NEGATIVE) || (tokens[i-1].type == '*') || (tokens[i-1].type == '/')))
 	 if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type != NUM) || (tokens[i-1].type != ')')))
 		  tokens[i].type = TK_NEGATIVE;
   }
@@ -248,8 +247,15 @@ word_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
   int i;
+
+  for (i = 0; i < nr_token; i++) {                                                                                                                                         
+	  if ((i == 0) && (tokens[i].type == '-')) tokens[i].type = TK_NEGATIVE;
+	  if ((i > 0) && (tokens[i].type == '-') && ((tokens[i-1].type != NUM) && (tokens[i-1].type != TK_HEX) && (tokens[i-1].type != ')')))
+		  tokens[i].type = TK_NEGATIVE;
+  }
+
   for (i = 0; i < nr_token; i++) {                //判别是否是指针，*位于最左边或者*号左边不是数字或者右括号‘）’
-	  if ((tokens[i].type == '*') && ((i==0) || ((tokens[i-1].type != NUM) && (tokens[i-1].type != ')'))))
+	  if ((tokens[i].type == '*') && ((i==0) || ((tokens[i-1].type != NUM) && (tokens[i-1].type != TK_HEX) && (tokens[i-1].type != ')'))))
 		  tokens[i].type = DEREF;
   }
   //TODO();
