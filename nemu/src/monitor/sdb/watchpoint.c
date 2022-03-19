@@ -4,6 +4,7 @@
 
 typedef struct watchpoint {
   int NO;
+  uint64_t expr;  //用于存储表达式的值
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
