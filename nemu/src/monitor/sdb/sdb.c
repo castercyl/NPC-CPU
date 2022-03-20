@@ -4,20 +4,23 @@
 #include <readline/history.h>
 #include "sdb.h"
 
-typedef struct watchpoint {
+/*typedef struct watchpoint {
 	int NO;
 	char *expr;  //用于存储表达式
 	uint64_t in_val; //用于存储表达式的初值
 	struct watchpoint *next;
 
 
-} WP;     //为什么不可以直接调用watchopits.c的WP?
+} WP;     //为什么不可以直接调用watchopits.c的WP?*/
 
 //typedef struct watchpoint WP;
 
-static WP* head1 = NULL;
+//static WP* head1 = NULL;
+//extern struct watchpoint;
+//typedef struct watchpoint WP;
+//typedef extern struct wathpoint WP;
 
-word_t expr(char *e, bool *success); //I DO
+//word_t expr(char *e, bool *success); //头文件"sdb.h"里有
 
 WP* new_wp();                       //I DO
 void free_wp(WP *wp);               // I DO
@@ -73,14 +76,14 @@ static int cmd_info(char *args) {
 	void isa_reg_display();
 	if (*args == 'r') {
 		isa_reg_display();
-	}
-	else if (*args == 'w') {
+	} 
+	/*else if (*args == 'w') { 
 		WP *wp = head1;
-		while (wp != NULL) {
+		while (wp != NULL) { 
 			printf("watchpoint NO %d is: 0x%lx\n",wp->NO, wp->in_val);
 			wp = wp->next;
 		}
-	}
+	}*/
 	else printf("Please input r or w !\n");
 	return 0;
 }
@@ -115,10 +118,10 @@ static int cmd_p(char *args) {
 static int cmd_w(char *args) {
 	bool success = true;
 	WP *tmp_wp = new_wp();
-	/*if (head1 == NULL)
+	/*if (head1 == NULL) 
 		head1 = tmp_wp;
 	else
-		head1-> next = tmp_wp;*/
+		head1-> next  = tmp_wp;*/
 	strcpy(tmp_wp->expr, args);
 	//tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);

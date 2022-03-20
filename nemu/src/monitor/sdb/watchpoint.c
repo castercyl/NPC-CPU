@@ -2,17 +2,17 @@
 
 #define NR_WP 32
 
-word_t expr(char *e, bool *success); //I DO
+//word_t expr(char *e, bool *success); //I DO
 
-typedef struct watchpoint {
+/*typedef struct watchpoint {
   int NO;
   char *expr;  //用于存储表达式
   uint64_t in_val; //用于存储表达式的初值
   struct watchpoint *next;
 
-  /* TODO: Add more members if necessary */
+  TODO: Add more members if necessary 
 
-} WP;
+} WP;*/    //头文件"sdb.h"中定义
 
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
