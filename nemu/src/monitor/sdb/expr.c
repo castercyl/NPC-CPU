@@ -111,12 +111,12 @@ static bool make_token(char *e) {
 			case '/': tokens[nr_token].type = '/'; nr_token = nr_token + 1; break;
 			case '(': tokens[nr_token].type = '('; nr_token = nr_token + 1; break;
 			case ')': tokens[nr_token].type = ')'; nr_token = nr_token + 1; break;
-			case NUM: tokens[nr_token].type = NUM; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break;
+			case NUM: tokens[nr_token].type = NUM; strncpy(tokens[nr_token].str, substr_start, substr_len); nr_token = nr_token + 1; break;
 			//case TK_NEQ: tokens[nr_token].type = TK_NEQ; nr_token = nr_token + 1; break;
 			case TK_AND: tokens[nr_token].type = TK_AND; nr_token = nr_token + 1; break;
 			case DEREF: tokens[nr_token].type = DEREF; nr_token = nr_token + 1; break;
-			case TK_HEX: tokens[nr_token].type = TK_HEX; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break;
-			case TK_REG: tokens[nr_token].type = TK_REG; strcpy(tokens[nr_token].str, substr_start); nr_token = nr_token + 1; break; //去掉第一个$
+			case TK_HEX: tokens[nr_token].type = TK_HEX; strncpy(tokens[nr_token].str, substr_start, substr_len); nr_token = nr_token + 1; break;
+			case TK_REG: tokens[nr_token].type = TK_REG; strncpy(tokens[nr_token].str, substr_start+1, substr_len-1); nr_token = nr_token + 1; break; //去掉第一个$
         // above I DO
           default: assert(0);  //TODO();
         }
