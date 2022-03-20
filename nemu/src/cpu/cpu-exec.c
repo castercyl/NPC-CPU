@@ -27,9 +27,9 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
   // I DO
- /* if (check_watchpoints() == true) {
+  if (check_watchpoints() == true) {
 	  nemu_state.state = NEMU_STOP;            //这句话不太懂是怎样的运行机理
-  } */
+  } 
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
@@ -45,7 +45,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
   for (i = 0; i < ilen; i ++) {
     p += snprintf(p, 4, " %02x", inst[i]);
-  }
+  } 
   int ilen_max = MUXDEF(CONFIG_ISA_x86, 8, 4);
   int space_len = ilen_max - ilen;
   if (space_len < 0) space_len = 0;
@@ -66,12 +66,12 @@ static void execute(uint64_t n) {
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
 
-	if (check_watchpoints())         // I DO
-		nemu_state.state = NEMU_STOP;
+	/*if (check_watchpoints())         // I DO
+		nemu_state.state = NEMU_STOP;*/
 
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
-  }
+  } 
 }
 
 static void statistic() {
