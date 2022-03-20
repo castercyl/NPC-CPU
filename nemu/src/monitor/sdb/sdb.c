@@ -13,6 +13,8 @@ typedef struct watchpoint {
 
 } WP;     //为什么不可以直接调用watchopits.c的WP?
 
+//typedef struct watchpoint WP;
+
 word_t expr(char *e, bool *success); //I DO
 
 WP* new_wp();                       //I DO
