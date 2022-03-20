@@ -119,7 +119,8 @@ static int cmd_w(char *args) {
 		head1 = tmp_wp;
 	else
 		head1-> next = tmp_wp;*/
-	tmp_wp->expr = args;
+	strcpy(tmp_wp->expr, args);
+	//tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
 	printf("NO.%d Watchpoint is set up on %s now!\n",tmp_wp->NO, tmp_wp->expr);
 	return 0;
