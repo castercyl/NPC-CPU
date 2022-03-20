@@ -26,7 +26,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 			return cpu.gpr[i];
 		}
 	}
-	printf("Sorry, can not find\n");
+	printf("Sorry, the name of reg is not exist!\n");
 	assert(0);
   return 0;
 }
