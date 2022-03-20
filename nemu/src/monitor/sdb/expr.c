@@ -200,6 +200,7 @@ uint64_t eval(int p, int q) {
 	else if (p == q) {
 		uint64_t res = 0;
 		bool flag_s = true;
+		printf("tokens[%d].str = %s\n",p, tokens[p].str);
 		if (tokens[p].type == NUM)
 			sscanf(tokens[p].str, "%lu", &res);    //不要用atoi()去转换，'1'会转换为10
 		else if (tokens[p].type == TK_HEX)
