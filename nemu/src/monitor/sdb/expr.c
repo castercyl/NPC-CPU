@@ -201,7 +201,7 @@ uint64_t eval(int p, int q) {
 		uint64_t res;
 		bool flag_s = true;
 		if (tokens[p].type == NUM)
-			sscanf(tokens[p].str, "%ld", &res);    //不要用atoi()去转换，'1'会转换为10
+			sscanf(tokens[p].str, "%lu", &res);    //不要用atoi()去转换，'1'会转换为10
 		else if (tokens[p].type == TK_HEX)
 			sscanf(tokens[p].str,"%lx",&res);
 		else if (tokens[p].type == TK_REG)
@@ -209,7 +209,8 @@ uint64_t eval(int p, int q) {
 		else
 			assert(0);
 
-		printf("Number is: %ld\n",res);
+		printf("Number ld  is: %ld\n",res);
+		printf("Number lu  is: %lu\n",res);
 		return res;
 	}
 	else if (check_parentheses(p,q) == true) {
