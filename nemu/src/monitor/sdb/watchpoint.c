@@ -124,7 +124,7 @@ bool check_watchpoints() {
 	bool success = true;
 	bool changed = false;
 	uint64_t tmp_val;
-	while(tmp->next != NULL) {
+	while(tmp != NULL) {
 		tmp_val = expr(tmp->expr, &success);
 		if (tmp->in_val != tmp_val) {
 			changed = true;
