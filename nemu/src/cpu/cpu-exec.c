@@ -27,9 +27,9 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
   // I DO
- /* if (check_watchpoints() == true) {
+  if (check_watchpoints() == true) {
 	  nemu_state.state = NEMU_STOP;            //这句话不太懂是怎样的运行机理
-  } */
+  } 
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
@@ -65,11 +65,6 @@ static void execute(uint64_t n) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
-
-	if (check_watchpoints()) {        // I DO
-		nemu_state.state = NEMU_STOP;
-	}
-
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
