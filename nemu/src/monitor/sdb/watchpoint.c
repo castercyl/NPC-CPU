@@ -51,6 +51,9 @@ WP* new_wp() {
 		wp_pool[i-1].next = NULL;
 	else
 		free_ = NULL;
+	//将空闲的监视点结构挂在head链表上，按0-31的顺序挂载
+	wp_pool[i].next = head;
+	head = &wp_pool[i];
    //返回空闲的监视点结构
 	return &wp_pool[i];
 }
