@@ -201,7 +201,7 @@ uint64_t eval(int p, int q) {
 		uint64_t temp;
 		bool flag_s = true;
 		if (tokens[p].type == NUM)
-			temp = atoi(tokens[p].str);
+			sscanf(tokens[p].str, "%ld", &temp);    //不要用atoi()去转换，'1'会转换为10
 		else if (tokens[p].type == TK_HEX)
 			sscanf(tokens[p].str,"%lx",&temp);
 		else if (tokens[p].type == TK_REG)
