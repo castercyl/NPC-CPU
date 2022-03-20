@@ -198,17 +198,17 @@ uint64_t eval(int p, int q) {
 		assert(0);
 	}
 	else if (p == q) {
-		uint64_t temp;
+		uint64_t res;
 		bool flag_s = true;
 		if (tokens[p].type == NUM)
-			sscanf(tokens[p].str, "%ld", &temp);    //不要用atoi()去转换，'1'会转换为10
+			sscanf(tokens[p].str, "%ld", &res);    //不要用atoi()去转换，'1'会转换为10
 		else if (tokens[p].type == TK_HEX)
-			sscanf(tokens[p].str,"%lx",&temp);
+			sscanf(tokens[p].str,"%lx",&res);
 		else if (tokens[p].type == TK_REG)
-			temp = isa_reg_str2val(tokens[p].str, &flag_s);
+			res = isa_reg_str2val(tokens[p].str, &flag_s);
 		else
 			assert(0);
-		return temp;
+		return res;
 	}
 	else if (check_parentheses(p,q) == true) {
 		return eval(p+1, q-1);
