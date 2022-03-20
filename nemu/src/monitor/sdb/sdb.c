@@ -115,10 +115,10 @@ static int cmd_p(char *args) {
 static int cmd_w(char *args) {
 	bool success = true;
 	WP *tmp_wp = new_wp();
-	if (head1 == NULL)
+	/*if (head1 == NULL)
 		head1 = tmp_wp;
 	else
-		head1-> next = tmp_wp;
+		head1-> next = tmp_wp;*/
 	tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
 	printf("NO.%d Watchpoint is set up on %s now!\n",tmp_wp->NO, tmp_wp->expr);
