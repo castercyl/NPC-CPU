@@ -15,6 +15,8 @@ typedef struct watchpoint {
 
 //typedef struct watchpoint WP;
 
+static WP* head1 = NULL;
+
 word_t expr(char *e, bool *success); //I DO
 
 WP* new_wp();                       //I DO
@@ -72,6 +74,13 @@ static int cmd_info(char *args) {
 	if (*args == 'r') {
 		isa_reg_display();
 	}
+	else if (*args == 'w') {
+		WP *wp = head1;
+		while (wp != NULL) {
+			printf("watchpoint NO %d is: 0x%lx\n",wp->NO, wp->in_val);
+			wp = wp->next;
+		}
+	}
 	else printf("Please input r or w !\n");
 	return 0;
 }
@@ -106,6 +115,10 @@ static int cmd_p(char *args) {
 static int cmd_w(char *args) {
 	bool success = true;
 	WP *tmp_wp = new_wp();
+	if (head1 == NULL)
+		head1 = tmp_wp;
+	else
+		head1-> next = tmp_wp;
 	tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
 	printf("NO.%d Watchpoint is set up on %s now!\n",tmp_wp->NO, tmp_wp->expr);
