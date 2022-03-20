@@ -198,7 +198,7 @@ uint64_t eval(int p, int q) {
 		assert(0);
 	}
 	else if (p == q) {
-		uint64_t res;
+		uint64_t res = 0;
 		bool flag_s = true;
 		if (tokens[p].type == NUM)
 			sscanf(tokens[p].str, "%lu", &res);    //不要用atoi()去转换，'1'会转换为10
