@@ -20,7 +20,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 	int i;
 	//word_t tmp;
 	*success = false;
-	printf("The reg name is: %s", s);
+	printf("The reg name is: %s\n", s);
 
 	for (i = 0; i < 32; i++) {
 		if (strcmp(s, *(regs + i)) == 0) {
