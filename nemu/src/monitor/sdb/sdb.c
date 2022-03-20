@@ -10,9 +10,8 @@ typedef struct watchpoint {
 	uint64_t in_val; //用于存储表达式的初值
 	struct watchpoint *next;
 
-	/* TODO: Add more members if necessary */
 
-} WP;
+} WP;     //为什么不可以直接调用watchopits.c的WP?
 
 word_t expr(char *e, bool *success); //I DO
 
@@ -107,7 +106,7 @@ static int cmd_w(char *args) {
 	WP *tmp_wp = new_wp();
 	tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
-	printf("NO.%d Watchpoint is set up!",tmp_wp->NO);
+	printf("NO.%d Watchpoint is set up now!\n",tmp_wp->NO);
 	return 0;
 }
 
