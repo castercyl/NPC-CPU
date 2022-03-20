@@ -100,6 +100,8 @@ static bool make_token(char *e) {
 		if (substr_len > 31) {       //超过32位溢出，终止程序
 			assert(0);
 		}
+
+		memset(tokens[nr_token].str,'\0',32); // I DO
  
          switch (rules[i].token_type) {
 			case TK_NOTYPE: break;
