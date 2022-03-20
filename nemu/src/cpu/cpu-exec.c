@@ -27,11 +27,9 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
   // I DO
- /* bool changed = false;
-  changed = check_watchpoints();
-  if (changed == true) {
+  if (check_watchpoints() == true) {
 	  nemu_state.state = NEMU_STOP;            //这句话不太懂是怎样的运行机理
-  }*/
+  }
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {

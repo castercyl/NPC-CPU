@@ -133,5 +133,8 @@ bool check_watchpoints() {
 		}
 		tmp = tmp->next;
 	}
-	return changed;
+	if (changed == true) 
+		return true;
+	else
+		return false;
 }
