@@ -4,7 +4,20 @@
 #include <readline/history.h>
 #include "sdb.h"
 
+typedef struct watchpoint {
+	int NO;
+	char *expr;  //用于存储表达式
+	uint64_t in_val; //用于存储表达式的初值
+	struct watchpoint *next;
+
+	/* TODO: Add more members if necessary */
+
+} WP;
+
 word_t expr(char *e, bool *success); //I DO
+
+WP* new_wp();                       //I DO
+void free_wp(WP *wp);               // I DO
 
 static int is_batch_mode = false;
 
@@ -89,6 +102,15 @@ static int cmd_p(char *args) {
 	return 0;
 }
 
+static int cmd_w(char *args) {
+	bool success = true;
+	WP *tmp_wp = new_wp();
+	tmp_wp->expr = args;
+	tmp_wp->in_val = expr(args, &success);
+	printf("NO.%d Watchpoint is set up!",tmp_wp->NO);
+	return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -101,6 +123,7 @@ static struct {
   {"info", "Display regs or watchpoints", cmd_info},
   {"x", "Scanning memory", cmd_x},
   {"p", "Evaluates the value of an expression", cmd_p},
+  {"w", "Set up a new watchpoint", cmd_w},
 	
   /* TODO: Add more commands */
 
