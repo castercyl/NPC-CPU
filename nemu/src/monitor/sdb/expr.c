@@ -208,6 +208,8 @@ uint64_t eval(int p, int q) {
 			res = isa_reg_str2val(tokens[p].str, &flag_s);
 		else
 			assert(0);
+
+		printf("Number is: %ld\n",res);
 		return res;
 	}
 	else if (check_parentheses(p,q) == true) {
