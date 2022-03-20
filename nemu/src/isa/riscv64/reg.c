@@ -26,5 +26,6 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 			return cpu.gpr[i];
 		}
 	}
+	printf("Sorry, can not find");
   return 0;
 }
