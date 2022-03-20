@@ -101,7 +101,7 @@ static bool make_token(char *e) {
 			assert(0);
 		}
 
-		memset(tokens[nr_token].str,'\0',32); // I DO
+		memset(tokens[nr_token].str,'\0',32); // I DO 一定要有这句话，不然的话每次使用寄存器运算后会的计算会多0！
  
          switch (rules[i].token_type) {
 			case TK_NOTYPE: break;
