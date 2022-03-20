@@ -108,7 +108,7 @@ static int cmd_w(char *args) {
 	WP *tmp_wp = new_wp();
 	tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
-	printf("NO.%d Watchpoint is set up now!\n",tmp_wp->NO);
+	printf("NO.%d Watchpoint is set up on %s now!\n",tmp_wp->NO, tmp_wp->expr);
 	return 0;
 }
 
