@@ -80,7 +80,7 @@ static int cmd_info(char *args) {
 		isa_reg_display();
 	} 
 	else if (*args == 'w') {
-		void info_w(); 
+		info_w(); 
 	}
 	else printf("Please input r or w !\n");
 	return 0;
