@@ -7,7 +7,7 @@ word_t expr(char *e, bool *success);
 
 typedef struct watchpoint {        // I DO
 	int NO;
-	char *expr;  //用于存储表达式
+	char expr[64];  //用于存储表达式
 	uint64_t in_val; //用于存储表达式的初值
 	struct watchpoint *next;
 
