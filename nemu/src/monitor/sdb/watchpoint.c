@@ -74,12 +74,13 @@ void free_wp(int n) {
 		printf("There are no watchpoints in use now!\n");
 		return;
 	}  
-  //在head中找到NO=n的监视点并从head链表中删除
+  //在head中找到NO=n的监视点并从head链表中删除，找到的监视点用current_p指向
 
 	WP *prev_p = head;
 	WP *current_p = prev_p->next;
 	if  (prev_p->NO == n) {
 		head = current_p;
+		current_p = prev_p;
 	}
 	else {
 		 while (current_p != NULL) {
