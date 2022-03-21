@@ -75,6 +75,7 @@ void free_wp(int n) {
 		return;
 	}  
   //在head中找到NO=n的监视点并从head链表中删除
+
 	WP *prev_p = head;
 	WP *current_p = prev_p->next;
 	if  (prev_p->NO == n) {
