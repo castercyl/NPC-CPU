@@ -22,10 +22,10 @@
 
 //word_t expr(char *e, bool *success); //头文件"sdb.h"里有
 
-WP* new_wp();                       //I DO
-void free_wp(WP *wp);               // I DO
+WP* new_wp();                       //I DO 调用一个空闲的监视点
+void free_wp(int n);               // I DO 释放一个不使用的监视点
 //WP *wp_used[32];           //I DO 用于存储正在使用的监视点结构
-void info_w();              // I DO
+void info_w();              // I DO 打印正在使用的监视点的值
 
 static int is_batch_mode = false;
 
@@ -127,6 +127,18 @@ static int cmd_w(char *args) {
 	return 0;
 }
 
+static int cmd_d(char *args) {
+	if (args == NULL) {
+		printf("Need the NO of the watchpoint!\n");
+	}
+	else {
+		int n;
+		sscanf(args, "%d", &n);
+		free_wp(n);
+	}
+	return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -140,6 +152,7 @@ static struct {
   {"x", "Scanning memory", cmd_x},
   {"p", "Evaluates the value of an expression", cmd_p},
   {"w", "Set up a new watchpoint", cmd_w},
+  {"d", "Free the Watchpoint", cmd_d},
 	
   /* TODO: Add more commands */
 

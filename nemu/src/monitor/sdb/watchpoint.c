@@ -19,7 +19,7 @@ static WP *head = NULL, *free_ = NULL;
 
 void init_wp_pool() {
   int i;
-  for (i = 0; i < NR_WP; i ++) {
+  for (i = 0; i < NR_WP;  i ++) {
     wp_pool[i].NO = i;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
@@ -36,91 +36,103 @@ WP* new_wp() {
 	//从free_链表中返回一个空闲的监视点结构
 
 	//如果free_中没有空闲的监视点结构则报错终止程序
-	if (free_ == NULL)
+	if (free_ == NULL) {
+		printf("There is no free wathpoint now!");
 		assert(0);
-
+	}
 	//找到free_链表中的最后一个监视点结构
 	int i = 0;
 	WP *find_end = free_;
-	while ( find_end->next != NULL) {
+	while ( find_end != NULL) {
 		find_end = find_end->next;
 		i = i + 1;
 	}
 
-	if (i != 0) 
-		wp_pool[i-1].next = NULL;
+	if (i != 1) 
+		wp_pool[i-2].next = NULL;
 	else
 		free_ = NULL;
 	
-	memset(wp_pool[i].expr,'\0',64);   //以防万一，使用前先清空
-	//将空闲的监视点结构挂在head链表上，按0-31的顺序挂载
-	wp_pool[i].next = head;
+	memset(wp_pool[i-1].expr,'\0',64);   //以防万一，使用前先清空
+	//将空闲的监视点结构挂在head链表上，每次挂在最左边
+	wp_pool[i-1].next = head;
 	head = &wp_pool[i];
    //返回空闲的监视点结构
 	return &wp_pool[i];
 }
 
-void free_wp(WP *wp) {
-	//将wp监视点结构归还到free_链表中
+void free_wp(int n) {
+	//将head链表中NO为n的监视点结构归还到free_链表中
 
    //head链表如果为空，则不能归还
 	if (head == NULL) {
-		printf("There is no watchpoints now!");
+		printf("There are no watchpoints in use now!\n");
 		return;
 	}  
-  //在head中找到wp并从head链表中删除
+  //在head中找到NO=n的监视点并从head链表中删除
 	WP *prev_p = head;
 	WP *current_p = prev_p->next;
-	int j = wp->NO;
-	if  (head->NO == j) {
-		head = wp->next;
+	if  (head->NO == n) {
+		head = prev_p->next;
 	}
 	else {
 		 while (current_p != NULL) {
-			if (current_p->NO == j) {
+			if (current_p->NO == n) {
 				break;
 		 	}
 		 	prev_p = current_p;
 			current_p = prev_p->next;
 		}
 		if (current_p == NULL) { 
-			printf("There is no such wathpoint in using!");
+			printf("There is no such wathpoint in using!\n");
 			return;
 		}
-		prev_p->next = wp->next;
+		prev_p->next = current_p->next;
 	}
 
-    // 将归还的wp重新插入free_链表中
+    // 将归还的监视点重新插入free_链表中
 	//如果free_链表是NULL的，则作为free_的第一个结构体
 	if (free_ == NULL) {
-		free_ = wp;
+		free_ = current_p;
 		free_->next = NULL;
 		return;
 	} 
 	//wp插入free_的首端
-	if (wp->NO < free_->NO) {
-		wp->next = free_->next;
-		free_ = wp;
+	if (n < free_->NO) {
+		current_p->next = free_;
+		free_ = current_p;
 		return;
 	} 
 	//wp插入中间或者尾端
 	prev_p = free_;
-	current_p = prev_p->next;
-	while (prev_p != NULL) {
-		if ((prev_p->NO <  wp->NO) && (wp->NO < current_p->NO)) {
+	WP *current_p1 = prev_p->next;
+	//current_p = prev_p->next;
+	while (current_p1 != NULL) {
+		if ((prev_p->NO <  n) && (n < current_p1->NO)) {
 			break;
 		}
-		prev_p = current_p;
-		current_p = prev_p->next;
+		prev_p = current_p1;
+		current_p1 = prev_p->next;
 	} 
-	if ((current_p == NULL)  && (prev_p->NO < wp->NO)) {
-			prev_p->next = wp;
-			wp->next = NULL;
+	if ((current_p1 == NULL)  && (prev_p->NO < n)) {
+			prev_p->next = current_p;
+			current_p->next = NULL;
 		}
 	else { 
-		prev_p->next = wp;
-		wp->next = current_p;
+		prev_p->next = current_p;
+		current_p->next = current_p1;
 	}
+	printf("Watchpoint[%d] is free successfully\n",n);
+
+	WP* tmp = free_;         //检查下重新挂载的顺序
+	printf("free_: ");
+	while (tmp != NULL) {
+		printf("NO=%d ",tmp->NO);
+		tmp = tmp->next;
+	}
+	printf("\n");
+
+	return;
 
 }
 
