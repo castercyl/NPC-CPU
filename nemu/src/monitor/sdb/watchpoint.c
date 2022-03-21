@@ -134,7 +134,7 @@ bool check_watchpoints() {
 		tmp_val = expr(tmp->expr, &success);
 		if (tmp->in_val != tmp_val) {
 			changed = true;
-			printf("watchpoint %d has changed, from 0x%lx to 0x%lx", tmp->NO, tmp->in_val, tmp_val);
+			printf("watchpoint %d has changed, from 0x%lx to 0x%lx\n", tmp->NO, tmp->in_val, tmp_val);
 			tmp->in_val = tmp_val;
 		}
 		tmp = tmp->next;
