@@ -123,7 +123,7 @@ static int cmd_w(char *args) {
 	strcpy(tmp_wp->expr, args);  //exper是个64的字符数组
 	//tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
-	printf("NO.%d Watchpoint is set up on %s now!\n",tmp_wp->NO, tmp_wp->expr);
+	printf("Watchpoint[%d] is set up on %s now.\n",tmp_wp->NO, tmp_wp->expr);
 	return 0;
 }
 

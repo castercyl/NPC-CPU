@@ -41,24 +41,29 @@ WP* new_wp() {
 		assert(0);
 	}
 	//找到free_链表中的最后一个监视点结构
-	int i = 0;
-	WP *find_end = free_;
-	while ( find_end != NULL) {
-		find_end = find_end->next;
-		i = i + 1;
+	WP *prev_p = free_;
+	WP *current_p = prev_p->next;
+	WP *find_end;
+	if (current_p == NULL) {
+		printf("There is only one watchpoint in free.\n");
+		free_ = NULL;
+		find_end = prev_p;
+	}
+	else {
+		while (current_p->next != NULL) {
+			prev_p = current_p;
+			current_p = prev_p->next;
+		}
+		prev_p->next = NULL;
+		find_end = current_p;
 	}
 
-	if (i != 1) 
-		wp_pool[i-2].next = NULL;
-	else
-		free_ = NULL;
-	
-	memset(wp_pool[i-1].expr,'\0',64);   //以防万一，使用前先清空
+	memset(find_end->expr,'\0',64);   //以防万一，使用前先清空
 	//将空闲的监视点结构挂在head链表上，每次挂在最左边
-	wp_pool[i-1].next = head;
-	head = &wp_pool[i];
+	find_end->next = head;
+	head = find_end;
    //返回空闲的监视点结构
-	return &wp_pool[i];
+	return find_end;
 }
 
 void free_wp(int n) {
