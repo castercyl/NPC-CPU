@@ -51,6 +51,8 @@ WP* new_wp() {
 		wp_pool[i-1].next = NULL;
 	else
 		free_ = NULL;
+	
+	memset(wp_pool[i].expr,'\0',64);   //以防万一，使用前先清空
 	//将空闲的监视点结构挂在head链表上，按0-31的顺序挂载
 	wp_pool[i].next = head;
 	head = &wp_pool[i];
@@ -143,4 +145,18 @@ bool check_watchpoints() {
 		return true;
 	else
 		return false;
+}
+
+void info_w() {
+	//打印当前head链表中的监视结构体的值
+	WP *tmp_p1 = head;
+	if (tmp_p1 == NULL) {
+		printf("There are no watchpoints in use!\n");
+		return;
+	}
+	while (tmp_p1 != NULL) {
+		printf("Watchpoint[%d] = %ld (0x%lx)\n",tmp_p1->NO,tmp_p1->in_val,tmp_p1->in_val);
+		tmp_p1 = tmp_p1->next;
+	}
+	return;
 }

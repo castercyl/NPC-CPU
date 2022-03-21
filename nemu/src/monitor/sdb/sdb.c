@@ -24,6 +24,8 @@
 
 WP* new_wp();                       //I DO
 void free_wp(WP *wp);               // I DO
+//WP *wp_used[32];           //I DO 用于存储正在使用的监视点结构
+void info_w();              // I DO
 
 static int is_batch_mode = false;
 
@@ -77,13 +79,9 @@ static int cmd_info(char *args) {
 	if (*args == 'r') {
 		isa_reg_display();
 	} 
-	/*else if (*args == 'w') { 
-		WP *wp = head1;
-		while (wp != NULL) { 
-			printf("watchpoint NO %d is: 0x%lx\n",wp->NO, wp->in_val);
-			wp = wp->next;
-		}
-	}*/
+	else if (*args == 'w') {
+		void info_w(); 
+	}
 	else printf("Please input r or w !\n");
 	return 0;
 }
@@ -122,7 +120,7 @@ static int cmd_w(char *args) {
 		head1 = tmp_wp;
 	else
 		head1-> next  = tmp_wp;*/
-	strcpy(tmp_wp->expr, args);
+	strcpy(tmp_wp->expr, args);  //exper是个64的字符数组
 	//tmp_wp->expr = args;
 	tmp_wp->in_val = expr(args, &success);
 	printf("NO.%d Watchpoint is set up on %s now!\n",tmp_wp->NO, tmp_wp->expr);
