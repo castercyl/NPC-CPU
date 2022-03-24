@@ -149,7 +149,7 @@ bool check_watchpoints() {
 	bool changed = false;
 	uint64_t tmp_val;
 	if (tmp == NULL)
-		printf("Watchpoint is NULL\n");
+		printf("Watchpoint is NULL!\n");
 	while(tmp != NULL) {
 		printf("Watchpoint[%d].expr = %s\n",tmp->NO,tmp->expr);
 		tmp_val = expr(tmp->expr, &success);
