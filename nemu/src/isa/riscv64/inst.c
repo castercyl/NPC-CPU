@@ -41,7 +41,7 @@ static void decode_operand(Decode *s, word_t *dest, word_t *src1, word_t *src2, 
 	case TYPE_J: src1I(immJ(i)); break;    //I DO
 	case TYPE_R: src1R(rs1);     src2R(rs2); break; //I DO
 	case TYPE_B: src1R(rs1);     src2R(rs2); destI(immB(i)); break; // I DO 
-  } 
+  }  
 }
 
 static int decode_exec(Decode *s) {
@@ -76,12 +76,14 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 110 ????? 01110 11", remw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) %  SEXT(BITS(src2,31,0), 32), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] %𝑠 x[rs2][31: 0]), 求余数字
   INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(dest) = src1 - src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO x[rd] = x[rs1] − x[rs2]
   INSTPAT("0000000 ????? ????? 001 ????? 01110 11", sllw   , R, R(dest) = SEXT(src1 << SEXT(BITS(src2, 4, 0) & 31, 6), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ u x[rs2][4: 0])[31: 0]), 逻辑左移字
+  INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(dest) = (SEXT(src1,64) < SEXT(src2,64)), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] <𝑠 x[rs2]), 小于则置位
   INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , R, R(dest) = src1 & src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = x[rs1] & x[rs2]
   INSTPAT("0000000 ????? ????? 011 ????? 01100 11", sltu   , R, R(dest) = (src1 < src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] <𝑢 x[rs2] , 无符号小于则置位)
   INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or     , R, R(dest) = src1 | src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] | 𝑥[𝑟𝑠2] 取或
 
   INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(dest) = (src1 < src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc), printf("src1= 0x%lx, src2 = 0x%lx, R(dest) = 0x%lx\n",src1,src2,R(dest))); //I DO 无符号小于立即数则置位 x[rd] = (x[rs1] < u_sext(immediate))
   INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc = (src1 == src2)? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO    if(rs1 == rs2) pc += sext(offset)
+  INSTPAT("??????? ????? ????? 100 ????? 11000 11", blt    , B, s->dnpc = (SEXT(src1,64) < SEXT(src2,64))? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <s rs2) pc += sext(offset), 小于时分支
   INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, s->dnpc = (src1 != src2)? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO   if (rs1 != rs2) pc += sext(offset)
   INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc = (SEXT(src1,64) >= SEXT(src2,64))? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 ≥s rs2) pc += sext(offset), 大于等于时分支
   INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(dest) = src1 + src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] + x[rs2]
