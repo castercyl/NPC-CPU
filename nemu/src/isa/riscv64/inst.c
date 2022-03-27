@@ -57,8 +57,11 @@ static int decode_exec(Decode *s) {
   INSTPAT_START();
   //R(0) = 0; // I OD
   INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(dest) = src1 + s->pc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
+  INSTPAT("??????? ????? ????? ??? ????? 01101 11", lui    , U, R(dest) = SEXT(src1, 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(immediate[31:12] << 12), 高位立即数加载
+
   INSTPAT("??????? ????? ????? 011 ????? 00000 11", ld     , I, R(dest) = Mr(src1 + src2, 8), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
   INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi   , I, R(dest) = src1 & src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] & sext(immediate), 位与立即数
+  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, R(dest) = s->pc + 4, s->dnpc = (src1 + src2)&~1, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO t =pc+4; pc=(x[rs1]+sext(offset))&~1; x[rd]=t, 跳转并寄存器链接
   INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh     , I, R(dest) = SEXT(Mr(src1+src2,2), 16), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(M[x[rs1] + sext(offset)][15:0]), 半字加载
   INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu    , I, R(dest) = SEXT(Mr(src1+src2,2)&65535, 17), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = M[x[rs1] + sext(offset)][15:0], 无符号半字加载
   INSTPAT("000000? ????? ????? 001 ????? 00100 11", slli   , I, R(dest) = (src1 << src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
