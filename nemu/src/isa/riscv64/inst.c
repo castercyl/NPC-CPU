@@ -33,7 +33,7 @@ static void decode_operand(Decode *s, word_t *dest, word_t *src1, word_t *src2, 
   int rs1 = BITS(i, 19, 15);
   int rs2 = BITS(i, 24, 20);
   destR(rd);
-  switch (type) {
+  switch (type) { 
     case TYPE_I: src1R(rs1);     src2I(immI(i)); break;
     case TYPE_U: src1I(immU(i)); break;
     case TYPE_S: destI(immS(i)); src1R(rs1); src2R(rs2); break;
@@ -77,6 +77,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000000 00000 00001 000 00000 11001 11", ret    , I, s->dnpc = src1, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO pc = X[1]
   
   INSTPAT("0000001 ????? ????? 100 ????? 01110 11", divw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) / SEXT(BITS(src2,31,0), 32), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31:0] ÷s x[rs2][31:0]), 字除法
+  INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , R, R(dest) = src1 * src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] × x[rs2], 乘
   INSTPAT("0000001 ????? ????? 000 ????? 01110 11", mulw   , R, R(dest) = SEXT(BITS(src1*src2, 31, 0), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = sext((x[rs1] × x[rs2])[31: 0]), 乘字
   INSTPAT("0000001 ????? ????? 110 ????? 01110 11", remw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) %  SEXT(BITS(src2,31,0), 32), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] %𝑠 x[rs2][31: 0]), 求余数字
   INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(dest) = src1 - src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO x[rd] = x[rs1] − x[rs2]
