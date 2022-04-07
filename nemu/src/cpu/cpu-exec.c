@@ -26,10 +26,10 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
-  // I DO
-  if (check_watchpoints() == true) {
+  // I DO 启用监视点的暂停功能
+ /* if (check_watchpoints() == true) {
 	  nemu_state.state = NEMU_STOP;            //这句话不太懂是怎样的运行机理
-  } 
+  }*/
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
