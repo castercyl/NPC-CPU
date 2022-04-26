@@ -4,6 +4,8 @@
 #include <readline/history.h>
 #include "sdb.h"
 
+void cpu_quit();
+
 /*typedef struct watchpoint {
 	int NO;
 	char *expr;  //用于存储表达式
@@ -57,7 +59,9 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-  return -1;
+  //nemu_state.state == NEMU_END;  //I DO
+  cpu_quit();           //I DO
+  return -1;            //I DO 原本是返回-1
 }
 
 static int cmd_help(char *args);

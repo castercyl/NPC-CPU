@@ -10,7 +10,19 @@
  */
 #define MAX_INST_TO_PRINT 10
 
+void cpu_quit() {                  //I DO 用于解决q退出报错的问题
+  nemu_state.state = NEMU_QUIT;
+}
+
 bool check_watchpoints();     //I DO
+//char *iringbuf[10]; //I DO 指令环形缓冲区，用于保存指令出错前的前10条指令
+/*char iringbuf[10][128];
+void iring(int iring_num, Decode *s){  //I DO
+  if (iring_num > 10){
+    iring_num = 0;
+  }
+  iringbuf[iring_num++] = s->logbuf;
+}*/
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
@@ -61,13 +73,27 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void execute(uint64_t n) {
   Decode s;
+  //int iring_num = 0;      //I DO
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
 
+    //iring(iring_num, &s);   //I DO
+
 	/*if (check_watchpoints())         // I DO
 		nemu_state.state = NEMU_STOP;*/
+    /*if (nemu_state.state = NEMU_ABORT){   //I DO
+      int i = 0;
+      for (i = 0; i < 10; i++){
+        if (i == iring_num){
+          printf("--> %s\n",*(iringbuf[i]));
+        }
+        else{
+          printf("%s\n",*(iringbuf[i]));
+        }
+      }
+    }*/
 
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
