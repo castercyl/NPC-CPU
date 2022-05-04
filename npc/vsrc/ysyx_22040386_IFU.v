@@ -9,7 +9,7 @@ output [63:0] snpc
 );
 
 wire [63:0] real_pc;
-reg [63:0] final_pc
+reg [63:0] final_pc;
 
 assign snpc = pc + 64'd4;
 assign real_pc = (Branch) ? dnpc : snpc;

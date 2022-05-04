@@ -7,7 +7,7 @@ module ysyx_22040386_RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 64) (
   input [ADDR_WIDTH-1:0] raddr2,
 
   output [DATA_WIDTH-1:0] rdata1,
-  output [DATA_WIDTH-1:0] rdata2,
+  output [DATA_WIDTH-1:0] rdata2
   );
 
   reg [DATA_WIDTH-1:0] rf [31:0];

@@ -59,6 +59,7 @@ always @ (*) begin
             reg_ALUAsrc = 1'b1;
         end
         default: reg_ALUAsrc = 1'b0;          // src1 = rs1
+    endcase
 end
 
 /*### ALUBsrc 生成 ###*/
@@ -66,11 +67,12 @@ always @ (*) begin
     case(I[6:0])
         7'b011_0111, 7'b001_0111,        // U-Type
         7'b110_1111,                     // jal
-        7'b001_0011                      // addi
+        7'b001_0011,                    // addi
         7'b110_0111:begin                // jalr
             reg_ALUBsrc = 1'b1;          // src2 = imm
         end
         default: reg_ALUBsrc = 1'b0;          // src2 = rs2
+    endcase
 end
 
 /*### RegWrite 生成 ###*/
@@ -78,11 +80,12 @@ always @ (*) begin
     case(I[6:0])
         7'b011_0111, 7'b001_0111,        // U-Type
         7'b110_1111,                     // jal
-        7'b001_0011                      // addi
+        7'b001_0011,                     // addi
         7'b110_0111:begin                // jalr
             reg_RegWrite = 1'b1;          // 结果写入寄存器
         end
         default: reg_RegWrite = 1'b0;
+    endcase
 end
 
 /*### Branch 生成 ###*/
@@ -93,6 +96,7 @@ always @ (*) begin
             reg_Branch = 1'b1;          // 跳转
         end
         default: reg_Branch = 1'b0;
+    endcase
 end
 
 /*##DPI-C 识别到ebreak指令后自动结束##*/
