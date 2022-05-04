@@ -39,7 +39,8 @@ assign ALUctr = reg_ALUctr;
 /*### ALUctr 生成 ###*/
 always @ (*) begin
     case (I[6:0])
-        7'b110_1111, 7'b110_0111:begin  // result = snpc = pc + 4; jalr,jal
+        7'b110_1111, 
+        7'b110_0111:begin  // result = snpc = pc + 4; jalr,jal
             reg_ALUctr = 3'b011;
         end
         7'b011_0111:begin          // result = src2; lui

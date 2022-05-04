@@ -74,8 +74,8 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_init_sub__TOP__0(Vysyx_220
     tracep->declQuad(c+14,"final_pc", false,-1, 63,0);
     tracep->popNamePrefix(1);
     tracep->pushNamePrefix("ysyx_22040386_RegisterFile_inst ");
-    tracep->declBus(c+101,"ADDR_WIDTH", false,-1, 31,0);
-    tracep->declBus(c+102,"DATA_WIDTH", false,-1, 31,0);
+    tracep->declBus(c+103,"ADDR_WIDTH", false,-1, 31,0);
+    tracep->declBus(c+104,"DATA_WIDTH", false,-1, 31,0);
     tracep->declBit(c+80,"clk", false,-1);
     tracep->declBit(c+86,"wen", false,-1);
     tracep->declQuad(c+97,"wdata", false,-1, 63,0);
@@ -87,6 +87,7 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_init_sub__TOP__0(Vysyx_220
     for (int i = 0; i < 32; ++i) {
         tracep->declQuad(c+16+i*2,"rf", true,(i+0), 63,0);
     }
+    tracep->declQuad(c+101,"real_wdata", false,-1, 63,0);
     tracep->popNamePrefix(2);
 }
 
@@ -229,6 +230,19 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_full_sub_0(Vysyx_22040386_
                                               & vlSelf->I)))
                                  ? vlSelf->ysyx_22040386_TOP__DOT__sum
                                  : (4ULL + vlSelf->pc))),64);
-    tracep->fullIData(oldp+101,(5U),32);
-    tracep->fullIData(oldp+102,(0x40U),32);
+    tracep->fullQData(oldp+101,(((0U == (0x1fU & (vlSelf->I 
+                                                  >> 7U)))
+                                  ? 0ULL : ((2U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                                             ? ((1U 
+                                                 & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                                                 ? 
+                                                (4ULL 
+                                                 + vlSelf->pc)
+                                                 : vlSelf->ysyx_22040386_TOP__DOT__src2)
+                                             : ((1U 
+                                                 & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                                                 ? vlSelf->ysyx_22040386_TOP__DOT__src1
+                                                 : vlSelf->ysyx_22040386_TOP__DOT__sum)))),64);
+    tracep->fullIData(oldp+103,(5U),32);
+    tracep->fullIData(oldp+104,(0x40U),32);
 }

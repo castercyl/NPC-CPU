@@ -16,7 +16,7 @@ assign real_pc = (Branch) ? dnpc : snpc;
 
 always @ (posedge clk) begin
   if (!rst_n)
-    final_pc <= 64'h0000_0000_8000_000;
+    final_pc <= 64'h0000_0000_8000_0000;
   else
     final_pc <= real_pc;
 end

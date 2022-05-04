@@ -120,6 +120,18 @@ void Vysyx_22040386_TOP___024root__trace_chg_sub_0(Vysyx_22040386_TOP___024root*
                                              & vlSelf->I)))
                                 ? vlSelf->ysyx_22040386_TOP__DOT__sum
                                 : (4ULL + vlSelf->pc))),64);
+    tracep->chgQData(oldp+100,(((0U == (0x1fU & (vlSelf->I 
+                                                 >> 7U)))
+                                 ? 0ULL : ((2U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                                            ? ((1U 
+                                                & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                                                ? (4ULL 
+                                                   + vlSelf->pc)
+                                                : vlSelf->ysyx_22040386_TOP__DOT__src2)
+                                            : ((1U 
+                                                & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                                                ? vlSelf->ysyx_22040386_TOP__DOT__src1
+                                                : vlSelf->ysyx_22040386_TOP__DOT__sum)))),64);
 }
 
 void Vysyx_22040386_TOP___024root__trace_cleanup(void* voidSelf, VerilatedVcd* /*unused*/) {

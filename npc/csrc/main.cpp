@@ -10,17 +10,17 @@
 #define CONFIG_MBASE 0x80000000  //测试程序的起始虚拟地址
 #define CONFIG_MSIZE 0x2800000   //指令存储空间开辟的大小
 
-enum {NPC_STOP, NPC_RUNNING, NPC_END, NPC_ABORT, DIFFTEST_TO_DUT, DIFFTEST_TO_REF};
+enum {DIFFTEST_TO_DUT, DIFFTEST_TO_REF, NPC_STOP, NPC_RUNNING, NPC_END, NPC_ABORT};
+
+typedef uint64_t word_t;
+typedef word_t vaddr_t;
+typedef uint32_t paddr_t;
 
 //##函数指针，用于调用spike库中的API##//
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n, bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
 void (*ref_difftest_exec)(uint64_t n) = NULL;
 void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
-
-typedef uint64_t word_t;
-typedef word_t vaddr_t;
-typedef uint32_t paddr_t;
 
 int npc_state = NPC_STOP;              //npc运行的状态
 
@@ -52,7 +52,7 @@ static long load_img(char *img_file);
 word_t host_read(void *addr, int len);
 word_t pmem_read(paddr_t addr, int len);
 int is_exit_status_bad();
-void init_difftest(char *ref_so_file, long img_size, int port);
+void init_difftest(long img_size, int port);
 void difftest_step(vaddr_t pc);
 static void checkregs(CPU_state *ref, vaddr_t pc);
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc);
@@ -90,7 +90,7 @@ int main(int argc, char** argv, char** env) {
 			break;
 		}
 		
-		//printf("main_time = %d\n",main_time);
+		printf("main_time = %ld\n",main_time);
 
 		if (main_time < 4){     //电路初始化
             top->rst_n = 0;
@@ -100,17 +100,22 @@ int main(int argc, char** argv, char** env) {
 			top->rst_n = 1;
 		}
 
+
 		if(main_time % 2 == 0){
 			top->clk = 0;
+			top->eval();
 		}
 		if(main_time % 2 == 1){
 			top->clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
-			difftest_step(top->pc);
+			if(main_time >= 3){
+				difftest_step(top->pc);
+			}
+			//difftest_step(top->pc);
 		}
 
 		if(npc_state == NPC_ABORT){    //如果DIFTest失败，立刻结束程序
-			printf("Error:ABORT!The false PC is 0x%0lx\n",cpu.pc);
+			printf("False:ABORT!The false PC is 0x%0lx\n",cpu.pc);
 			break;
 		}
 
@@ -208,7 +213,7 @@ int is_exit_status_bad() {
 }
 
 /*##DIffTest初始化##*/
-void init_difftest(char *ref_so_file, long img_size, int port) {
+void init_difftest(long img_size, int port) {
   char const *ref_so_file = "/home/cyl/ysyx-workbench/nemu/tools/spike-diff/build/riscv64-spike-so";
   assert(ref_so_file != NULL);
 
@@ -217,19 +222,19 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   assert(handle);
 
   //用函数指针指向动态库中的对应函数，以便调用
-  ref_difftest_memcpy = dlsym(handle, "difftest_memcpy"); //
+  ref_difftest_memcpy = (void (*)(paddr_t, void *, size_t, bool))dlsym(handle, "difftest_memcpy"); //
   assert(ref_difftest_memcpy);
 
-  ref_difftest_regcpy = dlsym(handle, "difftest_regcpy"); //
+  ref_difftest_regcpy = (void (*)(void *, bool))dlsym(handle, "difftest_regcpy"); //
   assert(ref_difftest_regcpy);
 
-  ref_difftest_exec = dlsym(handle, "difftest_exec");     //
+  ref_difftest_exec = (void (*)(uint64_t))dlsym(handle, "difftest_exec");     //
   assert(ref_difftest_exec);
 
-  ref_difftest_raise_intr = dlsym(handle, "difftest_raise_intr");
+  ref_difftest_raise_intr = (void (*)(uint64_t))dlsym(handle, "difftest_raise_intr");
   assert(ref_difftest_raise_intr);
 
-  void (*ref_difftest_init)(int) = dlsym(handle, "difftest_init");
+  void (*ref_difftest_init)(int) =  (void (*)(int))dlsym(handle, "difftest_init");
   assert(ref_difftest_init);
 
   //初始化REF的DIFFTest功能，没太弄懂？
@@ -238,8 +243,9 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   cpu.pc = CONFIG_MBASE;
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
   //把用作测试的PC值和寄存器值写入REF的PC和寄存器值中
-  for(i = 0; i < 32; i++){
-	  cpu.gpr[i] = cpu_gpr[i];
+  for(int i = 0; i < 32; i++){
+	  //cpu.gpr[i] = cpu_gpr[i];
+	  cpu.gpr[i] = 0;
   }
   ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
 }
@@ -266,14 +272,14 @@ static void checkregs(CPU_state *ref, vaddr_t dnpc) {
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t dnpc) {   // I DO
   int i = 0;
   bool DIF_result = true;
-  if (ref->pc != dnpc){
-	  printf("Error: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, top->I);
+  if (ref_r->pc != dnpc){
+	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, top->I);
 	  DIF_result = false;
   }
   for (i = 0; i < 32; i++){
-    if (ref_r->gpr[i] != cpu.gpr[i]){
-		printf("Error: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
-		i, ref_r->gpr[i], i, cpu.gpr[i], top->I);
+    if (ref_r->gpr[i] != cpu_gpr[i]){
+		printf("False: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
+		i, ref_r->gpr[i], i, cpu_gpr[i], top->I);
 		DIF_result = false;
     }
   }

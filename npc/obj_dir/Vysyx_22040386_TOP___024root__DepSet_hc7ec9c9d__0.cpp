@@ -240,7 +240,7 @@ VL_INLINE_OPT void Vysyx_22040386_TOP___024root___sequent__TOP__0(Vysyx_22040386
                                                    & vlSelf->I)))
                                       ? vlSelf->ysyx_22040386_TOP__DOT__sum
                                       : (4ULL + vlSelf->pc))
-            : 0x8000000ULL);
+            : 0x80000000ULL);
     if ((1U & ((0x40U & vlSelf->I) ? (IData)((0x27U 
                                               == (0x37U 
                                                   & vlSelf->I)))
@@ -250,12 +250,13 @@ VL_INLINE_OPT void Vysyx_22040386_TOP___024root___sequent__TOP__0(Vysyx_22040386
                                                    & vlSelf->I)))
                     : (IData)((0x13U == (0x1bU & vlSelf->I))))))) {
         __Vdlyvval__ysyx_22040386_TOP__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf__v0 
-            = ((2U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
-                ? ((1U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
-                    ? (4ULL + vlSelf->pc) : vlSelf->ysyx_22040386_TOP__DOT__src2)
-                : ((1U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
-                    ? vlSelf->ysyx_22040386_TOP__DOT__src1
-                    : vlSelf->ysyx_22040386_TOP__DOT__sum));
+            = ((0U == (0x1fU & (vlSelf->I >> 7U))) ? 0ULL
+                : ((2U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                    ? ((1U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                        ? (4ULL + vlSelf->pc) : vlSelf->ysyx_22040386_TOP__DOT__src2)
+                    : ((1U & (IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr))
+                        ? vlSelf->ysyx_22040386_TOP__DOT__src1
+                        : vlSelf->ysyx_22040386_TOP__DOT__sum)));
         __Vdlyvset__ysyx_22040386_TOP__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf__v0 = 1U;
         __Vdlyvdim0__ysyx_22040386_TOP__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf__v0 
             = (0x1fU & (vlSelf->I >> 7U));
