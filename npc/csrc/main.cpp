@@ -25,6 +25,7 @@ typedef uint32_t paddr_t;
 int npc_state = NPC_STOP;              //npc运行的状态
 
 static uint8_t *pimem = NULL;    //指令存储空间的物理起始地址
+static int port = 1234;           //REF DIFTest初始化的参数
 
 typedef struct
 {
@@ -51,6 +52,13 @@ static long load_img(char *img_file);
 word_t host_read(void *addr, int len);
 word_t pmem_read(paddr_t addr, int len);
 int is_exit_status_bad();
+void init_difftest(char *ref_so_file, long img_size, int port);
+void difftest_step(vaddr_t pc);
+static void checkregs(CPU_state *ref, vaddr_t pc);
+bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc);
+
+
+
 
 vluint64_t main_time = 0;           // 仿真时间,并且以verilog中的时间单位为精度
 const vluint64_t max_sim_time = 2000;   // 最大仿真时间戳
@@ -86,6 +94,7 @@ int main(int argc, char** argv, char** env) {
 
 		if (main_time < 4){     //电路初始化
             top->rst_n = 0;
+			init_difftest(img_size, port);
         }
 		else{
 			top->rst_n = 1;
@@ -97,9 +106,17 @@ int main(int argc, char** argv, char** env) {
 		if(main_time % 2 == 1){
 			top->clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
+			difftest_step(top->pc);
+		}
+
+		if(npc_state == NPC_ABORT){    //如果DIFTest失败，立刻结束程序
+			printf("Error:ABORT!The false PC is 0x%0lx\n",cpu.pc);
+			break;
 		}
 
 		top->I = pmem_read(top->pc, 4);
+
+		cpu.pc = top->pc;
 
 		top->eval();
         tfp->dump(main_time);
@@ -192,19 +209,21 @@ int is_exit_status_bad() {
 
 /*##DIffTest初始化##*/
 void init_difftest(char *ref_so_file, long img_size, int port) {
+  char const *ref_so_file = "/home/cyl/ysyx-workbench/nemu/tools/spike-diff/build/riscv64-spike-so";
   assert(ref_so_file != NULL);
 
   void *handle;
-  handle = dlopen(ref_so_file, RTLD_LAZY | MUXNDEF(CONFIG_CC_ASAN, RTLD_DEEPBIND, 0));
+  handle = dlopen(ref_so_file, RTLD_LAZY); //将动态库加载到内存中
   assert(handle);
 
-  ref_difftest_memcpy = dlsym(handle, "difftest_memcpy");
+  //用函数指针指向动态库中的对应函数，以便调用
+  ref_difftest_memcpy = dlsym(handle, "difftest_memcpy"); //
   assert(ref_difftest_memcpy);
 
-  ref_difftest_regcpy = dlsym(handle, "difftest_regcpy");
+  ref_difftest_regcpy = dlsym(handle, "difftest_regcpy"); //
   assert(ref_difftest_regcpy);
 
-  ref_difftest_exec = dlsym(handle, "difftest_exec");
+  ref_difftest_exec = dlsym(handle, "difftest_exec");     //
   assert(ref_difftest_exec);
 
   ref_difftest_raise_intr = dlsym(handle, "difftest_raise_intr");
@@ -213,7 +232,50 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   void (*ref_difftest_init)(int) = dlsym(handle, "difftest_init");
   assert(ref_difftest_init);
 
+  //初始化REF的DIFFTest功能，没太弄懂？
   ref_difftest_init(port);
-  ref_difftest_memcpy(RESET_VECTOR, guest_to_host(RESET_VECTOR), img_size, DIFFTEST_TO_REF);
+  //将要执行文件的二进制指令代码放入REF中的指令内存中
+  cpu.pc = CONFIG_MBASE;
+  ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
+  //把用作测试的PC值和寄存器值写入REF的PC和寄存器值中
+  for(i = 0; i < 32; i++){
+	  cpu.gpr[i] = cpu_gpr[i];
+  }
   ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+}
+
+/*##DIffTest在CPU中比较功能的实现##*/
+void difftest_step(vaddr_t dnpc) {
+	CPU_state ref_r;                  //构建一个临时的中间结构体同于存放REF的值，与DUT进行比较
+
+	ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);  //检查，复制，最后执行
+	checkregs(&ref_r, dnpc);                        //实际比较的PC是dnpc！
+
+	ref_difftest_exec(1);
+}
+
+static void checkregs(CPU_state *ref, vaddr_t dnpc) {
+  if (!isa_difftest_checkregs(ref, dnpc)) {
+	  npc_state = NPC_ABORT;
+    //nemu_state.state = NEMU_ABORT;
+    //nemu_state.halt_pc = pc;
+    //isa_reg_display();
+  }
+}
+
+bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t dnpc) {   // I DO
+  int i = 0;
+  bool DIF_result = true;
+  if (ref->pc != dnpc){
+	  printf("Error: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, top->I);
+	  DIF_result = false;
+  }
+  for (i = 0; i < 32; i++){
+    if (ref_r->gpr[i] != cpu.gpr[i]){
+		printf("Error: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
+		i, ref_r->gpr[i], i, cpu.gpr[i], top->I);
+		DIF_result = false;
+    }
+  }
+  return DIF_result;
 }
