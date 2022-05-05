@@ -16,8 +16,12 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at vsrc/ysyx_22040386_IDU.v:104:30
+    // DPI import at vsrc/ysyx_22040386_IDU.v:140:30
     extern void ebreak();
+    // DPI import at vsrc/ysyx_22040386_TOP.v:31:30
+    extern void pmem_read(long long raddr, long long* rdata);
+    // DPI import at vsrc/ysyx_22040386_TOP.v:33:30
+    extern void pmem_write(long long waddr, long long wdata, char wmask);
     // DPI import at vsrc/ysyx_22040386_RegisterFile.v:26:30
     extern void set_gpr_ptr(const svOpenArrayHandle a);
 

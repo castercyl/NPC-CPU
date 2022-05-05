@@ -14,17 +14,20 @@ VL_MODULE(Vysyx_22040386_TOP___024root) {
     // DESIGN SPECIFIC STATE
     VL_IN8(clk,0,0);
     VL_IN8(rst_n,0,0);
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUBsrc;
     CData/*2:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr;
     CData/*0:0*/ __Vclklast__TOP__clk;
-    VL_IN(I,31,0);
+    VL_OUT(I,31,0);
     VL_OUT64(pc,63,0);
     QData/*63:0*/ ysyx_22040386_TOP__DOT__src1;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__src2;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__sum;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__i_rdata;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IFU_inst__DOT__final_pc;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_imm;
+    QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__pmem_read__0__rdata;
     VlUnpacked<QData/*63:0*/, 32> ysyx_22040386_TOP__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf;
-    VlUnpacked<CData/*0:0*/, 3> __Vm_traceActivity;
+    VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
 
     // INTERNAL VARIABLES
     Vysyx_22040386_TOP__Syms* vlSymsp;  // Symbol table

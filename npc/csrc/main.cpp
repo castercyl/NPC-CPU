@@ -50,13 +50,46 @@ void init_imem();
 uint8_t *guest_to_host(paddr_t paddr);
 static long load_img(char *img_file);
 word_t host_read(void *addr, int len);
-word_t pmem_read(paddr_t addr, int len);
+//word_t pmem_read(paddr_t addr, int len);
 int is_exit_status_bad();
 void init_difftest(long img_size, int port);
 void difftest_step(vaddr_t pc);
 static void checkregs(CPU_state *ref, vaddr_t pc);
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc);
+static inline void host_write(void *addr, int len, word_t data);
 
+//##DPI-C函数，从内存读##//
+extern "C" void pmem_read(long long raddr, long long *rdata) {
+  // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
+  if (raddr >= CONFIG_MBASE){
+	    //unit_64 real_raddr = raddr & ~0x7ull       //等价为 & 0xFFFF_FFFF_FFFF_FFF8,总线这样要求的
+		*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
+	}
+	else{
+		*rdata = 0;
+	}
+}
+
+//##DPI-C函数，往内存写##// //自然对齐方式，对内存的读写地址总是64的倍数
+extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
+  // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
+  // `wmask`中每比特表示`wdata`中1个字节的掩码,
+  // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
+  long long addr = waddr & ~0x7ull;
+  int len = 0;
+  switch(wmask){
+	  case 0x1: len = 1; break;
+	  case 0x3: len = 2; break;
+	  case 0x7: len = 4; break;
+	  case -1: len = 8; break;
+	  default: printf("False: Wmask is %lx false !\n",wmask);
+  }
+
+  printf("waddr = %llx\n",waddr);
+  printf("addr = %llx\n",addr);
+
+  host_write(guest_to_host(addr), len, wdata);
+}
 
 
 
@@ -108,6 +141,7 @@ int main(int argc, char** argv, char** env) {
 		if(main_time % 2 == 1){
 			top->clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
+			printf(" PC : 0x%0lx\n",top->pc);
 			if(main_time >= 3){
 				difftest_step(top->pc);
 			}
@@ -119,7 +153,8 @@ int main(int argc, char** argv, char** env) {
 			break;
 		}
 
-		top->I = pmem_read(top->pc, 4);
+
+		//top->I = pmem_read(top->pc, 4);
 
 		cpu.pc = top->pc;
 
@@ -179,15 +214,27 @@ static long load_img(char *img_file) {
 	return size;
 }
 
-/*##从指令存储器中读取32位指令的函数##*/
+/*##从内存中读数据##*/
 inline word_t host_read(void *addr, int len) {
 	switch (len) {
     case 1: return *(uint8_t  *)addr;
     case 2: return *(uint16_t *)addr;
     case 4: return *(uint32_t *)addr;
+	case 8: return *(uint64_t *)addr;
     default: {printf("hoost_read is error !\n"); assert(0); return 4096;}
   }
 }
+/*##往内存中写数据##*/  //自然对齐方式，对内存的读写地址总是64的倍数
+static inline void host_write(void *addr, int len, word_t data) {
+  switch (len) {
+    case 1: *(uint8_t  *)addr = data; return;
+    case 2: *(uint16_t *)addr = data; return;
+    case 4: *(uint32_t *)addr = data; return;
+	case 8: *(uint64_t *)addr = data; return;
+	default: {printf("hoost_wirte is error !\n"); assert(0);}
+  }
+}
+/*
 word_t pmem_read(paddr_t addr, int len) {
 	//printf("PC is %x\n",addr);
 	
@@ -199,7 +246,7 @@ word_t pmem_read(paddr_t addr, int len) {
 		return 0;
 	}
 }
-
+*/
 /*##判断程序是否出错##*/
 int is_exit_status_bad() {
   int good = (npc_state == NPC_END && cpu_gpr[10] == 0);

@@ -23,4 +23,4 @@ image: $(IMAGE).elf
 
 ##/ I DO /##
 run: image
-	$(MAKE) -C $(NEMU_HOME)/../npc ISA=$(ISA) sim IMG=$(IMAGE).bin
+	$(MAKE) -C $(NEMU_HOME)/../npc sim IMG=$(IMAGE).bin
