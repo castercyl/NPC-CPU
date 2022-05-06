@@ -29,6 +29,7 @@ class Vysyx_22040386_TOP VL_NOT_FINAL {
     VL_IN8(&clk,0,0);
     VL_IN8(&rst_n,0,0);
     VL_OUT(&I,31,0);
+    VL_OUT64(&mem_d_addr,63,0);
     VL_OUT64(&pc,63,0);
 
     // CELLS

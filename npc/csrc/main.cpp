@@ -64,6 +64,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   if (raddr >= CONFIG_MBASE){
 	    //unit_64 real_raddr = raddr & ~0x7ull       //等价为 & 0xFFFF_FFFF_FFFF_FFF8,总线这样要求的
 		*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
+		printf("rdata = 0x%llx\n",*rdata);
 	}
 	else{
 		*rdata = 0;
@@ -82,7 +83,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
 	  case 0x3: len = 2; break;
 	  case 0x7: len = 4; break;
 	  case -1: len = 8; break;
-	  default: printf("False: Wmask is %lx false !\n",wmask);
+	  default: printf("False: Wmask is %x false !\n",wmask);
   }
 
   printf("waddr = %llx\n",waddr);
@@ -145,6 +146,7 @@ int main(int argc, char** argv, char** env) {
 			if(main_time >= 3){
 				difftest_step(top->pc);
 			}
+			printf("a0 : 0x%lx\n",cpu_gpr[10]);
 			//difftest_step(top->pc);
 		}
 

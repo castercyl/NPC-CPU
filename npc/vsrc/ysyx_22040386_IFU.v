@@ -1,7 +1,7 @@
 module ysyx_22040386_IFU (
 input rst_n,
 input clk,
-input Branch,
+input switch,
 input [63:0] dnpc,
 
 output [63:0] pc,
@@ -12,7 +12,7 @@ wire [63:0] real_pc;
 reg [63:0] final_pc;
 
 assign snpc = pc + 64'd4;
-assign real_pc = (Branch) ? dnpc : snpc;
+assign real_pc = (switch) ? dnpc : snpc;
 
 always @ (posedge clk) begin
   if (!rst_n)

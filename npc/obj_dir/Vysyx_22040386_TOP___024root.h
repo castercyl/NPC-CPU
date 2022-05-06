@@ -18,14 +18,19 @@ VL_MODULE(Vysyx_22040386_TOP___024root) {
     CData/*2:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr;
     CData/*0:0*/ __Vclklast__TOP__clk;
     VL_OUT(I,31,0);
+    VL_OUT64(mem_d_addr,63,0);
     VL_OUT64(pc,63,0);
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__src1;
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__src2;
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__sum;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__final_result;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__rd_mem_data;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__i_rdata;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IFU_inst__DOT__final_pc;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_imm;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__src1;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__src2;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__sum;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__reg_result;
     QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__pmem_read__0__rdata;
+    QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__pmem_read__1__rdata;
     VlUnpacked<QData/*63:0*/, 32> ysyx_22040386_TOP__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf;
     VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
 

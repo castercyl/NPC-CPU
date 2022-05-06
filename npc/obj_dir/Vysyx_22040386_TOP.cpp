@@ -14,6 +14,7 @@ Vysyx_22040386_TOP::Vysyx_22040386_TOP(VerilatedContext* _vcontextp__, const cha
     , clk{vlSymsp->TOP.clk}
     , rst_n{vlSymsp->TOP.rst_n}
     , I{vlSymsp->TOP.I}
+    , mem_d_addr{vlSymsp->TOP.mem_d_addr}
     , pc{vlSymsp->TOP.pc}
     , rootp{&(vlSymsp->TOP)}
 {
