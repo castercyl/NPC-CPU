@@ -71,11 +71,13 @@ always @ (*) begin
                 end
             endcase
         end
-        7'b001_0011:begin  // I-type(非load)
+
+        // I-type(非load)
+        7'b001_0011:begin
             case(funct3)
                 3'b000: reg_unkown_code = 1'b0; //addi
                 3'd1: begin
-                    if (funct7 == 7'h00)
+                    if (funct7[6:1] == 6'h00)
                         reg_unkown_code = 1'b0; //slli
                 end
                 3'd2: reg_unkown_code = 1'b0; //slti
@@ -115,6 +117,7 @@ always @ (*) begin
             case(funct3)
                 3'd3: reg_unkown_code = 1'b0; //sd
                 3'd0: reg_unkown_code = 1'b0; //sb
+                3'd2: reg_unkown_code = 1'b0; //sw
                 default: reg_unkown_code = 1'b1;
             endcase
         end

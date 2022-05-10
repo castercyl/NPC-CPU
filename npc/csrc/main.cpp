@@ -143,7 +143,7 @@ int main(int argc, char** argv, char** env) {
 	npc_state = NPC_RUNNING;
 	
 	//##仿真运行##//
-	while (!contextp->gotFinish() && main_time < max_sim_time) {
+	while (!contextp->gotFinish()) {
 		if(ebreak_flag){
 			printf("ebreak: program is finished !\n");
 			npc_state = NPC_END;

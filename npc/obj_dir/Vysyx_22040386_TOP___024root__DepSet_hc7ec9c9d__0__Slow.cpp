@@ -153,8 +153,10 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root___settle__TOP__0(Vysyx_22040386_T
                 = (1U & ((3U != (0xfU & vlSelf->Inst)) 
                          | ((3U != (7U & (vlSelf->Inst 
                                           >> 0xcU))) 
-                            & (0U != (7U & (vlSelf->Inst 
-                                            >> 0xcU))))));
+                            & ((0U != (7U & (vlSelf->Inst 
+                                             >> 0xcU))) 
+                               & (2U != (7U & (vlSelf->Inst 
+                                               >> 0xcU)))))));
         }
     } else if ((0x10U & vlSelf->Inst)) {
         if ((8U & vlSelf->Inst)) {
@@ -181,7 +183,7 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root___settle__TOP__0(Vysyx_22040386_T
                 } else if ((0x2000U & vlSelf->Inst)) {
                     vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__code_test_inst__DOT__reg_unkown_code = 0U;
                 } else if ((0x1000U & vlSelf->Inst)) {
-                    if ((0U == (vlSelf->Inst >> 0x19U))) {
+                    if ((0U == (vlSelf->Inst >> 0x1aU))) {
                         vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__code_test_inst__DOT__reg_unkown_code = 0U;
                     }
                 } else {
