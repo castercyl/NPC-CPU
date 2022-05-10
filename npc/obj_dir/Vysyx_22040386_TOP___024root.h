@@ -14,24 +14,37 @@ VL_MODULE(Vysyx_22040386_TOP___024root) {
     // DESIGN SPECIFIC STATE
     VL_IN8(clk,0,0);
     VL_IN8(rst_n,0,0);
+    VL_OUT8(unkown_code,0,0);
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__Jalr;
+    CData/*1:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ALUop;
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_RegWrite;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUBsrc;
-    CData/*2:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_ALUctr;
+    CData/*4:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ysyx_22040386_ALUcontrol_inst__DOT__R_ctr;
+    CData/*4:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ysyx_22040386_ALUcontrol_inst__DOT__I_ctr;
+    CData/*4:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ysyx_22040386_ALUcontrol_inst__DOT__reg_ALUctr;
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__code_test_inst__DOT__reg_unkown_code;
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_Branchjuge_inst__DOT__w1;
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__cn;
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__cn0;
     CData/*0:0*/ __Vclklast__TOP__clk;
-    VL_OUT(I,31,0);
-    VL_OUT64(mem_d_addr,63,0);
+    VL_OUT(Inst,31,0);
     VL_OUT64(pc,63,0);
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__final_result;
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__rd_mem_data;
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__i_rdata;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__src2;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__pc_imm;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IFU_inst__DOT__inst_rdata;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IFU_inst__DOT__final_pc;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__busA;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__reg_imm;
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__src1;
-    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__src2;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__real_src2;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__sum;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__real_sum;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__src1_shift;
     QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__reg_result;
-    QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__pmem_read__0__rdata;
-    QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__pmem_read__1__rdata;
-    VlUnpacked<QData/*63:0*/, 32> ysyx_22040386_TOP__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_MEMU_inst__DOT__reg_rd_mem_data;
+    QData/*63:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_MEMU_inst__DOT__rmdata1;
+    QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__ysyx_22040386_IFU_inst__DOT__pmem_read__0__rdata;
+    QData/*63:0*/ __Vtask_ysyx_22040386_TOP__DOT__ysyx_22040386_MEMU_inst__DOT__pmem_read__3__rdata;
+    VlUnpacked<QData/*63:0*/, 32> ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ysyx_22040386_RegisterFile_inst__DOT__rf;
     VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
 
     // INTERNAL VARIABLES

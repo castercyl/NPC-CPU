@@ -16,6 +16,8 @@ typedef uint64_t word_t;
 typedef word_t vaddr_t;
 typedef uint32_t paddr_t;
 
+uint32_t current_inst = 0;        //用于显示当前的32位指令
+
 //##函数指针，用于调用spike库中的API##//
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n, bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
@@ -35,10 +37,18 @@ typedef struct
 CPU_state cpu = {};          //开辟一个空间用于存放模拟的cpu状态
 
 uint32_t ebreak_flag = 0;    //程序结束标志，为1时结束仿真
+uint32_t unkown_code_flag = 0;    //未译码指令标志，为1时结束仿真
 //##DPI-C函数，检测到ebreak指令后，结束仿真##//
 extern "C" void ebreak() {
 		ebreak_flag = 1;
 }
+
+//##DPI-C函数，检测到未译码指令后，结束仿真##//
+
+extern "C" void unkown_inst() {
+		unkown_code_flag = 1;
+}
+
 
 //##DPI-C函数，将电路中寄存器的值导出##//
 uint64_t *cpu_gpr = NULL;
@@ -68,6 +78,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
 	}
 	else{
 		*rdata = 0;
+		printf("Warning : Invalid Instruction !\n");
 	}
 }
 
@@ -78,10 +89,25 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   long long addr = waddr & ~0x7ull;
   int len = 0;
-  switch(wmask){
+  switch(wmask){      //char型(有符号数)的范围为-128～127
+	  //8位/bit
 	  case 0x1: len = 1; break;
-	  case 0x3: len = 2; break;
-	  case 0x7: len = 4; break;
+	  case 0x2: len = 1; addr = addr + 1; break;
+	  case 0x4: len = 1; addr = addr + 2; break;
+	  case 0x8: len = 1; addr = addr + 3; break;
+	  case 0x10: len = 1; addr = addr + 4; break;
+	  case 0x20: len = 1; addr = addr + 5; break;
+	  case 0x40: len = 1; addr = addr + 6; break;
+	  case -128: len = 1; addr = addr + 7; break;
+	  //16位/half word
+	  case 0x3:  len = 2; break;
+	  case 0xc: len = 2; addr = addr + 2; break;
+	  case 0x30: len = 2; addr = addr + 4; break;
+	  case -64: len = 2; addr = addr + 6; break;
+	  //32位/word
+	  case 0xF: len = 4; break;
+	  case -16: len = 4; addr = addr + 4; break;
+	  //64位/double word
 	  case -1: len = 8; break;
 	  default: printf("False: Wmask is %x false !\n",wmask);
   }
@@ -124,7 +150,7 @@ int main(int argc, char** argv, char** env) {
 			break;
 		}
 		
-		printf("main_time = %ld\n",main_time);
+		//printf("main_time = %ld\n",main_time);
 
 		if (main_time < 4){     //电路初始化
             top->rst_n = 0;
@@ -140,12 +166,22 @@ int main(int argc, char** argv, char** env) {
 			top->eval();
 		}
 		if(main_time % 2 == 1){
+			printf("main_time = %ld\n",main_time);
 			top->clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
-			printf(" PC : 0x%0lx\n",top->pc);
+			
 			if(main_time >= 3){
 				difftest_step(top->pc);
 			}
+
+			printf("PC: 0x%0lx; Inst: 0x%x;\n", top->pc, top->Inst);
+			
+			if (unkown_code_flag || top->unkown_code){
+				printf("Warining: An unkown Inst! pc: %lx; Inst: %x\n", top->pc, top->Inst);
+				npc_state = NPC_ABORT;
+				break;
+			}
+			
 			printf("a0 : 0x%lx\n",cpu_gpr[10]);
 			//difftest_step(top->pc);
 		}
@@ -159,6 +195,7 @@ int main(int argc, char** argv, char** env) {
 		//top->I = pmem_read(top->pc, 4);
 
 		cpu.pc = top->pc;
+		current_inst = top->Inst;
 
 		top->eval();
         tfp->dump(main_time);
@@ -322,13 +359,13 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t dnpc) {   // I DO
   int i = 0;
   bool DIF_result = true;
   if (ref_r->pc != dnpc){
-	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, top->I);
+	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, current_inst);
 	  DIF_result = false;
   }
   for (i = 0; i < 32; i++){
     if (ref_r->gpr[i] != cpu_gpr[i]){
 		printf("False: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
-		i, ref_r->gpr[i], i, cpu_gpr[i], top->I);
+		i, ref_r->gpr[i], i, cpu_gpr[i], top->Inst);
 		DIF_result = false;
     }
   }

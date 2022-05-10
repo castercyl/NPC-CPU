@@ -28,8 +28,8 @@ class Vysyx_22040386_TOP VL_NOT_FINAL {
     // propagate new values into/out from the Verilated model.
     VL_IN8(&clk,0,0);
     VL_IN8(&rst_n,0,0);
-    VL_OUT(&I,31,0);
-    VL_OUT64(&mem_d_addr,63,0);
+    VL_OUT8(&unkown_code,0,0);
+    VL_OUT(&Inst,31,0);
     VL_OUT64(&pc,63,0);
 
     // CELLS

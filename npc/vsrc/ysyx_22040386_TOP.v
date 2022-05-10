@@ -1,42 +1,38 @@
 module ysyx_22040386_TOP (
     input clk,
     input rst_n,
-    //input [31:0] I,
 
-    output [31:0] I,
-    output [63:0] mem_d_addr,
+    output unkown_code,
+    output [31:0] Inst,
     output [63:0] pc
 );
 
-
-//控制信号
-wire RegWrite, MemWrite, Branch, ALUAsrc, ALUBsrc, DNPCsrc, RESULTsrc, Mem_to_Reg, Jump;
-wire [2:0] ALUctr;
-wire [7:0] Wmask;
-//模块间的连接线
-wire switch;
-wire [4:0] rd_reg_addr1, rd_reg_addr2, wr_reg_addr;
-wire [63:0] snpc, busA, busB, imm, final_result, wr_reg_data, dnpc;
-
-assign rd_reg_addr1 = I[19:15];
-assign rd_reg_addr2 = I[24:20];
-assign wr_reg_addr = I[11:7];
-
-assign mem_d_addr = final_result;
-assign wr_reg_data = (Mem_to_Reg) ? rd_mem_data : final_result;    //???
+wire Branch, MemWrite, Reg_to_Mem, Result_to_Pc, Auipc, Jal, Jalr, Lui, MemRead, Word_op;
+wire [2:0] Branch_type, mask_type; 
+wire [4:0] ALUctr;
+//wire [7:0] Wmask;
+wire [63:0] dnpc, snpc, wr_reg_data, imm, src1, src2, mem_data_addr, pc_imm, result, rd_mem_data, wr_mem_data;
+assign mem_data_addr = result;
 
 //模块例化
-ysyx_22040386_IFU ysyx_22040386_IFU_inst (.rst_n(rst_n), .clk(clk), .switch(switch), .dnpc(dnpc), .pc(pc), .snpc(snpc));
-ysyx_22040386_IDU ysyx_22040386_IDU_inst (.I(I), .RegWrite(RegWrite), .MemWrite(MemWrite), .Branch(Branch), .ALUAsrc(ALUAsrc), 
-.ALUBsrc(ALUBsrc), .DNPCsrc(DNPCsrc), .RESULTsrc(RESULTsrc), .Mem_to_Reg(Mem_to_Reg), .Jump(Jump), .ALUctr(ALUctr), .Wmask(Wmask), 
-.imm(imm));
-ysyx_22040386_EXU ysyx_22040386_EXU_inst (.ALUAsrc(ALUAsrc), .ALUBsrc(ALUBsrc), .Jump(Jump), .Branch(Branch), .DNPCsrc(DNPCsrc), 
-.RESULTsrc(RESULTsrc), .ALUctr(ALUctr), .pc(pc), .imm(imm), .snpc(snpc), .busA(busA), .busB(busB), .switch(switch), .dnpc(dnpc), 
-.final_result(final_result));
-ysyx_22040386_RegisterFile ysyx_22040386_RegisterFile_inst (.clk(clk), .wen(RegWrite), .wdata(wr_reg_data), .waddr(wr_reg_addr),
-.raddr1(rd_reg_addr1), .raddr2(rd_reg_addr2), .rdata1(busA), .rdata2(busB));
+ysyx_22040386_IFU ysyx_22040386_IFU_inst (.rst_n(rst_n), .clk(clk), .Branch(Branch), .dnpc(dnpc), .pc(pc), .snpc(snpc), .Inst(Inst));
+
+ysyx_22040386_IDU ysyx_22040386_IDU_inst (.clk(clk), .Inst(Inst), .wr_reg_data(wr_reg_data), .MemWrite(MemWrite), .Reg_to_Mem(Reg_to_Mem), 
+.Result_to_Pc(Result_to_Pc), .Auipc(Auipc), .Jal(Jal), .Jalr(Jalr), .Lui(Lui), .Branch_type(Branch_type), .ALUctr(ALUctr), 
+.imm(imm), .src1(src1), .src2(src2), .wr_mem_data(wr_mem_data), .MemRead(MemRead), .Word_op(Word_op), 
+.mask_type(mask_type), .unkown_code(unkown_code));
+
+ysyx_22040386_EXU ysyx_22040386_EXU_inst (.Jal(Jal), .Jalr(Jalr), .Branch_type(Branch_type), .ALUctr(ALUctr), .pc(pc), .imm(imm), 
+.src1(src1), .src2(src2), .Branch(Branch), .dnpc(dnpc), .pc_imm(pc_imm), .result(result), .Word_op(Word_op));
+
+ysyx_22040386_MEMU ysyx_22040386_MEMU_inst (.clk(clk), .MemWrite(MemWrite), .wr_mem_data(wr_mem_data), .mem_data_addr(mem_data_addr), 
+.rd_mem_data(rd_mem_data), .MemRead(MemRead), .mask_type(mask_type));
+
+ysyx_22040386_WBU ysyx_22040386_WBU_inst (.Auipc(Auipc), .Result_to_Pc(Result_to_Pc), .Reg_to_Mem(Reg_to_Mem), .Lui(Lui), 
+.rd_mem_data(rd_mem_data), .snpc(snpc), .pc_imm(pc_imm), .imm(imm), .result(result), .wr_reg_data(wr_reg_data));
 
 //##DPI-C访存内存##*/
+/*
 import "DPI-C" function void pmem_read(
   input longint raddr, output longint rdata);
 import "DPI-C" function void pmem_write(
@@ -60,7 +56,7 @@ always @ (posedge clk) begin
     if (MemWrite)
         pmem_write(mem_d_addr, wr_mem_data, Wmask);
 end
-
+*/
 /*
 wire _unused_ok = &{1'b0,
                     MemWrite,

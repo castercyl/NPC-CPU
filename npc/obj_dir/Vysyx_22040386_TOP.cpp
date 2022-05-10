@@ -13,8 +13,8 @@ Vysyx_22040386_TOP::Vysyx_22040386_TOP(VerilatedContext* _vcontextp__, const cha
     : vlSymsp{new Vysyx_22040386_TOP__Syms(_vcontextp__, _vcname__, this)}
     , clk{vlSymsp->TOP.clk}
     , rst_n{vlSymsp->TOP.rst_n}
-    , I{vlSymsp->TOP.I}
-    , mem_d_addr{vlSymsp->TOP.mem_d_addr}
+    , unkown_code{vlSymsp->TOP.unkown_code}
+    , Inst{vlSymsp->TOP.Inst}
     , pc{vlSymsp->TOP.pc}
     , rootp{&(vlSymsp->TOP)}
 {
