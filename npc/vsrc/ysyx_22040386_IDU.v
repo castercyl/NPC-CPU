@@ -15,7 +15,7 @@ module ysyx_22040386_IDU (
     output Lui,
     output [2:0] Branch_type,
     output [2:0] mask_type,
-    output [4:0] ALUctr,
+    output [5:0] ALUctr,
     //output [7:0] Wmask,
     output [63:0] imm,
     output [63:0] src1,

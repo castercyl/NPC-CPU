@@ -38,6 +38,8 @@ always @ (*) begin
                         reg_unkown_code = 1'b0; //add
                     else if(funct7 == 7'h20)
                         reg_unkown_code = 1'b0; //sub
+                    else if(funct7 == 7'h01)
+                        reg_unkown_code = 1'b0; //mul
                 end
                 3'd1:begin
                     if (funct7 == 7'h00)
@@ -84,7 +86,7 @@ always @ (*) begin
                 3'd3: reg_unkown_code = 1'b0; //sltiu
                 3'd4: reg_unkown_code = 1'b0; //xori
                 3'd5:begin
-                    if(funct7 == 7'h00)
+                    if(funct7[6:1] == 6'h00)
                         reg_unkown_code = 1'b0; //srli
                     else if(funct7 == 7'h20)
                         reg_unkown_code = 1'b0; //srai
@@ -118,6 +120,7 @@ always @ (*) begin
                 3'd3: reg_unkown_code = 1'b0; //sd
                 3'd0: reg_unkown_code = 1'b0; //sb
                 3'd2: reg_unkown_code = 1'b0; //sw
+                3'd1: reg_unkown_code = 1'b0; //sh
                 default: reg_unkown_code = 1'b1;
             endcase
         end
@@ -128,6 +131,8 @@ always @ (*) begin
                 3'd3: reg_unkown_code = 1'b0; //ld
                 3'd2: reg_unkown_code = 1'b0; //lw
                 3'd4: reg_unkown_code = 1'b0; //lbu
+                3'd1: reg_unkown_code = 1'b0; //lh
+                3'd5: reg_unkown_code = 1'b0; //lhu
                 default: reg_unkown_code = 1'b1; 
             endcase
         end
@@ -136,6 +141,16 @@ always @ (*) begin
         7'b001_1011:begin
             case(funct3)
                 3'd0: reg_unkown_code = 1'b0; //addiw
+                3'd1:begin
+                    if (funct7[6:1] == 6'h00)
+                        reg_unkown_code = 1'b0; //slliw
+                end
+                3'd5:begin
+                    if (funct7[6:1] == 6'h10)
+                        reg_unkown_code = 1'b0; //sraiw
+                    else if (funct7[6:1] == 6'h00)
+                        reg_unkown_code = 1'b0; //srliw
+                end
                 default: reg_unkown_code = 1'b1; 
             endcase
         end
@@ -146,14 +161,30 @@ always @ (*) begin
                 3'd0:begin
                     if(funct7 == 7'h00)
                         reg_unkown_code = 1'b0; //addw
-                    else
-                        reg_unkown_code = 1'b1; 
+                    else if (funct7 == 7'h01)
+                        reg_unkown_code = 1'b0; //mulw 
+                    else if (funct7 == 7'h20)
+                        reg_unkown_code = 1'b0; //subw
                 end
                 3'd1:begin
                     if(funct7 == 7'h00)
                         reg_unkown_code = 1'b0; //sllw
                     else
                         reg_unkown_code = 1'b1; 
+                end
+                3'd4:begin
+                    if (funct7 == 7'h01)
+                        reg_unkown_code = 1'b0; //divw
+                end
+                3'd5:begin
+                    if (funct7 == 7'h20)
+                        reg_unkown_code = 1'b0; //sraw
+                    else if (funct7 == 7'h00)
+                        reg_unkown_code = 1'b0; //srlw
+                end
+                3'd6:begin
+                    if (funct7 == 7'h01)
+                        reg_unkown_code = 1'b0; //remw
                 end
                 default: reg_unkown_code = 1'b1; 
             endcase

@@ -9,7 +9,7 @@ module ysyx_22040386_TOP (
 
 wire Branch, MemWrite, Reg_to_Mem, Result_to_Pc, Auipc, Jal, Jalr, Lui, MemRead, Word_op;
 wire [2:0] Branch_type, mask_type; 
-wire [4:0] ALUctr;
+wire [5:0] ALUctr;
 //wire [7:0] Wmask;
 wire [63:0] dnpc, snpc, wr_reg_data, imm, src1, src2, mem_data_addr, pc_imm, result, rd_mem_data, wr_mem_data;
 assign mem_data_addr = result;

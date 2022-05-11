@@ -4,7 +4,7 @@ module ysyx_22040386_EXU(
     input Jalr,
     input [2:0] Branch_type,
     //input [2:0] funct3,
-    input [4:0] ALUctr,
+    input [5:0] ALUctr,
     input [63:0] pc,
     input [63:0] imm,
     input [63:0] src1,
