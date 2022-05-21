@@ -56,57 +56,69 @@ static int decode_exec(Decode *s) {
 
   INSTPAT_START();
   //R(0) = 0; // I OD
-  INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(dest) = src1 + s->pc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
-  INSTPAT("??????? ????? ????? ??? ????? 01101 11", lui    , U, R(dest) = SEXT(src1, 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(immediate[31:12] << 12), 高位立即数加载
+  INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(dest) = src1 + s->pc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
+  INSTPAT("??????? ????? ????? ??? ????? 01101 11", lui    , U, R(dest) = SEXT(src1, 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(immediate[31:12] << 12), 高位立即数加载
 
-  INSTPAT("??????? ????? ????? 011 ????? 00000 11", ld     , I, R(dest) = Mr(src1 + src2, 8), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
-  INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi   , I, R(dest) = src1 & src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] & sext(immediate), 位与立即数
-  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, R(dest) = s->pc + 4, s->dnpc = (src1 + src2)&~1, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO t =pc+4; pc=(x[rs1]+sext(offset))&~1; x[rd]=t, 跳转并寄存器链接
-  INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh     , I, R(dest) = SEXT(Mr(src1+src2,2), 16), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(M[x[rs1] + sext(offset)][15:0]), 半字加载
-  INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu    , I, R(dest) = SEXT(Mr(src1+src2,2)&65535, 17), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = M[x[rs1] + sext(offset)][15:0], 无符号半字加载
-  INSTPAT("000000? ????? ????? 001 ????? 00100 11", slli   , I, R(dest) = (src1 << src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
-  INSTPAT("000000? ????? ????? 001 ????? 00110 11", slliw  , I, R(dest) = SEXT(BITS(src1<<src2,31,0), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ shamt)[31: 0]), 立即数逻辑左移字
-  INSTPAT("010000? ????? ????? 101 ????? 00110 11", sraiw  , I, R(dest) = SEXT(BITS(src1,31,0),32) >> src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] >>s shamt),立即数算术右移字
-  INSTPAT("000000? ????? ????? 101 ????? 00100 11", srli   , I, R(dest) = (src1 >> src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>u shamt) 立即数逻辑右移
-  INSTPAT("000000? ????? ????? 101 ????? 00110 11", srliw  , I, R(dest) = SEXT((src1&4294967295) >> src2, 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DOx[rd] = sext(x[rs1][31: 0] >>u shamt), 立即数逻辑右移字
-  INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori   , I, R(dest) = src1 ^ src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ^ sext(immediate), 立即数异或
+  INSTPAT("??????? ????? ????? 011 ????? 00000 11", ld     , I, R(dest) = Mr(src1 + src2, 8)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
+  INSTPAT("??????? ????? ????? 000 ????? 00000 11", lb     , I, R(dest) = SEXT(BITS(Mr(src1 + src2, 1), 7, 0), 8) ); //I DO
+  INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi   , I, R(dest) = src1 & src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] & sext(immediate), 位与立即数
+  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, R(dest) = s->pc + 4, s->dnpc = (src1 + src2)&~1); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO t =pc+4; pc=(x[rs1]+sext(offset))&~1; x[rd]=t, 跳转并寄存器链接
+  INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh     , I, R(dest) = SEXT(Mr(src1+src2,2), 16)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(M[x[rs1] + sext(offset)][15:0]), 半字加载
+  INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu    , I, R(dest) = SEXT(Mr(src1+src2,2)&65535, 17)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = M[x[rs1] + sext(offset)][15:0], 无符号半字加载
+  INSTPAT("??????? ????? ????? 110 ????? 00000 11", lwu    , I, R(dest) = SEXT(Mr(src1+src2,4)&4294967295, 33)); //I DO
+  INSTPAT("000000? ????? ????? 001 ????? 00100 11", slli   , I, R(dest) = (src1 << src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
+  INSTPAT("000000? ????? ????? 001 ????? 00110 11", slliw  , I, R(dest) = SEXT(BITS(src1<<src2,31,0), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ shamt)[31: 0]), 立即数逻辑左移字
+  INSTPAT("010000? ????? ????? 101 ????? 00110 11", sraiw  , I, R(dest) = SEXT(BITS(src1,31,0),32) >> src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] >>s shamt),立即数算术右移字
+  INSTPAT("000000? ????? ????? 101 ????? 00100 11", srli   , I, R(dest) = (src1 >> src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>u shamt) 立即数逻辑右移
+  INSTPAT("000000? ????? ????? 101 ????? 00110 11", srliw  , I, R(dest) = SEXT((src1&4294967295) >> src2, 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DOx[rd] = sext(x[rs1][31: 0] >>u shamt), 立即数逻辑右移字
+  INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori   , I, R(dest) = src1 ^ src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ^ sext(immediate), 立即数异或
+  INSTPAT("??????? ????? ????? 110 ????? 00100 11", ori    , I, R(dest) = src1 | src2 ); //I DO
 
-  INSTPAT("??????? ????? ????? 011 ????? 01000 11", sd     , S, Mw(src1 + dest, 8, src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
-  INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh     , S, Mw(src1 + dest, 2, src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO M[x[rs1] + sext(offset) = x[rs2][15: 0], 存半字
-  INSTPAT("??????? ????? ????? 010 ????? 01000 11", sw     , S, Mw(src1 + dest, 4, src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO M[x[rs1] + sext(offset) = x[rs2][31: 0] 存字
+  INSTPAT("??????? ????? ????? 011 ????? 01000 11", sd     , S, Mw(src1 + dest, 8, src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));
+  INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh     , S, Mw(src1 + dest, 2, src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO M[x[rs1] + sext(offset) = x[rs2][15: 0], 存半字
+  INSTPAT("??????? ????? ????? 010 ????? 01000 11", sw     , S, Mw(src1 + dest, 4, src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO M[x[rs1] + sext(offset) = x[rs2][31: 0] 存字
   //INSTPAT("??????? ????? ????? ??? ????? 00100 11", li     , I, R(dest) = src2);            //I DO.(伪指令)(可扩展为addi)li:立即加载指令，X[rd] = imm,将立即数0装入寄存器 
-  INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi   , I, R(dest) = src1 + src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));  //I DO addi:加立即数,addi rd,rs1,imm; X[rd] = X[rs1] + imm
-  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, R(dest) = s->pc + 4, s->dnpc = s->pc + src1, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO jal：跳转指令, X[rd] = pc +4 ; pc + = sext(offset) ?
+  INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi   , I, R(dest) = src1 + src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));  //I DO addi:加立即数,addi rd,rs1,imm; X[rd] = X[rs1] + imm
+  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, R(dest) = s->pc + 4, s->dnpc = s->pc + src1); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO jal：跳转指令, X[rd] = pc +4 ; pc + = sext(offset) ?
   //INSTPAT("??????? ????? ????? 011 ????? 01000 11", sd     , S, Mw(src1 + dest, 8, src2));      //I DO sd: M[x[rs1] + sext(offset)}]= x[rs2][63: 0]
-  INSTPAT("0000000 00000 00001 000 00000 11001 11", ret    , I, s->dnpc = src1, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO pc = X[1]
+  INSTPAT("0000000 00000 00001 000 00000 11001 11", ret    , I, s->dnpc = src1); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO pc = X[1]
   
-  INSTPAT("0000001 ????? ????? 100 ????? 01110 11", divw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) / SEXT(BITS(src2,31,0), 32), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31:0] ÷s x[rs2][31:0]), 字除法
-  INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , R, R(dest) = src1 * src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] × x[rs2], 乘
-  INSTPAT("0000001 ????? ????? 000 ????? 01110 11", mulw   , R, R(dest) = SEXT(BITS(src1*src2, 31, 0), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = sext((x[rs1] × x[rs2])[31: 0]), 乘字
-  INSTPAT("0000001 ????? ????? 110 ????? 01110 11", remw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) %  SEXT(BITS(src2,31,0), 32), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] %𝑠 x[rs2][31: 0]), 求余数字
-  INSTPAT("0100000 ????? ????? 101 ????? 01110 11", sraw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) >> (src2 & 31), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] ≫𝑠 x[rs2][4: 0]), 算术右移字
-  INSTPAT("0000000 ????? ????? 101 ????? 01110 11", srlw   , R, R(dest) = SEXT((src1 & 4294967295) >> (src2 & 31), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] >>u x[rs2][4: 0]), 逻辑右移字
-  INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(dest) = src1 - src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO x[rd] = x[rs1] − x[rs2]
-  INSTPAT("0100000 ????? ????? 000 ????? 01110 11", subw   , R, R(dest) = SEXT(BITS(src1 - src2, 31, 0), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] − x[rs2])[31: 0], 减去字
-  INSTPAT("0000000 ????? ????? 001 ????? 01110 11", sllw   , R, R(dest) = SEXT(src1 << SEXT(BITS(src2, 4, 0) & 31, 6), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ u x[rs2][4: 0])[31: 0]), 逻辑左移字
-  INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(dest) = (SEXT(src1,64) < SEXT(src2,64)), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] <𝑠 x[rs2]), 小于则置位
-  INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , R, R(dest) = src1 & src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = x[rs1] & x[rs2]
-  INSTPAT("0000000 ????? ????? 011 ????? 01100 11", sltu   , R, R(dest) = (src1 < src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] <𝑢 x[rs2] , 无符号小于则置位)
-  INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or     , R, R(dest) = src1 | src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] | 𝑥[𝑟𝑠2] 取或
+  INSTPAT("0000001 ????? ????? 100 ????? 01110 11", divw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) / SEXT(BITS(src2,31,0), 32), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31:0] ÷s x[rs2][31:0]), 字除法
+  INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , R, R(dest) = src1 * src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] × x[rs2], 乘
+  INSTPAT("0000001 ????? ????? 000 ????? 01110 11", mulw   , R, R(dest) = SEXT(BITS(src1*src2, 31, 0), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = sext((x[rs1] × x[rs2])[31: 0]), 乘字
+  INSTPAT("0000001 ????? ????? 110 ????? 01110 11", remw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) %  SEXT(BITS(src2,31,0), 32), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] %𝑠 x[rs2][31: 0]), 求余数字
+  INSTPAT("0100000 ????? ????? 101 ????? 01110 11", sraw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) >> (src2 & 31), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] ≫𝑠 x[rs2][4: 0]), 算术右移字
+  INSTPAT("0000000 ????? ????? 101 ????? 01110 11", srlw   , R, R(dest) = SEXT((src1 & 4294967295) >> (src2 & 31), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] >>u x[rs2][4: 0]), 逻辑右移字
+  INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(dest) = src1 - src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO x[rd] = x[rs1] − x[rs2]
+  INSTPAT("0100000 ????? ????? 000 ????? 01110 11", subw   , R, R(dest) = SEXT(BITS(src1 - src2, 31, 0), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] − x[rs2])[31: 0], 减去字
+  INSTPAT("0000000 ????? ????? 001 ????? 01110 11", sllw   , R, R(dest) = SEXT(src1 << SEXT(BITS(src2, 4, 0) & 31, 6), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ u x[rs2][4: 0])[31: 0]), 逻辑左移字
+  INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(dest) = (SEXT(src1,64) < SEXT(src2,64))); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] <𝑠 x[rs2]), 小于则置位
+  INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , R, R(dest) = src1 & src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = x[rs1] & x[rs2]
+  INSTPAT("0000000 ????? ????? 011 ????? 01100 11", sltu   , R, R(dest) = (src1 < src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] <𝑢 x[rs2] , 无符号小于则置位)
+  INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or     , R, R(dest) = src1 | src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] | 𝑥[𝑟𝑠2] 取或
+  INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu   , R, R(dest) = src1 / src2);  // I DO
+  INSTPAT("0000001 ????? ????? 101 ????? 01110 11", divuw  , R, R(dest) = SEXT((BITS(src1,31,0) / BITS(src2,31,0)), 32));  // I DO
+  INSTPAT("0000000 ????? ????? 100 ????? 01100 11", xor    , R, R(dest) = src1 ^ src2);  // I DO
+  INSTPAT("0000001 ????? ????? 111 ????? 01110 11", remuw  , R, R(dest) = SEXT((BITS(src1,31,0) % BITS(src2,31,0)), 32));  //I DO
+  INSTPAT("0000000 ????? ????? 001 ????? 01100 11", sll    , R, R(dest) = src1 << BITS(src2,5,0)); //I DO
+  INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem   ,  R, R(dest) = SEXT(src1,64) % SEXT(src2,64)); //I DO
+  INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu   , R, R(dest) = src1 % src2); //I DO
 
-  INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(dest) = (src1 < src2), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc), printf("src1= 0x%lx, src2 = 0x%lx, R(dest) = 0x%lx\n",src1,src2,R(dest))); //I DO 无符号小于立即数则置位 x[rd] = (x[rs1] < u_sext(immediate))
-  INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc = (src1 == src2)? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO    if(rs1 == rs2) pc += sext(offset)
-  INSTPAT("??????? ????? ????? 100 ????? 11000 11", blt    , B, s->dnpc = (SEXT(src1,64) < SEXT(src2,64))? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <s rs2) pc += sext(offset), 小于时分支
-  INSTPAT("??????? ????? ????? 110 ????? 11000 11", blu    , B, s->dnpc = (src1 < src2)? s->pc + dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <u rs2) pc += sext(offset), 无符号小于时分支
-  INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, s->dnpc = (src1 != src2)? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO   if (rs1 != rs2) pc += sext(offset)
-  INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc = (SEXT(src1,64) >= SEXT(src2,64))? s->pc+dest : s->dnpc, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 ≥s rs2) pc += sext(offset), 大于等于时分支
-  INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(dest) = src1 + src2, isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] + x[rs2]
-  INSTPAT("??????? ????? ????? 000 ????? 00110 11", addiw  , I, R(dest) = SEXT((src1 + src2), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] + sext(immediate))[31:0])
-  INSTPAT("??????? ????? ????? 010 ????? 00000 11", lw     , I, R(dest) = SEXT(Mr(src1 + src2, 4), 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = sext(M[x[rs1] + sext(offset)][31:0]) 字加载，对于 RV64I，结果要进行符号位扩展
-  INSTPAT("0000000 ????? ????? 000 ????? 01110 11", addw   , R, R(dest) = SEXT(BITS(src1 + src2, 31, 0) , 32), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] + x[rs2])[31:0]) 加字
-  INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb     , S, Mw(src1 + dest , 1, BITS(src2, 7, 0)), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO M[x[rs1] + sext(offset) = x[rs2][7: 0], 存字节
-  INSTPAT("010000? ????? ????? 101 ????? 00100 11", srai   , I, R(dest) = (SEXT(src1, 64) >> SEXT(BITS(src2, 5, 0), 6)), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>s shamt) 立即数算术右移
-  INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(dest) = SEXT((Mr(src1 + src2,1) & 255), 9), isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = M[x[rs1] + sext(offset)][7:0] 无符号字节加载
+  INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(dest) = (src1 < src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc), printf("src1= 0x%lx, src2 = 0x%lx, R(dest) = 0x%lx\n",src1,src2,R(dest))); //I DO 无符号小于立即数则置位 x[rd] = (x[rs1] < u_sext(immediate))
+  INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc = (src1 == src2)? s->pc+dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO    if(rs1 == rs2) pc += sext(offset)
+  INSTPAT("??????? ????? ????? 100 ????? 11000 11", blt    , B, s->dnpc = (SEXT(src1,64) < SEXT(src2,64))? s->pc+dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <s rs2) pc += sext(offset), 小于时分支
+  INSTPAT("??????? ????? ????? 110 ????? 11000 11", blu    , B, s->dnpc = (src1 < src2)? s->pc + dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <u rs2) pc += sext(offset), 无符号小于时分支
+  INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, s->dnpc = (src1 != src2)? s->pc+dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO   if (rs1 != rs2) pc += sext(offset)
+  INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc = (SEXT(src1,64) >= SEXT(src2,64))? s->pc + dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 ≥s rs2) pc += sext(offset), 大于等于时分支
+  INSTPAT("??????? ????? ????? 111 ????? 11000 11", bgeu   , B, s->dnpc = (src1 >= src2) ? s->pc + dest : s->dnpc); //I DO
+
+  INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(dest) = src1 + src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] + x[rs2]
+  INSTPAT("??????? ????? ????? 000 ????? 00110 11", addiw  , I, R(dest) = SEXT((src1 + src2), 32)); //sa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] + sext(immediate))[31:0])
+  INSTPAT("??????? ????? ????? 010 ????? 00000 11", lw     , I, R(dest) = SEXT(BITS(Mr(src1 + src2, 4),31,0), 32) ); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = sext(M[x[rs1] + sext(offset)][31:0]) 字加载，对于 RV64I，结果要进行符号位扩展
+  INSTPAT("0000000 ????? ????? 000 ????? 01110 11", addw   , R, R(dest) = SEXT(BITS(src1 + src2, 31, 0) , 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] + x[rs2])[31:0]) 加字
+  INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb     , S, Mw(src1 + dest , 1, BITS(src2, 7, 0))); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO M[x[rs1] + sext(offset) = x[rs2][7: 0], 存字节
+  INSTPAT("010000? ????? ????? 101 ????? 00100 11", srai   , I, R(dest) = (SEXT(src1, 64) >> SEXT(BITS(src2, 5, 0), 6))); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>s shamt) 立即数算术右移
+  INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(dest) = SEXT((Mr(src1 + src2,1) & 255), 9)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = M[x[rs1] + sext(offset)][7:0] 无符号字节加载
 
 
 

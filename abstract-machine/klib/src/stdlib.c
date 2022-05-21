@@ -2,6 +2,8 @@
 #include <klib.h>
 #include <klib-macros.h>
 
+//static char *hbrk = NULL;//I DO
+
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 static unsigned long int next = 1;
 
@@ -29,14 +31,42 @@ int atoi(const char* nptr) {
   return x;
 }
 
+uintptr_t *addr;
 void *malloc(size_t size) {
   // On native, malloc() will be called during initializaion of C runtime.
   // Therefore do not call panic() here, else it will yield a dead recursion:
   //   panic() -> putchar() -> (glibc) -> malloc() -> panic()
 #if !(defined(__ISA_NATIVE__) && defined(__NATIVE_USE_KLIB__))
-  panic("Not implemented");
+  //panic("Not implemented");
 #endif
-  return NULL;
+  // I DO
+  /*
+  if (size == 0){
+    printf("size = 0\n");
+    return NULL;
+  }
+  //printf("old = %d\n", (uint64_t)heap.start);   //I DO
+  size  = (size_t)ROUNDUP(size, 8);  //8与64间的数值转换
+  //char* hbrk = NULL;
+  if (hbrk == NULL){
+    hbrk = (void *)ROUNDUP(heap.start, 8);;
+  }
+  char *old = hbrk;
+  hbrk += size;
+  assert((uintptr_t)heap.start <= (uintptr_t)hbrk && (uintptr_t)hbrk < (uintptr_t)heap.end);
+  for (uint64_t *p = (uint64_t *)old; p != (uint64_t *)hbrk; p ++) {  //开辟空间
+    *p = 0;
+  }
+  */
+  //assert((uintptr_t)hbrk - (uintptr_t)heap.start <= setting->mlim);
+  //return old;
+  //return NULL;
+  if (!addr){
+    addr = heap.start;
+  }
+  void *t = addr;
+  addr = addr + size;
+  return t;
 }
 
 void free(void *ptr) {

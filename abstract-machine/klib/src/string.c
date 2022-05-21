@@ -42,7 +42,7 @@ char *strcat(char *dst, const char *src) {
 }
 
 int strcmp(const char *s1, const char *s2) {
-  while ((*s1 != '\0') && (*s1 == *s2)) {
+  while ((*s1 != '\0') && (*s1 == *s2) &&(*s2 != '\0')) {
     s1++;
     s2++;
   }
@@ -69,7 +69,19 @@ void *memmove(void *dst, const void *src, size_t n) {
   panic("Not implemented");
 }
 
-void *memcpy(void *out, const void *in, size_t n) {
+void *memcpy(void *out, const void *in, size_t n) {   // I DO 未测试
+  /*
+  for(int i = 0; i < n; i++){
+    *(char*)(out + i) = *(char*)(in + i);
+  }
+  return out;
+  */
+  char* s1 = out;
+  const char* s2 = in;
+  while(n--){
+    *s1++ = *s2++; 
+  }
+  return out;
   panic("Not implemented");
 }
 
