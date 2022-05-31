@@ -11,11 +11,12 @@
 
 Vysyx_22040386_TOP::Vysyx_22040386_TOP(VerilatedContext* _vcontextp__, const char* _vcname__)
     : vlSymsp{new Vysyx_22040386_TOP__Syms(_vcontextp__, _vcname__, this)}
-    , clk{vlSymsp->TOP.clk}
-    , rst_n{vlSymsp->TOP.rst_n}
-    , unkown_code{vlSymsp->TOP.unkown_code}
-    , Inst{vlSymsp->TOP.Inst}
-    , pc{vlSymsp->TOP.pc}
+    , i_TOP_clk{vlSymsp->TOP.i_TOP_clk}
+    , i_TOP_rst_n{vlSymsp->TOP.i_TOP_rst_n}
+    , o_TOP_unkown_code{vlSymsp->TOP.o_TOP_unkown_code}
+    , o_TOP_Branch{vlSymsp->TOP.o_TOP_Branch}
+    , o_TOP_inst{vlSymsp->TOP.o_TOP_inst}
+    , o_TOP_pc{vlSymsp->TOP.o_TOP_pc}
     , rootp{&(vlSymsp->TOP)}
 {
 }
