@@ -5,8 +5,18 @@ module ysyx_22040386_IDU (
     input wire        i_ID_RegWrite,
     input wire [4:0]  i_ID_reg_wr_addr,
     input wire [63:0] i_ID_reg_wr_data,
+    input wire [4:0] i_ID_reg_rd_addr1,
+    input wire [4:0] i_ID_reg_rd_addr2,
+
+    input wire i_fw_ID_reg_rd1fw,
+    input wire i_fw_ID_reg_rd2fw,
+    input wire i_id_ID_EX_MemRead_o,
+    input wire [4:0] i_id_ID_EX_reg_wr_addr_o,
+    input wire [63:0] i_id_MEM_WB_reg_wr_data_o,
 
     output wire o_ID_unkown_code,    //仅用于前期检测未实现的指令
+
+    output wire o_load_use_flag,
 
     output reg o_ID_RegWrite,
     output wire o_ID_Word_op,
@@ -24,8 +34,15 @@ module ysyx_22040386_IDU (
     output reg [63:0] o_ID_imm,
     output wire [63:0] o_ID_reg_rd_data1,
     output wire [63:0] o_ID_reg_rd_data2,
-    output wire [63:0] o_ID_pc
+    output wire [63:0] o_ID_pc,
+    output wire [4:0] o_ID_reg_rd_addr1,
+    output wire [4:0] o_ID_reg_rd_addr2
 );
+
+wire [63:0] ID_reg_rd_data1, ID_reg_rd_data2;
+assign o_ID_reg_rd_data1 = (i_fw_ID_reg_rd1fw) ? i_id_MEM_WB_reg_wr_data_o : ID_reg_rd_data1;
+assign o_ID_reg_rd_data2 = (i_fw_ID_reg_rd2fw) ? i_id_MEM_WB_reg_wr_data_o : ID_reg_rd_data2;
+
 
 //初次关键标志拆分
 wire [2:0] ID_funct3;
@@ -35,14 +52,19 @@ wire [4:0] ID_reg_rd_addr1, ID_reg_rd_addr2;
 assign ID_funct3 = i_ID_inst[14:12];
 assign ID_funct7 = i_ID_inst[31:25];
 assign ID_opcode = i_ID_inst[6:0];
-assign ID_reg_rd_addr1 = i_ID_inst[19:15];
-assign ID_reg_rd_addr2 = i_ID_inst[24:20];
+//assign ID_reg_rd_addr1 = i_ID_inst[19:15];
+//assign ID_reg_rd_addr2 = i_ID_inst[24:20];
+assign ID_reg_rd_addr1 = i_ID_reg_rd_addr1;
+assign ID_reg_rd_addr2 = i_ID_reg_rd_addr2;
 
 assign o_ID_reg_wr_addr = i_ID_inst[11:7];
 
+
+
 //中间数据流，流水线
 assign o_ID_pc = i_ID_pc;
-
+assign o_ID_reg_rd_addr1 = i_ID_reg_rd_addr1;
+assign o_ID_reg_rd_addr2 = i_ID_reg_rd_addr2;
 /*### 数据通路控制信号生成 ###*/
 
 /*### 1.ALUop信号生成 ###*/
@@ -145,15 +167,43 @@ assign o_ID_MemRead = (ID_opcode == 7'b000_0011) ? 1'b1 : 1'b0;   //load-type
 
 
 //子控模块，根据ALUop产生ALUctr
-ysyx_22040386_ALUcontrol ysyx_22040386_ALUcontrol_inst (.ALUop(ID_ALUop), .funct3(ID_funct3), .funct7(ID_funct7), 
-.ALUctr(o_ID_ALUctr));
+ysyx_22040386_ALUcontrol ysyx_22040386_ALUcontrol_inst (
+.ALUop(ID_ALUop),
+.funct3(ID_funct3),
+.funct7(ID_funct7),
+.ALUctr(o_ID_ALUctr)
+);
+
 //寄存器堆模块
-ysyx_22040386_RegisterFile ysyx_22040386_RegisterFile_inst (.clk(i_ID_clk), .wen(i_ID_RegWrite), .wdata(i_ID_reg_wr_data), 
-.waddr(i_ID_reg_wr_addr), .raddr1(ID_reg_rd_addr1), .raddr2(ID_reg_rd_addr2), .rdata1(o_ID_reg_rd_data1), .rdata2(o_ID_reg_rd_data2));
+ysyx_22040386_RegisterFile ysyx_22040386_RegisterFile_inst (
+.clk(i_ID_clk),
+.wen(i_ID_RegWrite),
+.wdata(i_ID_reg_wr_data),
+.waddr(i_ID_reg_wr_addr),
+.raddr1(ID_reg_rd_addr1),
+.raddr2(ID_reg_rd_addr2),
+.rdata1(ID_reg_rd_data1),
+.rdata2(ID_reg_rd_data2)
+);
+
+//Load_use检测模块
+ysyx_22040386_Load_use_control ysyx_22040386_Load_use_control_inst (
+.i_id_ID_EX_MemRead_o(i_id_ID_EX_MemRead_o),
+.i_id_MemWrite_o(o_ID_MemWrite),
+.i_id_ID_EX_reg_wr_addr_o(i_id_ID_EX_reg_wr_addr_o),
+.i_id_reg_rd_addr1_i(ID_reg_rd_addr1),
+.i_id_reg_rd_addr2_i(ID_reg_rd_addr2),
+.o_load_use_flag(o_load_use_flag)
+);
 
 //测试模块，检测出未译码的指令
-code_test code_test_inst (.opcode(ID_opcode), .funct7(ID_funct7), .funct3(ID_funct3), .unkown_code(o_ID_unkown_code), 
-.Inst(i_ID_inst));
+code_test code_test_inst (
+.opcode(ID_opcode),
+.funct7(ID_funct7),
+.funct3(ID_funct3),
+.unkown_code(o_ID_unkown_code), 
+.Inst(i_ID_inst)
+);
 
 
 /*##DPI-C 识别到ebreak指令后自动结束##*/

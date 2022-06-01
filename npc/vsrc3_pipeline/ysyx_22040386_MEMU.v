@@ -11,6 +11,19 @@ module ysyx_22040386_MEMU (
     input wire [63:0] i_MEM_pc_add_imm,
     input wire [63:0] i_MEM_ALUresult,
     input wire [63:0] i_MEM_reg_wr_data,
+    input wire [63:0] i_MEM_snpc,
+    input wire [63:0] i_MEM_pc,
+    
+    input wire i_mem_EX_MEM_RegWrite_o,
+    input wire i_mem_MEM_WB_RegWrite_o,
+    input wire [4:0] i_mem_IF_ID_reg_rd_addr1_o,
+    input wire [4:0] i_mem_IF_ID_reg_rd_addr2_o,
+    input wire [4:0] i_mem_ID_EX_reg_rd_addr1_o,
+    input wire [4:0] i_mem_ID_EX_reg_rd_addr2_o,
+    input wire [4:0] i_mem_EX_MEM_reg_rd_addr2_o,
+    input wire [4:0] i_mem_EX_MEM_reg_wr_addr_o,
+    input wire [4:0] i_mem_MEM_WB_reg_wr_addr_o,
+    input wire [63:0] i_mem_MEM_WB_reg_wr_data_o,
 
     input wire i_MEM_RegWrite,
     input wire [4:0] i_MEM_reg_wr_addr,
@@ -21,8 +34,20 @@ module ysyx_22040386_MEMU (
     output wire [63:0] o_MEM_reg_wr_data,
 
     output wire o_MEM_RegWrite,
-    output wire [4:0] o_MEM_reg_wr_addr
+    output wire [4:0] o_MEM_reg_wr_addr,
+
+    output wire o_jump_flag,
+    output wire o_fw_ID_reg_rd1fw,
+    output wire o_fw_ID_reg_rd2fw,
+    output wire [1:0] o_fw_EX_src1fw,
+    output wire [1:0] o_fw_EX_src2fw,
+
+    output wire [63:0] o_MEM_pc
 );
+
+wire fw_MEM_disrcfw;
+wire [63:0] MEM_real_mem_wr_data;
+assign MEM_real_mem_wr_data = (fw_MEM_disrcfw) ? i_mem_MEM_WB_reg_wr_data_o : i_MEM_mem_wr_data;
 
 wire zero_extend;
 assign zero_extend = ~ i_MEM_mem_mask[2];
@@ -35,12 +60,44 @@ assign o_MEM_reg_wr_data = (i_MEM_MemRead) ? MEM_mem_rd_data : i_MEM_reg_wr_data
 
 assign o_MEM_dnpc = (i_MEM_Jalr) ? i_MEM_ALUresult : i_MEM_pc_add_imm;
 
-ysyx_22040386_Branchjuge ysyx_22040386_Branchjuge_inst (.zero(i_MEM_zero), .Jal(i_MEM_Jal), .Jalr(i_MEM_Jalr), 
-.result0(i_MEM_ALUresult[0]), .Branch_type(i_MEM_Branch_type), .Branch(o_MEM_Branch));
+ysyx_22040386_FWcontrol ysyx_22040386_FWcontrol_inst (
+.i_fw_EX_MEM_RegWrite(i_mem_EX_MEM_RegWrite_o),
+.i_fw_EX_MEM_MemWrite(i_MEM_MemWrite),
+.i_fw_MEM_WB_RegWrite(i_mem_MEM_WB_reg_wr_addr_o),
+.i_fw_EX_MEM_reg_wr_addr(i_mem_EX_MEM_reg_wr_addr_o),
+.i_fw_MEM_WB_reg_wr_addr(i_mem_MEM_WB_reg_wr_addr_o),
+.i_fw_EX_MEM_reg_rd_addr2(i_mem_EX_MEM_reg_rd_addr2_o),
+.i_fw_ID_EX_reg_rd_addr1(i_mem_ID_EX_reg_rd_addr1_o),
+.i_fw_ID_EX_reg_rd_addr2(i_mem_ID_EX_reg_rd_addr2_o),
+.i_fw_IF_ID_reg_rd_addr1(i_mem_IF_ID_reg_rd_addr1_o),
+.i_fw_IF_ID_reg_rd_addr2(i_mem_IF_ID_reg_rd_addr2_o),
+.o_fw_MEM_disrcfw(fw_MEM_disrcfw),
+.o_fw_ID_reg_rd1fw(o_fw_ID_reg_rd1fw),
+.o_fw_ID_reg_rd2fw(o_fw_ID_reg_rd2fw),
+.o_fw_EX_src1fw(o_fw_EX_src1fw),
+.o_fw_EX_src2fw(o_fw_EX_src2fw)
+);
+
+ysyx_22040386_jump_control ysyx_22040386_jump_control_inst (
+.i_mem_Branch(o_MEM_Branch),
+.i_mem_snpc(i_MEM_snpc),
+.i_mem_dnpc(o_MEM_dnpc),
+.o_jump_flag(o_jump_flag)
+);
+
+ysyx_22040386_Branchjuge ysyx_22040386_Branchjuge_inst (
+.zero(i_MEM_zero),
+.Jal(i_MEM_Jal),
+.Jalr(i_MEM_Jalr),
+.result0(i_MEM_ALUresult[0]),
+.Branch_type(i_MEM_Branch_type),
+.Branch(o_MEM_Branch)
+);
 
 //中间数据流
 assign o_MEM_RegWrite = i_MEM_RegWrite;
 assign o_MEM_reg_wr_addr = i_MEM_reg_wr_addr;
+assign o_MEM_pc = i_MEM_pc;
 
 //write to Mem
 wire [7:0] Wmask;
@@ -118,7 +175,7 @@ end
 
 always @ (posedge i_MEM_clk) begin
     if (i_MEM_MemWrite)
-        pmem_write(i_MEM_ALUresult, i_MEM_mem_wr_data, Wmask);
+        pmem_write(i_MEM_ALUresult, MEM_real_mem_wr_data, Wmask);
 end
 
 endmodule
