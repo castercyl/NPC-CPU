@@ -13,7 +13,7 @@ module ysyx_22040386_IF_ID (
     output reg [31:0] o_IF_ID_inst,
     output reg [63:0] o_IF_ID_pc,
     output reg [4:0] o_IF_ID_reg_rd_addr1,
-    output reg [4:0] o_IF_ID_reg_rd_addr2,
+    output reg [4:0] o_IF_ID_reg_rd_addr2
 );
 
 always @ (posedge i_IF_ID_clk) begin

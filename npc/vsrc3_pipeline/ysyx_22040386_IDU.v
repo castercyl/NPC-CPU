@@ -15,6 +15,7 @@ module ysyx_22040386_IDU (
     input wire [63:0] i_id_MEM_WB_reg_wr_data_o,
 
     output wire o_ID_unkown_code,    //仅用于前期检测未实现的指令
+    output wire [31:0] o_ID_inst,    //用于五级流水测试检测ebreak停程序
 
     output wire o_load_use_flag,
 
@@ -65,6 +66,7 @@ assign o_ID_reg_wr_addr = i_ID_inst[11:7];
 assign o_ID_pc = i_ID_pc;
 assign o_ID_reg_rd_addr1 = i_ID_reg_rd_addr1;
 assign o_ID_reg_rd_addr2 = i_ID_reg_rd_addr2;
+assign o_ID_inst = i_ID_inst;
 /*### 数据通路控制信号生成 ###*/
 
 /*### 1.ALUop信号生成 ###*/
@@ -207,13 +209,14 @@ code_test code_test_inst (
 
 
 /*##DPI-C 识别到ebreak指令后自动结束##*/
-
+//测试五级流水时得检测WB阶段的inst
+/*
 import "DPI-C" function void ebreak();
 always @ (*) begin
   if (i_ID_inst == 32'h0010_0073)
     ebreak();
 end
-
+*/
 //assign unkown_code = (opcode != 7'b0010011);
 /*
 import "DPI-C" function void unkown_inst();

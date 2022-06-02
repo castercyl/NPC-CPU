@@ -8,6 +8,14 @@
 #include "Vysyx_22040386_TOP__Syms.h"
 #include "Vysyx_22040386_TOP___024root.h"
 
+extern "C" void ebreak();
+
+VL_INLINE_OPT void Vysyx_22040386_TOP___024root____Vdpiimwrap_ysyx_22040386_TOP__DOT__ebreak_TOP() {
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vysyx_22040386_TOP___024root____Vdpiimwrap_ysyx_22040386_TOP__DOT__ebreak_TOP\n"); );
+    // Body
+    ebreak();
+}
+
 extern "C" void pmem_read(long long raddr, long long* rdata);
 
 VL_INLINE_OPT void Vysyx_22040386_TOP___024root____Vdpiimwrap_ysyx_22040386_TOP__DOT__ysyx_22040386_IFU_inst__DOT__pmem_read_TOP(QData/*63:0*/ raddr, QData/*63:0*/ &rdata) {
@@ -18,14 +26,6 @@ VL_INLINE_OPT void Vysyx_22040386_TOP___024root____Vdpiimwrap_ysyx_22040386_TOP_
     long long rdata__Vcvt;
     pmem_read(raddr__Vcvt, &rdata__Vcvt);
     rdata = rdata__Vcvt;
-}
-
-extern "C" void ebreak();
-
-VL_INLINE_OPT void Vysyx_22040386_TOP___024root____Vdpiimwrap_ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ebreak_TOP() {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vysyx_22040386_TOP___024root____Vdpiimwrap_ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ebreak_TOP\n"); );
-    // Body
-    ebreak();
 }
 
 extern "C" void set_gpr_ptr(const svOpenArrayHandle a);

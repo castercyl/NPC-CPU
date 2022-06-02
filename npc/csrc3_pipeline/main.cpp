@@ -12,6 +12,12 @@
 
 enum {DIFFTEST_TO_DUT, DIFFTEST_TO_REF, NPC_STOP, NPC_RUNNING, NPC_END, NPC_ABORT};
 
+const char *regs[] = {
+    "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
+    "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
+    "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+    "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
+
 typedef uint64_t word_t;
 typedef word_t vaddr_t;
 typedef uint32_t paddr_t;
@@ -35,6 +41,8 @@ typedef struct
     vaddr_t pc;
 } CPU_state;                 //模拟nemu写一个cpu状态,用于DIffTest
 CPU_state cpu = {};          //开辟一个空间用于存放模拟的cpu状态
+
+vaddr_t last_pc = 0;         //记录上一条有效执行的指令地址，不是nop
 
 uint32_t ebreak_flag = 0;    //程序结束标志，为1时结束仿真
 uint32_t unkown_code_flag = 0;    //未译码指令标志，为1时结束仿真
@@ -74,7 +82,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   if (raddr >= CONFIG_MBASE){
 	    //unit_64 real_raddr = raddr & ~0x7ull       //等价为 & 0xFFFF_FFFF_FFFF_FFF8,总线这样要求的
 		*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
-		printf("rdata = 0x%llx\n",*rdata);
+		//printf("rdata = 0x%llx\n",*rdata);
 	}
 	else{
 		*rdata = 0;
@@ -160,7 +168,6 @@ int main(int argc, char** argv, char** env) {
 			top->i_TOP_rst_n = 1;
 		}
 
-
 		if(main_time % 2 == 0){
 			top->i_TOP_clk = 0;
 			top->eval();
@@ -169,33 +176,48 @@ int main(int argc, char** argv, char** env) {
 			printf("main_time = %ld\n",main_time);
 			top->i_TOP_clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
-			
-			if(main_time >= 3){
+
+			printf("Branch:0x%x; jump_flag:0x%x\n",top->o_TOP_Branch,top->o_TOP_jump_flag);
+				
+			if((top->o_TOP_pc != 0) && (top->o_TOP_pc != cpu.pc)){    //WB阶段的pc不为0且和上一次存储的pc值不同才视为执行了一条指令
+				printf("PC: 0x%0lx\n", top->o_TOP_pc);
+				printf("a0 : 0x%lx\n",cpu_gpr[10]);
+
 				difftest_step(top->o_TOP_pc);
+				//difftest_step(top->o_TOP_pc);
+			}
+			else{
+				printf("pc: nop!\n");
 			}
 
-			printf("PC: 0x%0lx; Inst: 0x%x; Branch: 0x%x\n", top->o_TOP_pc, top->o_TOP_inst, top->o_TOP_Branch);
+			//printf("PC: 0x%0lx\n", top->o_TOP_pc);
+			//printf("fw_EX_src1fw = 0x%x; fw_EX_src1fw = 0x%x\n", top->o_fw_EX_src1fw, top->o_fw_EX_src2fw);
+			//printf("ID_EX_reg_rd_addr1=0x%x; ID_EX_reg_rd_addr2=0x%x; EX_MEM_reg_wr_addr=0x%x; EX_MEM_RegWrite=0x%x\n", top->o_ID_EX_reg_rd_addr1,top->o_ID_EX_reg_rd_addr2,top->o_EX_MEM_reg_wr_addr,top->o_EX_MEM_RegWrite);
 			
 			if (unkown_code_flag || top->o_TOP_unkown_code){
-				printf("Warining: An unkown Inst! pc: %lx; Inst: %x\n", top->o_TOP_pc, top->o_TOP_inst);
+				printf("Warining: An unkown Inst! pc: %lx", top->o_TOP_pc);
 				npc_state = NPC_ABORT;
 				break;
 			}
 			
-			printf("a0 : 0x%lx\n",cpu_gpr[10]);
+			//printf("a0 : 0x%lx\n",cpu_gpr[10]);
 			//difftest_step(top->pc);
 		}
 
 		if(npc_state == NPC_ABORT){    //如果DIFTest失败，立刻结束程序
-			printf("False:ABORT!The false PC is 0x%0lx\n",cpu.pc);
+			printf("False:ABORT!The false PC is 0x%0lx\n",last_pc);
+			printf("\n");
 			break;
 		}
+		printf("\n");
 
 
 		//top->I = pmem_read(top->pc, 4);
-
 		cpu.pc = top->o_TOP_pc;
-		current_inst = top->o_TOP_inst;
+		if (top->o_TOP_pc != 0){
+			last_pc = top->o_TOP_pc;
+		}
+		//current_inst = top->o_TOP_inst;
 
 		top->eval();
         tfp->dump(main_time);
@@ -357,15 +379,20 @@ static void checkregs(CPU_state *ref, vaddr_t dnpc) {
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t dnpc) {   // I DO
   int i = 0;
+  int j = 0;
   bool DIF_result = true;
   if (ref_r->pc != dnpc){
-	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, current_inst);
+	  for (j=0; j<32; j++){
+		  printf("ref_%s=0x%08lx; npc_%s=0x%08lx\n", regs[j],ref_r->gpr[j], regs[j], cpu_gpr[j]);
+	  }
+	  printf("\n");
+	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx\n",ref_r->pc, dnpc);
 	  DIF_result = false;
   }
   for (i = 0; i < 32; i++){
     if (ref_r->gpr[i] != cpu_gpr[i]){
-		printf("False: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
-		i, ref_r->gpr[i], i, cpu_gpr[i], top->o_TOP_inst);
+		printf("False: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx\n",
+		i, ref_r->gpr[i], i, cpu_gpr[i]);
 		DIF_result = false;
     }
   }

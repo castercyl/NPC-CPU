@@ -36,7 +36,7 @@ assign o_fw_ID_reg_rd1fw = (i_fw_IF_ID_reg_rd_addr1 == i_fw_MEM_WB_reg_wr_addr) 
 assign o_fw_ID_reg_rd2fw = (i_fw_IF_ID_reg_rd_addr2 == i_fw_MEM_WB_reg_wr_addr) && i_fw_MEM_WB_RegWrite
 && (i_fw_MEM_WB_reg_wr_addr != 5'd0);
 
-assign o_fw_MEM_disrcfw = (i_MEM_WB_reg_wr_addr == i_fw_EX_MEM_reg_rd_addr2) && i_fw_MEM_WB_RegWrite 
+assign o_fw_MEM_disrcfw = (i_fw_MEM_WB_reg_wr_addr == i_fw_EX_MEM_reg_rd_addr2) && i_fw_MEM_WB_RegWrite 
 && i_fw_EX_MEM_MemWrite && (i_fw_MEM_WB_reg_wr_addr != 5'd0);
 
 endmodule

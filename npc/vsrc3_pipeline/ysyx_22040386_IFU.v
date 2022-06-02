@@ -5,8 +5,8 @@ input wire i_IF_Branch,
 input wire i_IF_load_use_flag,
 input wire [63:0] i_IF_dnpc,
 
-output wire [4:0] o_IF_reg_rd_addr1;
-output wire [4:0] o_IF_reg_rd_addr2;
+output wire [4:0] o_IF_reg_rd_addr1,
+output wire [4:0] o_IF_reg_rd_addr2,
 output reg [63:0] o_IF_pc,
 output wire [31:0] o_IF_inst
 );
@@ -14,17 +14,19 @@ output wire [31:0] o_IF_inst
 //计算PC
 wire [63:0] IF_inst_rdata, IF_nextpc;
 
-assign IF_nextpc = (i_IF_Branch) ? i_IF_dnpc : (o_IF_pc + 64'd4);
+wire IF_load_use_flag;
+assign IF_load_use_flag = (i_IF_Branch) ? 1'b0 : i_IF_load_use_flag;  //Branch优先级高于load_use
 
 always @ (posedge i_IF_clk) begin
   if (!i_IF_rst_n)
     o_IF_pc <= 64'h0000_0000_8000_0000;
-  else if (i_IF_load_use_flag)
+  else if (IF_load_use_flag)
     o_IF_pc = o_IF_pc;
   else
     o_IF_pc <= IF_nextpc;
 end
 
+assign IF_nextpc = (i_IF_Branch) ? i_IF_dnpc : (o_IF_pc + 64'd4);
 
 //##DPI-C访问内存取指令##*/
 assign o_IF_inst = (o_IF_pc[2]) ? IF_inst_rdata[63:32] : IF_inst_rdata[31:0];  //取指

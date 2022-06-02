@@ -25,6 +25,9 @@ module ysyx_22040386_ID_EX (
     input wire [4:0] i_ID_EX_reg_rd_addr1,
     input wire [4:0] i_ID_EX_reg_rd_addr2,
 
+    input wire i_ID_EX_unkown_code,    //仅用于前期检测未实现的指令
+    input  wire [31:0] i_ID_EX_inst,    //用于五级流水测试检测ebreak停程序
+
     output reg o_ID_EX_Word_op,
     output reg o_ID_EX_RegWrite,
     output reg o_ID_EX_MemWrite,
@@ -43,7 +46,10 @@ module ysyx_22040386_ID_EX (
     output reg [63:0] o_ID_EX_reg_rd_data1,
     output reg [63:0] o_ID_EX_reg_rd_data2,
     output reg [4:0] o_ID_EX_reg_rd_addr1,
-    output reg [4:0] o_ID_EX_reg_rd_addr2
+    output reg [4:0] o_ID_EX_reg_rd_addr2,
+
+    output reg o_ID_EX_unkown_code,    //仅用于前期检测未实现的指令
+    output reg [31:0] o_ID_EX_inst   //用于五级流水测试检测ebreak停程序
 );
 
 always @ (posedge i_ID_EX_clk) begin
@@ -156,6 +162,39 @@ always @ (posedge i_ID_EX_clk) begin
         o_ID_EX_Branch_type <= i_ID_EX_Branch_type;
 end
 
+always @ (posedge i_ID_EX_clk) begin
+    if (!i_ID_EX_rst_n)
+        o_ID_EX_reg_rd_addr1 <= 5'd0;
+    else if (i_ID_EX_jump_flag)
+        o_ID_EX_reg_rd_addr1 <= 5'd0;
+    else if (i_ID_EX_load_use_flag)
+        o_ID_EX_reg_rd_addr1 <= 5'd0;
+    else
+        o_ID_EX_reg_rd_addr1 <= i_ID_EX_reg_rd_addr1;
+end
+
+always @ (posedge i_ID_EX_clk) begin
+    if (!i_ID_EX_rst_n)
+        o_ID_EX_reg_rd_addr2 <= 5'd0;
+    else if (i_ID_EX_jump_flag)
+        o_ID_EX_reg_rd_addr2 <= 5'd0;
+    else if (i_ID_EX_load_use_flag)
+        o_ID_EX_reg_rd_addr2 <= 5'd0;
+    else
+        o_ID_EX_reg_rd_addr2 <= i_ID_EX_reg_rd_addr2;
+end
+
+always @ (posedge i_ID_EX_clk) begin
+    if (!i_ID_EX_rst_n)
+        o_ID_EX_reg_wr_addr <= 5'd0;
+    else if (i_ID_EX_jump_flag)
+        o_ID_EX_reg_wr_addr <= 5'd0;
+    else if (i_ID_EX_load_use_flag)
+        o_ID_EX_reg_wr_addr <= 5'd0;
+    else
+        o_ID_EX_reg_wr_addr <= i_ID_EX_reg_wr_addr;
+end
+
 //##非数据通路控制信号
 
 always @ (posedge i_ID_EX_clk) begin
@@ -167,13 +206,6 @@ end
 
 always @ (posedge i_ID_EX_clk) begin
     if (!i_ID_EX_rst_n)
-        o_ID_EX_reg_wr_addr <= 5'd0;
-    else
-        o_ID_EX_reg_wr_addr <= i_ID_EX_reg_wr_addr;
-end
-
-always @ (posedge i_ID_EX_clk) begin
-    if (!i_ID_EX_rst_n)
         o_ID_EX_ALUctr <= 6'd0;
     else
         o_ID_EX_ALUctr <= i_ID_EX_ALUctr;
@@ -181,6 +213,8 @@ end
 
 always @ (posedge i_ID_EX_clk) begin
     if (!i_ID_EX_rst_n)
+        o_ID_EX_pc <= 64'd0;
+    else if (i_ID_EX_jump_flag)     //为了DIFTESE测试需要
         o_ID_EX_pc <= 64'd0;
     else
         o_ID_EX_pc <= i_ID_EX_pc;
@@ -207,18 +241,27 @@ always @ (posedge i_ID_EX_clk) begin
         o_ID_EX_reg_rd_data2 <= i_ID_EX_reg_rd_data2;
 end
 
+//仿真测试信号
 always @ (posedge i_ID_EX_clk) begin
     if (!i_ID_EX_rst_n)
-        o_ID_EX_reg_rd_addr1 <= 5'd0;
+        o_ID_EX_unkown_code <= 1'b0;
+    else if (i_ID_EX_jump_flag)
+        o_ID_EX_unkown_code <= 1'b0;
+    else if (i_ID_EX_load_use_flag)
+        o_ID_EX_unkown_code <= 1'b0;
     else
-        o_ID_EX_reg_rd_addr1 <= i_ID_EX_reg_rd_addr1;
+        o_ID_EX_unkown_code <= i_ID_EX_unkown_code;
 end
 
 always @ (posedge i_ID_EX_clk) begin
     if (!i_ID_EX_rst_n)
-        o_ID_EX_reg_rd_addr2 <= 5'd0;
+        o_ID_EX_inst <= 32'd0;
+    else if (i_ID_EX_jump_flag)
+        o_ID_EX_inst <= 32'd0;
+    else if (i_ID_EX_load_use_flag)
+        o_ID_EX_inst <= 32'd0;
     else
-        o_ID_EX_reg_rd_addr2 <= i_ID_EX_reg_rd_addr2;
+        o_ID_EX_inst <= i_ID_EX_inst;
 end
 
 endmodule

@@ -38,7 +38,11 @@ module ysyx_22040386_EX_MEM (
     output reg [63:0] o_EX_MEM_mem_wr_data,
     output reg [63:0] o_EX_MEM_snpc,
 
-    output reg [63:0] o_EX_MEM_pc
+    output reg [63:0] o_EX_MEM_pc,
+    input wire i_EX_MEM_unkown_code,
+    input wire [31:0] i_EX_MEM_inst,
+    output reg o_EX_MEM_unkown_code,
+    output reg [31:0] o_EX_MEM_inst
 );
 
 always @ (posedge i_EX_MEM_clk) begin
@@ -104,6 +108,24 @@ always @ (posedge i_EX_MEM_clk) begin
         o_EX_MEM_Branch_type <= i_EX_MEM_Branch_type;
 end
 
+always @ (posedge i_EX_MEM_clk) begin
+    if (!i_EX_MEM_rst_n)
+        o_EX_MEM_reg_rd_addr2 <= 5'd0;
+    else if (i_EX_MEM_jump_flag)
+         o_EX_MEM_reg_rd_addr2 <= 5'd0;
+    else
+        o_EX_MEM_reg_rd_addr2 <= i_EX_MEM_reg_rd_addr2;;
+end
+
+always @ (posedge i_EX_MEM_clk) begin
+    if (!i_EX_MEM_rst_n)
+        o_EX_MEM_reg_wr_addr <= 5'd0;
+    else if (i_EX_MEM_jump_flag)
+        o_EX_MEM_reg_wr_addr <= 5'd0;
+    else
+        o_EX_MEM_reg_wr_addr <= i_EX_MEM_reg_wr_addr;
+end
+
 //##非数据通路控制信号
 
 always @ (posedge i_EX_MEM_clk) begin
@@ -111,13 +133,6 @@ always @ (posedge i_EX_MEM_clk) begin
         o_EX_MEM_mem_mask <= 3'd0;
     else
         o_EX_MEM_mem_mask <= i_EX_MEM_mem_mask;
-end
-
-always @ (posedge i_EX_MEM_clk) begin
-    if (!i_EX_MEM_rst_n)
-        o_EX_MEM_reg_wr_addr <= 5'd0;
-    else
-        o_EX_MEM_reg_wr_addr <= i_EX_MEM_reg_wr_addr;
 end
 
 always @ (posedge i_EX_MEM_clk) begin
@@ -155,18 +170,33 @@ always @ (posedge i_EX_MEM_clk) begin
         o_EX_MEM_snpc <= i_EX_MEM_snpc;
 end
 
-always @ (posedge i_EX_MEM_clk) begin
-    if (!i_EX_MEM_rst_n)
-        o_EX_MEM_reg_rd_addr2 <= 5'd0;
-    else
-        o_EX_MEM_reg_rd_addr2 <= i_EX_MEM_reg_rd_addr2;;
-end
 
 always @ (posedge i_EX_MEM_clk) begin
     if (!i_EX_MEM_rst_n)
         o_EX_MEM_pc <= 64'd0;
+    else if (i_EX_MEM_jump_flag)            //为了DIFTEST测试需要
+        o_EX_MEM_pc <= 64'd0;
     else
         o_EX_MEM_pc <= i_EX_MEM_pc;;
+end
+
+//仿真测试信号
+always @ (posedge i_EX_MEM_clk) begin
+    if (!i_EX_MEM_rst_n)
+        o_EX_MEM_unkown_code <= 1'b0;
+    else if (i_EX_MEM_jump_flag)
+        o_EX_MEM_unkown_code <= 1'b0;
+    else
+        o_EX_MEM_unkown_code <= i_EX_MEM_unkown_code;
+end
+
+always @ (posedge i_EX_MEM_clk) begin
+    if (!i_EX_MEM_rst_n)
+        o_EX_MEM_inst <= 32'd0;
+    else if (i_EX_MEM_jump_flag)
+        o_EX_MEM_inst <= 32'd0;
+    else
+        o_EX_MEM_inst <=  i_EX_MEM_inst;
 end
 
 endmodule

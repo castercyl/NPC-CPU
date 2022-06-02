@@ -41,7 +41,12 @@ module ysyx_22040386_EXU(
     output wire o_EX_Jalr,
 
     output wire [63:0] o_EX_snpc,
-    output wire [63:0] o_EX_pc
+    output wire [63:0] o_EX_pc,
+
+    input wire i_EX_unkown_code,
+    input wire [31:0] i_EX_inst,
+    output wire o_EX_unkown_code,
+    output wire [31:0] o_EX_inst
 );
 
 wire [63:0] EX_src1, EX_src2;
@@ -49,19 +54,19 @@ reg [63:0] EX_real_reg_rd_data1, EX_real_reg_rd_data2;
 
 always @ (*) begin
     case (i_fw_EX_src1fw)
-    2'b00: EX_real_reg_rd_data1 <= i_EX_reg_rd_data1;
-    2'b01: EX_real_reg_rd_data1 <= i_ex_EX_MEM_reg_wr_data_o;
-    2'b10: EX_real_reg_rd_data1 <= i_ex_MEM_WB_reg_wr_data_o;
-    default: EX_real_reg_rd_data1 <= 64'd0;
+    2'b00: EX_real_reg_rd_data1 = i_EX_reg_rd_data1;
+    2'b01: EX_real_reg_rd_data1 = i_ex_MEM_WB_reg_wr_data_o;
+    2'b10: EX_real_reg_rd_data1 = i_ex_EX_MEM_reg_wr_data_o;
+    default: EX_real_reg_rd_data1 = 64'd0;
     endcase
 end
 
 always @ (*) begin
     case (i_fw_EX_src2fw)
-    2'b00: EX_real_reg_rd_data2 <= i_EX_reg_rd_data2;
-    2'b01: EX_real_reg_rd_data2 <= i_ex_EX_MEM_reg_wr_data_o;
-    2'b10: EX_real_reg_rd_data2 <= i_ex_MEM_WB_reg_wr_data_o;
-    default: EX_real_reg_rd_data2 <= 64'd0;
+    2'b00: EX_real_reg_rd_data2 = i_EX_reg_rd_data2;
+    2'b01: EX_real_reg_rd_data2 = i_ex_MEM_WB_reg_wr_data_o;
+    2'b10: EX_real_reg_rd_data2 = i_ex_EX_MEM_reg_wr_data_o;
+    default: EX_real_reg_rd_data2 = 64'd0;
     endcase
 end
 
@@ -87,11 +92,18 @@ assign o_EX_Jal = i_EX_Jal;
 assign o_EX_Jalr = i_EX_Jalr;
 
 assign o_EX_pc = i_EX_pc;
-
+assign o_EX_unkown_code = i_EX_unkown_code;
+assign o_EX_inst = i_EX_inst;
 //ysyx_22040386_Branchjuge ysyx_22040386_Branchjuge_inst (.zero(zero), .Jal(Jal), .Jalr(Jalr), .result0(result[0]), 
 //.Branch_type(Branch_type), .Branch(Branch));
 
-ysyx_22040386_ALU ysyx_22040386_ALU_inst (.src1(EX_src1), .src2(EX_src2), .ALUctr(i_EX_ALUctr), .zero(o_EX_zero), 
-.result(o_EX_ALUresult), .Word_op(i_EX_Word_op));
+ysyx_22040386_ALU ysyx_22040386_ALU_inst (
+.src1(EX_src1),
+.src2(EX_src2),
+.ALUctr(i_EX_ALUctr),
+.zero(o_EX_zero),
+.result(o_EX_ALUresult),
+.Word_op(i_EX_Word_op)
+);
 
 endmodule

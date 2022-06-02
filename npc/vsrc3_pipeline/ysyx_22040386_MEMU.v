@@ -42,7 +42,11 @@ module ysyx_22040386_MEMU (
     output wire [1:0] o_fw_EX_src1fw,
     output wire [1:0] o_fw_EX_src2fw,
 
-    output wire [63:0] o_MEM_pc
+    output wire [63:0] o_MEM_pc,
+    input wire i_MEM_unkown_code,
+    input wire [31:0] i_MEM_inst,
+    output wire o_MEM_unkown_code,
+    output wire [31:0] o_MEM_inst
 );
 
 wire fw_MEM_disrcfw;
@@ -63,7 +67,7 @@ assign o_MEM_dnpc = (i_MEM_Jalr) ? i_MEM_ALUresult : i_MEM_pc_add_imm;
 ysyx_22040386_FWcontrol ysyx_22040386_FWcontrol_inst (
 .i_fw_EX_MEM_RegWrite(i_mem_EX_MEM_RegWrite_o),
 .i_fw_EX_MEM_MemWrite(i_MEM_MemWrite),
-.i_fw_MEM_WB_RegWrite(i_mem_MEM_WB_reg_wr_addr_o),
+.i_fw_MEM_WB_RegWrite(i_mem_MEM_WB_RegWrite_o),
 .i_fw_EX_MEM_reg_wr_addr(i_mem_EX_MEM_reg_wr_addr_o),
 .i_fw_MEM_WB_reg_wr_addr(i_mem_MEM_WB_reg_wr_addr_o),
 .i_fw_EX_MEM_reg_rd_addr2(i_mem_EX_MEM_reg_rd_addr2_o),
@@ -99,6 +103,8 @@ assign o_MEM_RegWrite = i_MEM_RegWrite;
 assign o_MEM_reg_wr_addr = i_MEM_reg_wr_addr;
 assign o_MEM_pc = i_MEM_pc;
 
+assign o_MEM_unkown_code = i_MEM_unkown_code;
+assign o_MEM_inst = i_MEM_inst;
 //write to Mem
 wire [7:0] Wmask;
 reg [7:0] reg_Wmask;
