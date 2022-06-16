@@ -24,7 +24,9 @@ void iring(int iring_num, Decode *s){  //I DO
   iringbuf[iring_num++] = s->logbuf;
 }*/
 
-CPU_state cpu = {};
+//CPU_state cpu = {};
+CPU_state cpu = {.mstatus=0xa00001800}; //I DO 为了配合DIFTEST
+
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;

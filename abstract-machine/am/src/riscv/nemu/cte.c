@@ -8,8 +8,13 @@ Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
+      case 11: ev.event = EVENT_YIELD; c->mepc = c->mepc + 4; break; //I DO mcause=0xb
       default: ev.event = EVENT_ERROR; break;
     }
+ 
+  printf("mcause= %x\n",c->mcause); //I DO   这里调用的是自己写的printf函数 
+  printf("mstatus= %x\n",c->mstatus); //I DO
+  printf("mepc= %x\n",c->mepc); //I DO
 
     c = user_handler(ev, c);
     assert(c != NULL);

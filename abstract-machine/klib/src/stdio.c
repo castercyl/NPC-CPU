@@ -126,7 +126,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
 */
 size_t j = 0, k = 0, i = 0;
   int val, num[64] = {0};
-  uint32_t v;
+  uint64_t v;
   const char *str;
   char nums[20];
   while (*fmt != '\0')
@@ -185,7 +185,7 @@ size_t j = 0, k = 0, i = 0;
           fmt++;
           break;
         case 'x':
-          v = va_arg(ap, uint32_t);
+          v = va_arg(ap, uint64_t);
           k = 0;
           out[j++] = '0';
           out[j++] = 'x';

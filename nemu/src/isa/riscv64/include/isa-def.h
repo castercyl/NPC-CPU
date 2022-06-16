@@ -6,6 +6,11 @@
 typedef struct {
   word_t gpr[32];
   vaddr_t pc;
+
+  uintptr_t mepc;      //I DO 添加系统寄存器
+  uintptr_t mstatus;   //I DO
+  uintptr_t mcause;   // I DO
+  uintptr_t mtvec;    // I DO
 } riscv64_CPU_state;
 
 // decode
