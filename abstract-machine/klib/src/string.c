@@ -76,11 +76,15 @@ void *memcpy(void *out, const void *in, size_t n) {   // I DO 未测试
   }
   return out;
   */
+  assert(out != NULL);
+  assert(in != NULL);
+
   char* s1 = out;
   const char* s2 = in;
   while(n--){
     *s1++ = *s2++; 
   }
+  //*s1 = '\0';
   return out;
   panic("Not implemented");
 }

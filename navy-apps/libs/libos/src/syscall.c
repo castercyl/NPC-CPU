@@ -61,11 +61,21 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int _write(int fd, void *buf, size_t count) {
-  _exit(SYS_write);
+  _syscall_(SYS_write, fd, (intptr_t)buf, count);  //I DO 触发 SYS_write
+  //_exit(SYS_write);   //注释掉，不希望每次write异常后直接就退出程序了
   return 0;
 }
 
+extern char _end;                   //I DO
+intptr_t end = (intptr_t)&_end;     //I DO
+
+
 void *_sbrk(intptr_t increment) {
+  intptr_t old = end; //I DO
+  if(_syscall_(SYS_brk, old + increment, 0, 0) == 0){  //I DO
+    end = end + increment;
+    return (void*)old;
+  }
   return (void *)-1;
 }
 
