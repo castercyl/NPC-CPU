@@ -1,6 +1,8 @@
 #include <am.h>
 #include <klib-macros.h>
 
+static inline void outb(uintptr_t addr, uint8_t  data) { *(volatile uint8_t  *)addr = data; } //I DO
+
 extern char _heap_start;
 int main(const char *args);
 
@@ -15,6 +17,9 @@ Area heap = RANGE(&_heap_start, PMEM_END);
 static const char mainargs[] = MAINARGS;
 
 void putch(char ch) {
+  //uintptr_t addr;
+  //addr = 0xa00003f8;
+  outb(0xa00003f8, ch); //I DO
 }
 
 void halt(int code) {

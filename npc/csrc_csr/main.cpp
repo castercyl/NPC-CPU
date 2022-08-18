@@ -8,7 +8,10 @@
 #include <dlfcn.h>        //包含动态链接库的相关函数
 
 #define CONFIG_MBASE 0x80000000  //测试程序的起始虚拟地址
-#define CONFIG_MSIZE 0x2800000   //指令存储空间开辟的大小
+#define CONFIG_MSIZE 0x28000000   //指令存储空间开辟的大小
+//#define CONFIG_MSIZE 0x80000000   //指令存储空间开辟的大小
+#define IO_SPACE_MAX (2 * 1024 * 1024)
+#define CONFIG_SERIAL_MMIO 0xa00003f8
 
 enum {DIFFTEST_TO_DUT, DIFFTEST_TO_REF, NPC_STOP, NPC_RUNNING, NPC_END, NPC_ABORT};
 
@@ -33,6 +36,9 @@ void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
 int npc_state = NPC_STOP;              //npc运行的状态
 
 static uint8_t *pimem = NULL;    //指令存储空间的物理起始地址
+static uint8_t *io_space = NULL; //外设存储空间的物理起始地址
+static uint8_t *serial_base = NULL;
+
 static int port = 1234;           //REF DIFTest初始化的参数
 
 typedef struct
@@ -73,6 +79,12 @@ void difftest_step(vaddr_t pc);
 static void checkregs(CPU_state *ref, vaddr_t pc);
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc);
 static inline void host_write(void *addr, int len, word_t data);
+//开辟外设空间
+/*
+void init_device();
+void init_map();
+void init_serial();
+*/
 
 //##DPI-C函数，从内存读##//
 extern "C" void pmem_read(long long raddr, long long *rdata) {
@@ -80,7 +92,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   if (raddr >= CONFIG_MBASE){
 	    //unit_64 real_raddr = raddr & ~0x7ull       //等价为 & 0xFFFF_FFFF_FFFF_FFF8,总线这样要求的
 		*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
-		printf("rdata = 0x%llx\n",*rdata);
+		//printf("rdata = 0x%llx\n",*rdata);
 	}
 	else{
 		*rdata = 0;
@@ -93,6 +105,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
+  
+  //assert(CONFIG_MBASE <= waddr <= (CONFIG_MBASE + CONFIG_MSIZE));
+
   long long addr = waddr & ~0x7ull;
   int len = 0;
   switch(wmask){      //char型(有符号数)的范围为-128～127
@@ -118,10 +133,20 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
 	  default: printf("False: Wmask is %x false !\n",wmask);
   }
 
-  printf("waddr = %llx\n",waddr);
-  printf("addr = %llx\n",addr);
+  //printf("waddr = %llx\n",waddr);
+  //printf("addr = %llx\n",addr);
 
-  host_write(guest_to_host(addr), len, wdata);
+  
+  if (waddr == CONFIG_SERIAL_MMIO){
+	  printf("%c", wdata);
+  }
+  else {
+	  host_write(guest_to_host(addr), len, wdata);
+  }
+  
+  
+
+  //host_write(guest_to_host(addr), len, wdata);
 }
 
 
@@ -144,7 +169,8 @@ int main(int argc, char** argv, char** env) {
 	contextp->commandArgs(argc, argv);
     Verilated ::traceEverOn(true);
     top->trace(tfp, 99);
-    tfp->open("./obj_dir/Vysyx_22040386_TOP.vcd");
+	tfp->open("/obj_dir/Vysyx_22040386_TOP.vcd");
+    //tfp->open("./obj_dir/Vysyx_22040386_TOP.vcd");
 
 	npc_state = NPC_RUNNING;
 	
@@ -172,15 +198,17 @@ int main(int argc, char** argv, char** env) {
 			top->eval();
 		}
 		if(main_time % 2 == 1){
-			printf("main_time = %ld\n",main_time);
+			//printf("main_time = %ld\n",main_time);
 			top->i_TOP_clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
 			
 			if(main_time >= 3){
 				difftest_step(top->o_TOP_pc);
 			}
+			
 
-			printf("PC: 0x%0lx; Inst: 0x%x; Branch: 0x%x\n", top->o_TOP_pc, top->o_TOP_inst, top->o_TOP_Branch);
+			//printf("PC: 0x%0lx; Inst: 0x%x; Branch: 0x%x; ecall: 0x%x; mret: 0x%x\n", top->o_TOP_pc, top->o_TOP_inst, top->o_TOP_Branch, top->o_TOP_ecall, top->o_TOP_mret);
+			//printf("\n");
 			
 			if (unkown_code_flag || top->o_TOP_unkown_code){
 				printf("Warining: An unkown Inst! pc: %lx; Inst: %x\n", top->o_TOP_pc, top->o_TOP_inst);
@@ -188,7 +216,7 @@ int main(int argc, char** argv, char** env) {
 				break;
 			}
 			
-			printf("a0 : 0x%lx\n",cpu_gpr[10]);
+			//printf("a0 : 0x%lx\n",cpu_gpr[10]);
 			//difftest_step(top->pc);
 		}
 
@@ -197,7 +225,12 @@ int main(int argc, char** argv, char** env) {
 			break;
 		}
 
-
+		//csr tset
+		/*
+		if (top->o_TOP_mret){
+			printf("Mret ! csr_dnpc = 0x%0lx\n", top->o_TOP_csr_dnpc);
+			break;
+		}*/
 		//top->I = pmem_read(top->pc, 4);
 
 		cpu.pc = top->o_TOP_pc;
@@ -221,12 +254,17 @@ void init_imem(){
 	pimem = (uint8_t *)malloc(CONFIG_MSIZE);
 	//printf("pimem = %llx\n",pimem);
 	assert(pimem);
+
+	//serialmem = (uint8_t *)malloc(8);
+	
 }
 
 /*##程序中的虚拟地址转换为计算机的实际物理地址##*/
 uint8_t *guest_to_host(paddr_t paddr) {
+	//assert(CONFIG_MBASE <= paddr <= (CONFIG_MBASE + CONFIG_MSIZE));
 	uint8_t *tmp1 = pimem + paddr - CONFIG_MBASE;
 	//printf("guest to host is successful ! addr = %lx\n",tmp1);
+	//assert(paddr < (CONFIG_MBASE + CONFIG_MSIZE));
 	return tmp1;
     //return pimem + paddr - CONFIG_MBASE;
 }
@@ -363,17 +401,41 @@ static void checkregs(CPU_state *ref, vaddr_t dnpc) {
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t dnpc) {   // I DO
   int i = 0;
+  int j = 0;
   bool DIF_result = true;
+  
   if (ref_r->pc != dnpc){
-	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, current_inst);
+	  for (j=0; j<32; j++){
+		  printf("ref_%s=0x%08lx; npc_%s=0x%08lx\n", regs[j],ref_r->gpr[j], regs[j], cpu_gpr[j]);
+	  }
+	  printf("\n");
+	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx\n",ref_r->pc, dnpc);
 	  DIF_result = false;
   }
+   
   for (i = 0; i < 32; i++){
     if (ref_r->gpr[i] != cpu_gpr[i]){
-		printf("False: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
-		i, ref_r->gpr[i], i, cpu_gpr[i], top->o_TOP_inst);
+		printf("False: Reg is false! ref_%s=0x%08lx; npc_%x=0x%08lx\n",
+		regs[i], ref_r->gpr[i], regs[i], cpu_gpr[i]);
 		DIF_result = false;
     }
   }
   return DIF_result;
 }
+
+/*
+void init_map() {
+	init_map();
+	init_serial(); //开辟串口外设
+}
+
+void init_map() {
+  io_space = malloc(IO_SPACE_MAX);
+  assert(io_space);
+  p_space = io_space;
+}
+
+void init_serial() {
+	serial_base = new_space(8);
+}
+*/

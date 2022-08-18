@@ -29,16 +29,12 @@ class Vysyx_22040386_TOP VL_NOT_FINAL {
     VL_IN8(&i_TOP_clk,0,0);
     VL_IN8(&i_TOP_rst_n,0,0);
     VL_OUT8(&o_TOP_unkown_code,0,0);
-    VL_OUT8(&o_TOP_fw_EX_src1fw,1,0);
-    VL_OUT8(&o_TOP_fw_EX_src2fw,1,0);
-    VL_OUT8(&o_TOP_ID_EX_reg_rd_addr1,4,0);
-    VL_OUT8(&o_TOP_ID_EX_reg_rd_addr2,4,0);
-    VL_OUT8(&o_TOP_EX_MEM_reg_wr_addr,4,0);
-    VL_OUT8(&o_TOP_EX_MEM_RegWrite,0,0);
     VL_OUT8(&o_TOP_Branch,0,0);
-    VL_OUT8(&o_TOP_jump_flag,0,0);
+    VL_OUT8(&o_TOP_mret,0,0);
+    VL_OUT8(&o_TOP_ecall,0,0);
     VL_OUT(&o_TOP_inst,31,0);
     VL_OUT64(&o_TOP_pc,63,0);
+    VL_OUT64(&o_TOP_csr_dnpc,63,0);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.

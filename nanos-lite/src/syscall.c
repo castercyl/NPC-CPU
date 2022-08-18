@@ -22,10 +22,10 @@ void do_syscall(Context *c) {
   a[3] = c->GPR4; //I DO   $a2
 
   switch (a[0]) {
-    case 0 : printf("Do syscall ID = %d\n",a[0]); halt(c->GPRx); break; //I DO SYS_exit 接收的是哪个参数？
-    case 1 : printf("Do syscall ID = %d\n",a[0]); yield(); c->GPRx = 0; break; //I DO SYS_yield
-    case 4 : printf("Do syscall ID = %d\n",a[0]); c->GPRx = sys_write((int)a[1], (void*)a[2], (size_t)a[3]); break; //I DO SYS_write
-    case 9 : c->GPRx = 0; break;
+    case 0 : printf("Do SYS_exit\n"); halt(c->GPRx); break; //I DO SYS_exit 接收的是哪个参数？
+    case 1 : printf("Do SYS_yield\n"); yield(); c->GPRx = 0; break; //I DO SYS_yield
+    case 4 : printf("Do SYS_write\n"); c->GPRx = sys_write((int)a[1], (void*)a[2], (size_t)a[3]); break; //I DO SYS_write
+    case 9 : printf("Do SYS_brk\n"); c->GPRx = 0; break; //I DO SYS_brk 当前默认为总是申请成功
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }

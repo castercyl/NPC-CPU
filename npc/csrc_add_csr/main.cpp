@@ -363,15 +363,20 @@ static void checkregs(CPU_state *ref, vaddr_t dnpc) {
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t dnpc) {   // I DO
   int i = 0;
+  int j = 0;
   bool DIF_result = true;
   if (ref_r->pc != dnpc){
-	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx; Instruction is 0x%x\n",ref_r->pc, dnpc, current_inst);
+	  for (j=0; j<32; j++){
+		  printf("ref_%s=0x%08lx; npc_%s=0x%08lx\n", regs[j],ref_r->gpr[j], regs[j], cpu_gpr[j]);
+	  }
+	  printf("\n");
+	  printf("False: PC is false! ref_dnpc is 0x%0lx; npc_dnpc is 0x%0lx\n",ref_r->pc, dnpc);
 	  DIF_result = false;
   }
   for (i = 0; i < 32; i++){
     if (ref_r->gpr[i] != cpu_gpr[i]){
-		printf("False: Reg is false! ref_gpr[%d]: 0x%08lx; npc_gpr[%d]: 0x%08lx; Instruction is 0x%x\n",
-		i, ref_r->gpr[i], i, cpu_gpr[i], top->o_TOP_inst);
+		printf("False: Reg is false! ref_%s=0x%08lx; npc_%x=0x%08lx\n",
+		regs[i], ref_r->gpr[i], regs[i], cpu_gpr[i]);
 		DIF_result = false;
     }
   }

@@ -14,16 +14,12 @@ Vysyx_22040386_TOP::Vysyx_22040386_TOP(VerilatedContext* _vcontextp__, const cha
     , i_TOP_clk{vlSymsp->TOP.i_TOP_clk}
     , i_TOP_rst_n{vlSymsp->TOP.i_TOP_rst_n}
     , o_TOP_unkown_code{vlSymsp->TOP.o_TOP_unkown_code}
-    , o_TOP_fw_EX_src1fw{vlSymsp->TOP.o_TOP_fw_EX_src1fw}
-    , o_TOP_fw_EX_src2fw{vlSymsp->TOP.o_TOP_fw_EX_src2fw}
-    , o_TOP_ID_EX_reg_rd_addr1{vlSymsp->TOP.o_TOP_ID_EX_reg_rd_addr1}
-    , o_TOP_ID_EX_reg_rd_addr2{vlSymsp->TOP.o_TOP_ID_EX_reg_rd_addr2}
-    , o_TOP_EX_MEM_reg_wr_addr{vlSymsp->TOP.o_TOP_EX_MEM_reg_wr_addr}
-    , o_TOP_EX_MEM_RegWrite{vlSymsp->TOP.o_TOP_EX_MEM_RegWrite}
     , o_TOP_Branch{vlSymsp->TOP.o_TOP_Branch}
-    , o_TOP_jump_flag{vlSymsp->TOP.o_TOP_jump_flag}
+    , o_TOP_mret{vlSymsp->TOP.o_TOP_mret}
+    , o_TOP_ecall{vlSymsp->TOP.o_TOP_ecall}
     , o_TOP_inst{vlSymsp->TOP.o_TOP_inst}
     , o_TOP_pc{vlSymsp->TOP.o_TOP_pc}
+    , o_TOP_csr_dnpc{vlSymsp->TOP.o_TOP_csr_dnpc}
     , rootp{&(vlSymsp->TOP)}
 {
 }
