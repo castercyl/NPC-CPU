@@ -33,7 +33,7 @@ wire [31:0] IF_ID_inst;
 //##ID/EX
 wire ID_EX_RegWrite, ID_EX_Word_op, ID_EX_MemRead, ID_EX_MemWrite, ID_EX_ALUBsrc, ID_EX_Auipc;
 wire ID_EX_Jal, ID_EX_Jalr, ID_EX_Lui;
-wire [2:0] ID_EX_Branch_type, ID_EX_mem_mask;
+wire [2:0] ID_EX_Branch_type, ID_EX_mem_mask, ID_EX_FUNCT3;
 wire [4:0] ID_EX_reg_wr_addr;
 wire [5:0] ID_EX_ALUctr;
 wire [63:0] ID_EX_imm, ID_EX_reg_rd_data1, ID_EX_reg_rd_data2, ID_EX_pc;
@@ -64,7 +64,7 @@ wire [63:0] MEM_WB_csr_r_data;
 
 //模块例化
 ysyx_22040386_IFU ysyx_22040386_IFU_inst (.i_IF_rst_n(i_TOP_rst_n), .i_IF_clk(i_TOP_clk), 
-.i_IF_Branch(TOP_Branch), .i_IF_dnpc(TOP_dnpc), .o_IF_pc(IF_ID_pc), .o_IF_inst(IF_ID_inst));
+.i_IF_Branch(TOP_Branch), .i_IF_dnpc(TOP_dnpc), .o_IF_pc(IF_ID_pc), .o_IF_inst(IF_ID_inst) );
 
 ysyx_22040386_IDU ysyx_22040386_IDU_inst (.i_ID_clk(i_TOP_clk), .i_ID_pc(IF_ID_pc), 
 .i_ID_inst(IF_ID_inst), .i_ID_RegWrite(TOP_RegWrite), .i_ID_reg_wr_addr(TOP_reg_wr_addr), 
@@ -75,7 +75,8 @@ ysyx_22040386_IDU ysyx_22040386_IDU_inst (.i_ID_clk(i_TOP_clk), .i_ID_pc(IF_ID_p
 .o_ID_reg_wr_addr(ID_EX_reg_wr_addr), .o_ID_ALUctr(ID_EX_ALUctr), .o_ID_imm(ID_EX_imm), 
 .o_ID_reg_rd_data1(ID_EX_reg_rd_data1), .o_ID_reg_rd_data2(ID_EX_reg_rd_data2), .o_ID_pc(ID_EX_pc),
 .o_ID_ecall(ID_EX_ecall), .o_ID_mret(ID_EX_mret), .o_ID_csr_ren(ID_CSR_csr_ren), .o_ID_csr_wen(ID_CSR_csr_wen),
-.o_ID_csr_state(ID_CSR_csr_state), .o_ID_csr_waddr(ID_CSR_csr_waddr), .o_ID_csr_raddr(ID_CSR_csr_raddr)
+.o_ID_csr_state(ID_CSR_csr_state), .o_ID_csr_waddr(ID_CSR_csr_waddr), .o_ID_csr_raddr(ID_CSR_csr_raddr),
+.o_ID_FUNCT3(ID_EX_FUNCT3)
 );
 
 csr csr_inst (
@@ -98,7 +99,7 @@ ysyx_22040386_EXU ysyx_22040386_EXU_inst (.i_EX_Word_op(ID_EX_Word_op), .i_EX_AL
 .i_EX_ecall(ID_EX_ecall), .i_EX_mret(ID_EX_mret), .i_EX_csr_reg_write(CSR_EX_csr_reg_write),
 .i_EX_csr_r_data(CSR_EX_csr_r_data), .i_EX_csr_dnpc(CSR_EX_csr_dnpc),
 .o_EX_ecall(EX_MEM_ecall), .o_EX_mret(EX_MEM_mret), .o_EX_csr_reg_write(EX_MEM_csr_reg_write),
-.o_EX_csr_r_data(EX_MEM_csr_r_data), .o_EX_csr_dnpc(EX_MEM_csr_dnpc)
+.o_EX_csr_r_data(EX_MEM_csr_r_data), .o_EX_csr_dnpc(EX_MEM_csr_dnpc), .i_EX_FUNCT3(ID_EX_FUNCT3)
 );
 
 ysyx_22040386_MEMU ysyx_22040386_MEMU_inst (.i_MEM_clk(i_TOP_clk), .i_MEM_Jal(EX_MEM_Jal), .i_MEM_Jalr(EX_MEM_Jalr), 

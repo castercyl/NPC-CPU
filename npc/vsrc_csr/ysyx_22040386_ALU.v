@@ -1,5 +1,9 @@
 module ysyx_22040386_ALU (
     input Word_op,
+
+    //input DIV_word,
+    input [2:0] FUNCT3,
+
     input [63:0] src1,
     input [63:0] src2,
     input [5:0] ALUctr,
@@ -44,7 +48,9 @@ assign mul = src1 * src2;
 assign real_mul = (Word_op) ? {{32{mul[31]}}, mul[31:0]} : mul;
 assign div32 = src1[31:0] / src2[31:0];
 assign div64 = src1 / src2;
-assign real_div = (Word_op) ? {{32{div32[31]}}, div32} : div64;
+assign real_div = (~Word_op) ?          div64 :
+                  (FUNCT3 == 3'b101) ? {32'd0, div32} :
+                  {{32{div32[31]}}, div32};
 assign rem32 = src1[31:0] % src2[31:0];
 assign rem64 = src1 % src2;
 assign real_rem = (Word_op) ? {{32{rem32[31]}}, rem32} : rem64;

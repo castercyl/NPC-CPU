@@ -44,6 +44,8 @@ always @ (*) begin
                 R_ctr = 6'b10_0110;  //sra
             else if (funct7 == 7'h00)
                 R_ctr = 6'b00_0101;  //srl
+            else if (funct7 == 7'h01)
+                R_ctr = 6'b00_1001; //divu 待优化更改
         end
         3'b110:begin
             if (funct7 == 7'h00)

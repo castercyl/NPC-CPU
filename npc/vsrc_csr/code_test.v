@@ -77,6 +77,8 @@ always @ (*) begin
                         reg_unkown_code = 1'b0; //srl
                     else if(funct7 == 7'h20)
                         reg_unkown_code = 1'b0; //sra
+                    else if(funct7 == 7'b01)
+                        reg_unkown_code = 1'b0; //divu
                 end
                 3'd6:begin
                     if (funct7 == 7'h00)
@@ -143,11 +145,13 @@ always @ (*) begin
         //load-I-type
         7'b000_0011:begin
             case(funct3)
-                3'd3: reg_unkown_code = 1'b0; //ld
-                3'd2: reg_unkown_code = 1'b0; //lw
-                3'd4: reg_unkown_code = 1'b0; //lbu
+                3'd0: reg_unkown_code = 1'b0; //lb
                 3'd1: reg_unkown_code = 1'b0; //lh
+                3'd2: reg_unkown_code = 1'b0; //lw
+                3'd3: reg_unkown_code = 1'b0; //ld
+                3'd4: reg_unkown_code = 1'b0; //lbu
                 3'd5: reg_unkown_code = 1'b0; //lhu
+                3'd6: reg_unkown_code = 1'b0; //lwu
                 default: reg_unkown_code = 1'b1; 
             endcase
         end
@@ -196,6 +200,8 @@ always @ (*) begin
                         reg_unkown_code = 1'b0; //sraw
                     else if (funct7 == 7'h00)
                         reg_unkown_code = 1'b0; //srlw
+                    else if (funct7 == 7'h01)
+                        reg_unkown_code = 1'b0; //divuw
                 end
                 3'd6:begin
                     if (funct7 == 7'h01)

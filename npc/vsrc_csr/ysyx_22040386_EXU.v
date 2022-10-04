@@ -3,6 +3,10 @@ module ysyx_22040386_EXU(
     input wire i_EX_ALUBsrc,
     input wire i_EX_Auipc,
     input wire i_EX_Lui,
+
+    //input wire i_EX_DIV_word,
+    input wire [2:0] i_EX_FUNCT3,
+
     input wire [5:0] i_EX_ALUctr,
     input wire [63:0] i_EX_pc,
     input wire [63:0] i_EX_imm,
@@ -80,6 +84,6 @@ assign o_EX_Jalr = i_EX_Jalr;
 //.Branch_type(Branch_type), .Branch(Branch));
 
 ysyx_22040386_ALU ysyx_22040386_ALU_inst (.src1(EX_src1), .src2(EX_src2), .ALUctr(i_EX_ALUctr), .zero(o_EX_zero), 
-.result(o_EX_ALUresult), .Word_op(i_EX_Word_op));
+.result(o_EX_ALUresult), .Word_op(i_EX_Word_op), .FUNCT3(i_EX_FUNCT3));
 
 endmodule

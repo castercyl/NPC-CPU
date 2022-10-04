@@ -6,12 +6,14 @@
 #include <verilated_vcd_c.h> //生成波形.vcd所需要的文件
 #include <cassert>        //装有aseert()的库
 #include <dlfcn.h>        //包含动态链接库的相关函数
+#include <time.h>         //获取系统时间的库
 
 #define CONFIG_MBASE 0x80000000  //测试程序的起始虚拟地址
 #define CONFIG_MSIZE 0x28000000   //指令存储空间开辟的大小
 //#define CONFIG_MSIZE 0x80000000   //指令存储空间开辟的大小
 #define IO_SPACE_MAX (2 * 1024 * 1024)
 #define CONFIG_SERIAL_MMIO 0xa00003f8
+#define CONFIG_RTC_MMIO    0xa0000048
 
 enum {DIFFTEST_TO_DUT, DIFFTEST_TO_REF, NPC_STOP, NPC_RUNNING, NPC_END, NPC_ABORT};
 
@@ -40,6 +42,9 @@ static uint8_t *io_space = NULL; //外设存储空间的物理起始地址
 static uint8_t *serial_base = NULL;
 
 static int port = 1234;           //REF DIFTest初始化的参数
+
+static uint64_t boot_time = 0; //开机时间基准数
+static uint64_t boot_time_origin = 0; //1970.1.1到目前的秒数
 
 typedef struct
 {
@@ -91,7 +96,19 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
   if (raddr >= CONFIG_MBASE){
 	    //unit_64 real_raddr = raddr & ~0x7ull       //等价为 & 0xFFFF_FFFF_FFFF_FFF8,总线这样要求的
-		*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
+		if (raddr == CONFIG_RTC_MMIO){
+			long long now_s;
+			time(&now_s);
+			if (boot_time == 0){
+				boot_time = now_s;
+			}
+			//*rdata = now_s - boot_time;
+			*rdata = 100;
+		}
+		else {
+			*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
+		}
+		//*rdata = host_read(guest_to_host(raddr & ~0x7ull), 8);
 		//printf("rdata = 0x%llx\n",*rdata);
 	}
 	else{

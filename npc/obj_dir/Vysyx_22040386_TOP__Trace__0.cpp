@@ -281,11 +281,16 @@ void Vysyx_22040386_TOP___024root__trace_chg_sub_0(Vysyx_22040386_TOP___024root*
                                     : vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__mul)),64);
         tracep->chgQData(oldp+80,(VL_DIV_QQQ(64, vlSelf->ysyx_22040386_TOP__DOT__ID_EX_reg_rd_data1, vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__EX_src2)),64);
         tracep->chgQData(oldp+82,(((8U & vlSelf->ysyx_22040386_TOP__DOT__IF_ID_inst)
-                                    ? (((QData)((IData)(
-                                                        (- (IData)(
-                                                                   (vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32 
-                                                                    >> 0x1fU))))) 
-                                        << 0x20U) | (QData)((IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32)))
+                                    ? ((5U == (7U & 
+                                               (vlSelf->ysyx_22040386_TOP__DOT__IF_ID_inst 
+                                                >> 0xcU)))
+                                        ? (QData)((IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32))
+                                        : (((QData)((IData)(
+                                                            (- (IData)(
+                                                                       (vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32 
+                                                                        >> 0x1fU))))) 
+                                            << 0x20U) 
+                                           | (QData)((IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32))))
                                     : VL_DIV_QQQ(64, vlSelf->ysyx_22040386_TOP__DOT__ID_EX_reg_rd_data1, vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__EX_src2))),64);
         tracep->chgQData(oldp+84,(VL_MODDIV_QQQ(64, vlSelf->ysyx_22040386_TOP__DOT__ID_EX_reg_rd_data1, vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__EX_src2)),64);
         tracep->chgQData(oldp+86,(((8U & vlSelf->ysyx_22040386_TOP__DOT__IF_ID_inst)

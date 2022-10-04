@@ -32,6 +32,10 @@ module ysyx_22040386_IDU (
     output wire o_ID_Jal,
     output wire o_ID_Jalr,
     output wire o_ID_Lui,
+
+    //output wire o_ID_DIV_word,
+    output wire [2:0] o_ID_FUNCT3,
+
     output reg [2:0] o_ID_Branch_type,
     output wire [2:0] o_ID_mem_mask,
     output wire [4:0] o_ID_reg_wr_addr,
@@ -63,6 +67,8 @@ assign ID_reg_rd_addr1 = i_ID_inst[19:15];
 assign ID_reg_rd_addr2 = i_ID_inst[24:20];
 
 assign o_ID_reg_wr_addr = i_ID_inst[11:7];
+
+assign o_ID_FUNCT3 = ID_funct3;
 
 //中间数据流，流水线
 assign o_ID_pc = i_ID_pc;
@@ -187,6 +193,9 @@ assign o_ID_mem_mask = ID_funct3;
 
 /*### 13. MemRead 生成 ###*/
 assign o_ID_MemRead = (ID_opcode == 7'b000_0011) ? 1'b1 : 1'b0;   //load-type
+
+/*### 14. DIV_word 生成 ###*/
+//assign o_ID_DIV_word = (ID_opcode == 7'b011_1011) ? 1'b1 : 1'b0; //貌似算术运算中所有的word操作都是这个
 
 
 //子控模块，根据ALUop产生ALUctr

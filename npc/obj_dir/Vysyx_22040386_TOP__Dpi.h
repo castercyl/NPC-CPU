@@ -16,7 +16,7 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at vsrc_csr/ysyx_22040386_IDU.v:206:30
+    // DPI import at vsrc_csr/ysyx_22040386_IDU.v:215:30
     extern void ebreak();
     // DPI import at vsrc_csr/ysyx_22040386_IFU.v:26:30
     extern void pmem_read(long long raddr, long long* rdata);

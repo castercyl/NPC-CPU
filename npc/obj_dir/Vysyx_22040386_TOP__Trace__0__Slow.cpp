@@ -48,6 +48,7 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_init_sub__TOP__0(Vysyx_220
     tracep->declBit(c+19,"ID_EX_Lui", false,-1);
     tracep->declBus(c+20,"ID_EX_Branch_type", false,-1, 2,0);
     tracep->declBus(c+21,"ID_EX_mem_mask", false,-1, 2,0);
+    tracep->declBus(c+21,"ID_EX_FUNCT3", false,-1, 2,0);
     tracep->declBus(c+3,"ID_EX_reg_wr_addr", false,-1, 4,0);
     tracep->declBus(c+22,"ID_EX_ALUctr", false,-1, 5,0);
     tracep->declQuad(c+23,"ID_EX_imm", false,-1, 63,0);
@@ -110,6 +111,7 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_init_sub__TOP__0(Vysyx_220
     tracep->declBit(c+15,"i_EX_ALUBsrc", false,-1);
     tracep->declBit(c+16,"i_EX_Auipc", false,-1);
     tracep->declBit(c+19,"i_EX_Lui", false,-1);
+    tracep->declBus(c+21,"i_EX_FUNCT3", false,-1, 2,0);
     tracep->declBus(c+22,"i_EX_ALUctr", false,-1, 5,0);
     tracep->declQuad(c+8,"i_EX_pc", false,-1, 63,0);
     tracep->declQuad(c+23,"i_EX_imm", false,-1, 63,0);
@@ -152,6 +154,7 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_init_sub__TOP__0(Vysyx_220
     tracep->declQuad(c+58,"EX_snpc", false,-1, 63,0);
     tracep->pushNamePrefix("ysyx_22040386_ALU_inst ");
     tracep->declBit(c+12,"Word_op", false,-1);
+    tracep->declBus(c+21,"FUNCT3", false,-1, 2,0);
     tracep->declQuad(c+25,"src1", false,-1, 63,0);
     tracep->declQuad(c+56,"src2", false,-1, 63,0);
     tracep->declBus(c+22,"ALUctr", false,-1, 5,0);
@@ -197,6 +200,7 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_init_sub__TOP__0(Vysyx_220
     tracep->declBit(c+17,"o_ID_Jal", false,-1);
     tracep->declBit(c+18,"o_ID_Jalr", false,-1);
     tracep->declBit(c+19,"o_ID_Lui", false,-1);
+    tracep->declBus(c+21,"o_ID_FUNCT3", false,-1, 2,0);
     tracep->declBus(c+20,"o_ID_Branch_type", false,-1, 2,0);
     tracep->declBus(c+21,"o_ID_mem_mask", false,-1, 2,0);
     tracep->declBus(c+3,"o_ID_reg_wr_addr", false,-1, 4,0);
@@ -613,11 +617,15 @@ VL_ATTR_COLD void Vysyx_22040386_TOP___024root__trace_full_sub_0(Vysyx_22040386_
                                  : vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__mul)),64);
     tracep->fullQData(oldp+81,(VL_DIV_QQQ(64, vlSelf->ysyx_22040386_TOP__DOT__ID_EX_reg_rd_data1, vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__EX_src2)),64);
     tracep->fullQData(oldp+83,(((8U & vlSelf->ysyx_22040386_TOP__DOT__IF_ID_inst)
-                                 ? (((QData)((IData)(
-                                                     (- (IData)(
-                                                                (vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32 
-                                                                 >> 0x1fU))))) 
-                                     << 0x20U) | (QData)((IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32)))
+                                 ? ((5U == (7U & (vlSelf->ysyx_22040386_TOP__DOT__IF_ID_inst 
+                                                  >> 0xcU)))
+                                     ? (QData)((IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32))
+                                     : (((QData)((IData)(
+                                                         (- (IData)(
+                                                                    (vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32 
+                                                                     >> 0x1fU))))) 
+                                         << 0x20U) 
+                                        | (QData)((IData)(vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__ysyx_22040386_ALU_inst__DOT__div32))))
                                  : VL_DIV_QQQ(64, vlSelf->ysyx_22040386_TOP__DOT__ID_EX_reg_rd_data1, vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__EX_src2))),64);
     tracep->fullQData(oldp+85,(VL_MODDIV_QQQ(64, vlSelf->ysyx_22040386_TOP__DOT__ID_EX_reg_rd_data1, vlSelf->ysyx_22040386_TOP__DOT__ysyx_22040386_EXU_inst__DOT__EX_src2)),64);
     tracep->fullQData(oldp+87,(((8U & vlSelf->ysyx_22040386_TOP__DOT__IF_ID_inst)
