@@ -18,13 +18,13 @@ VL_MODULE(Vysyx_22040386_TOP___024root) {
     VL_OUT8(o_TOP_Branch,0,0);
     VL_OUT8(o_TOP_mret,0,0);
     VL_OUT8(o_TOP_ecall,0,0);
-    CData/*0:0*/ ysyx_22040386_TOP__DOT__TOP_Branch;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ID_EX_RegWrite;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ID_EX_ALUBsrc;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ID_EX_Jalr;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ID_CSR_csr_ren;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ID_CSR_csr_wen;
     CData/*1:0*/ ysyx_22040386_TOP__DOT__ID_CSR_csr_state;
+    CData/*0:0*/ ysyx_22040386_TOP__DOT__MEM_IF_Branch;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ID_csrrw;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ID_csrrs;
     CData/*0:0*/ ysyx_22040386_TOP__DOT__ysyx_22040386_IDU_inst__DOT__ID_ecall;
