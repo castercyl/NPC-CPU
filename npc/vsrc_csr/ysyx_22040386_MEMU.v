@@ -6,7 +6,8 @@ module ysyx_22040386_MEMU (
     input wire i_MEM_MemRead,
     input wire i_MEM_MemWrite,
     input wire [2:0] i_MEM_Branch_type,
-    input wire [2:0] i_MEM_mem_mask,
+    //input wire [2:0] i_MEM_mem_mask,
+    input wire [2:0] i_MEM_FUNCT3,
     input wire [63:0] i_MEM_mem_wr_data,
     input wire [63:0] i_MEM_pc_add_imm,
     input wire [63:0] i_MEM_ALUresult,
@@ -33,21 +34,25 @@ module ysyx_22040386_MEMU (
     output wire [63:0] o_MEM_csr_r_data
 );
 
+//############ CSR #####################
 //csr 过路信号
 assign o_MEM_csr_reg_write = i_MEM_csr_reg_write;
 assign o_MEM_csr_r_data    = i_MEM_csr_r_data;
 
+assign o_MEM_dnpc = (i_MEM_ecall || i_MEM_mret) ? i_MEM_csr_dnpc  :
+                    (i_MEM_Jalr)                ? i_MEM_ALUresult : i_MEM_pc_add_imm;
+//---------------------------------------
+
 wire zero_extend;
-assign zero_extend = ~ i_MEM_mem_mask[2];
+wire [2:0] MEM_mem_mask;
+assign MEM_mem_mask = i_MEM_FUNCT3;
+assign zero_extend = ~ MEM_mem_mask[2];//lbu, lhu
 
 wire [63:0] MEM_mem_rd_data;
 reg [63:0] reg_rd_mem_data, rmdata1;
 assign MEM_mem_rd_data = rmdata1;
 
 assign o_MEM_reg_wr_data = (i_MEM_MemRead) ? MEM_mem_rd_data : i_MEM_reg_wr_data;
-
-assign o_MEM_dnpc = (i_MEM_ecall || i_MEM_mret) ? i_MEM_csr_dnpc  :
-                    (i_MEM_Jalr)                ? i_MEM_ALUresult : i_MEM_pc_add_imm;
 
 ysyx_22040386_Branchjuge ysyx_22040386_Branchjuge_inst (.zero(i_MEM_zero), .Jal(i_MEM_Jal), .Jalr(i_MEM_Jalr), 
 .result0(i_MEM_ALUresult[0]), .Branch_type(i_MEM_Branch_type), .ecall(i_MEM_ecall), 
@@ -62,8 +67,8 @@ wire [7:0] Wmask;
 reg [7:0] reg_Wmask;
 assign Wmask = reg_Wmask;
 always @ (*) begin
-    case(i_MEM_mem_mask)
-    3'b000: reg_Wmask = 8'b0000_0001 << i_MEM_ALUresult[2:0];     //sb
+    case(MEM_mem_mask)
+    3'b000: reg_Wmask = 8'b0000_0001 << i_MEM_ALUresult[2:0];     //sb 这里的ALUresult对应的是内存地址
     3'b001: reg_Wmask = 8'b0000_0011 << i_MEM_ALUresult[2:0];     //sh
     3'b010: reg_Wmask = 8'b0000_1111 << i_MEM_ALUresult[2:0];     //sw
     3'b011: reg_Wmask = 8'b1111_1111;                    //sd
@@ -74,7 +79,7 @@ end
 //read from Mem
 always @ (*) begin
   rmdata1 = 64'hFFFF_FFFF_FFFF_FFFF;
-  case (i_MEM_mem_mask[1:0])
+  case (MEM_mem_mask[1:0])
     //bit
     2'b00:begin
       if (i_MEM_ALUresult[2:0] == 3'd0)

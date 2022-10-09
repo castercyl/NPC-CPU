@@ -19,7 +19,7 @@ always @ (*) begin
             else if(funct7 == 7'h00)
                 R_ctr = 6'b00_0000;  //add
             else if(funct7 == 7'h01)
-                R_ctr = 6'b00_1000;  //mul
+                R_ctr = 6'b01_1000;  //mul,mulw
         end
         3'b001:begin
             if(funct7 == 7'h00)
@@ -37,7 +37,7 @@ always @ (*) begin
             if (funct7 == 7'h00)
                 R_ctr = 6'b00_0011;  //xor
             else if (funct7 == 7'h01)
-                R_ctr = 6'b00_1001; //div
+                R_ctr = 6'b01_1001; //div 待思考
         end
         3'b101:begin
             if(funct7 == 7'h20)
@@ -51,7 +51,7 @@ always @ (*) begin
             if (funct7 == 7'h00)
                 R_ctr = 6'b00_0010;  //or
             else if (funct7 == 7'h01)
-                R_ctr = 6'b00_1100; //rem
+                R_ctr = 6'b01_1100; //rem 有符号%
         end
         3'b111:begin
             if (funct7 == 7'h00)

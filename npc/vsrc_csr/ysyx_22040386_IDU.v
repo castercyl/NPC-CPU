@@ -37,7 +37,7 @@ module ysyx_22040386_IDU (
     output wire [2:0] o_ID_FUNCT3,
 
     output reg [2:0] o_ID_Branch_type,
-    output wire [2:0] o_ID_mem_mask,
+    //output wire [2:0] o_ID_mem_mask,   等同于FUNCT3
     output wire [4:0] o_ID_reg_wr_addr,
     output wire [5:0] o_ID_ALUctr,
     output reg [63:0] o_ID_imm,
@@ -189,7 +189,7 @@ end
 assign o_ID_Word_op = i_ID_inst[3];   //Inst的第3位用于判断是否是字操作，如addiw；J型指令不影响
 
 /*### 12. mem_mask 生成 ###*/
-assign o_ID_mem_mask = ID_funct3;
+//assign o_ID_mem_mask = ID_funct3;
 
 /*### 13. MemRead 生成 ###*/
 assign o_ID_MemRead = (ID_opcode == 7'b000_0011) ? 1'b1 : 1'b0;   //load-type

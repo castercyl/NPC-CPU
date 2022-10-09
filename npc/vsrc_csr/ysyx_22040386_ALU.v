@@ -2,7 +2,7 @@ module ysyx_22040386_ALU (
     input Word_op,
 
     //input DIV_word,
-    input [2:0] FUNCT3,
+    //input [2:0] FUNCT3,
 
     input [63:0] src1,
     input [63:0] src2,
@@ -20,7 +20,7 @@ wire SF;  //符号位
 wire SUBctr;
 wire SIGctr;  //为1表示选择有符号数计算， 为0表示无符号数计算
 wire less1;
-wire [3:0] OPctr;
+wire [3:0] OPctr; //ALU执行逻辑运算的区分符号
 wire [31:0] div32, rem32;
 wire [63:0] real_src2, sum, src1_shift, mul, real_mul, div64, real_div, rem64, real_rem, shift_sig;
 
@@ -49,7 +49,7 @@ assign real_mul = (Word_op) ? {{32{mul[31]}}, mul[31:0]} : mul;
 assign div32 = src1[31:0] / src2[31:0];
 assign div64 = src1 / src2;
 assign real_div = (~Word_op) ?          div64 :
-                  (FUNCT3 == 3'b101) ? {32'd0, div32} :
+                  (~SIGctr) ? {32'd0, div32} :
                   {{32{div32[31]}}, div32};
 assign rem32 = src1[31:0] % src2[31:0];
 assign rem64 = src1 % src2;

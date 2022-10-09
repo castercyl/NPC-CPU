@@ -11,7 +11,7 @@ Context* __am_irq_handle(Context *c) {
       case 11: {
         if (c->gpr[17] == -1){
           ev.event = EVENT_YIELD; 
-          c->mepc += 4;    //I DO
+          c->mepc += 4;    //I DO 这里相当于直接对内存中压栈存入mepc值进行操作，改变内存中的值
           break;}
         //if((c->gpr[17]>=0) && (c->gpr[17]<=19))
         else {    //I DO a7
@@ -32,7 +32,7 @@ Context* __am_irq_handle(Context *c) {
   printf("mstatus= %x\n",c->mstatus); //I DO
   printf("mepc= %x\n",c->mepc); //I DO
 
-    c = user_handler(ev, c);
+    c = user_handler(ev, c);  //这里相当于执行 c = do_event(ev, c);
     assert(c != NULL);
   }
 
