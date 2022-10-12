@@ -216,11 +216,11 @@ int main(int argc, char** argv, char** env) {
 			top->i_TOP_clk = 1;
 			top->eval();          //时钟上升沿后必须更新一次状态，不然根据pc取的指令值有延迟！
 			//DIFTEST开关点
-			
+			/*
 			if(main_time >= 3){
 				difftest_step(top->o_TOP_pc);
 			}
-			
+			*/
 
 			//printf("PC: 0x%0lx; Inst: 0x%x; Branch: 0x%x; ecall: 0x%x; mret: 0x%x\n", top->o_TOP_pc, top->o_TOP_inst, top->o_TOP_Branch, top->o_TOP_ecall, top->o_TOP_mret);
 			//printf("\n");

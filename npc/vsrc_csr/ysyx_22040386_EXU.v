@@ -37,7 +37,7 @@ module ysyx_22040386_EXU(
     output wire [2:0] o_EX_Branch_type,
     output wire o_EX_Jal,
     output wire o_EX_Jalr,
-    //csr  只是过路信号
+    //------------------csr  只是过路信号---------------------
     input wire i_EX_ecall,
     input wire i_EX_mret,
     input wire i_EX_csr_reg_write,

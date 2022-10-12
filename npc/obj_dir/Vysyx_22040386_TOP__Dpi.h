@@ -20,7 +20,7 @@ extern "C" {
     extern void ebreak();
     // DPI import at vsrc_csr/ysyx_22040386_IFU.v:26:30
     extern void pmem_read(long long raddr, long long* rdata);
-    // DPI import at vsrc_csr/ysyx_22040386_MEMU.v:129:30
+    // DPI import at vsrc_csr/ysyx_22040386_MEMU.v:130:30
     extern void pmem_write(long long waddr, long long wdata, char wmask);
     // DPI import at vsrc_csr/ysyx_22040386_RegisterFile.v:26:30
     extern void set_gpr_ptr(const svOpenArrayHandle a);

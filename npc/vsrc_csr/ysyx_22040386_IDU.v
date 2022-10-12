@@ -47,7 +47,7 @@ module ysyx_22040386_IDU (
 
     output wire o_ID_ecall,
     output wire o_ID_mret,
-    //to CSR
+    //------to CSR-------------------
     output wire        o_ID_csr_ren,
     output wire        o_ID_csr_wen,
     output wire [1:0]  o_ID_csr_state,
@@ -73,7 +73,7 @@ assign o_ID_FUNCT3 = ID_funct3;
 //中间数据流，流水线
 assign o_ID_pc = i_ID_pc;
 
-//------CSR---------
+//-------------------------CSR--------------------------------------------
 wire ID_csrrw, ID_csrrs, ID_ecall, ID_mret;
 assign ID_csrrs = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b010);
 assign ID_csrrw = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b001);
@@ -92,7 +92,7 @@ assign o_ID_csr_wen = ID_csrrw || ID_ecall;
 assign o_ID_csr_state = (ID_csrrs || ID_csrrw) ? `CSR_STATE_RW   : 
                         (ID_ecall)             ? `CSR_STATE_ECALL:
                         (ID_mret)              ? `CSR_STATE_MRET : `CSR_STATE_IDLE;
-
+//-----------------------------------------------------------------------
 
 /*### 数据通路控制信号生成 ###*/
 

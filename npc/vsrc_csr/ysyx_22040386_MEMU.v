@@ -23,7 +23,7 @@ module ysyx_22040386_MEMU (
 
     output wire o_MEM_RegWrite,
     output wire [4:0] o_MEM_reg_wr_addr,
-    //csr
+    //----------------csr------------------
     input wire i_MEM_ecall,
     input wire i_MEM_mret,
     input wire [63:0] i_MEM_csr_dnpc,
@@ -32,6 +32,7 @@ module ysyx_22040386_MEMU (
     input wire [63:0] i_MEM_csr_r_data,
     output wire o_MEM_csr_reg_write,
     output wire [63:0] o_MEM_csr_r_data
+    //-------------------------------------
 );
 
 //############ CSR #####################
