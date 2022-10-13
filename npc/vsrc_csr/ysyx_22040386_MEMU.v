@@ -136,10 +136,17 @@ always @(*) begin
   else
     reg_rd_mem_data = 64'd0;
 end
+//--------加入Clint后------------
+always @ (posedge i_MEM_clk) begin
+    if (i_MEM_MemWrite && (i_MEM_ALUresult != 64'h200_BFF8) && (i_MEM_ALUresult != 64'h200_4000))
+        pmem_write(i_MEM_ALUresult, i_MEM_mem_wr_data, Wmask);
+end
 
+/*
 always @ (posedge i_MEM_clk) begin
     if (i_MEM_MemWrite)
         pmem_write(i_MEM_ALUresult, i_MEM_mem_wr_data, Wmask);
 end
+*/
 
 endmodule
