@@ -24,10 +24,10 @@ end
 //##DPI-C访问内存取指令##*/
 assign o_IF_inst = (o_IF_pc[2]) ? IF_inst_rdata[63:32] : IF_inst_rdata[31:0];  //取指
 import "DPI-C" function void pmem_read(
-  input longint raddr, output longint rdata);
+  input longint pc, input longint raddr, output longint rdata);
 
 always @(*) begin
-    pmem_read(o_IF_pc, IF_inst_rdata);
+    pmem_read(o_IF_pc, o_IF_pc, IF_inst_rdata);
     //pmem_read(mem_d_addr, rd_mem_data);
 end
 

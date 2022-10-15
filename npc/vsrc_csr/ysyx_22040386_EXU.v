@@ -38,24 +38,34 @@ module ysyx_22040386_EXU(
     output wire o_EX_Jal,
     output wire o_EX_Jalr,
     //------------------csr  只是过路信号---------------------
+    input wire i_EX_timer_interreupt,
     input wire i_EX_ecall,
     input wire i_EX_mret,
     input wire i_EX_csr_reg_write,
     input wire [63:0] i_EX_csr_r_data,
     input wire [63:0] i_EX_csr_dnpc,
+    output wire o_EX_timer_interreupt,
     output wire o_EX_ecall,
     output wire o_EX_mret,
     output wire o_EX_csr_reg_write,
     output wire [63:0] o_EX_csr_r_data,
-    output wire [63:0] o_EX_csr_dnpc
+    output wire [63:0] o_EX_csr_dnpc,
+    //---------------测试仿真需要---------
+    output wire [63:0] o_EX_pc
 );
 
+//---------------测试仿真需要---------
+assign o_EX_pc = i_EX_pc;
+
+
+
 //csr
-assign o_EX_ecall         = i_EX_ecall;
-assign o_EX_mret          = i_EX_mret;
-assign o_EX_csr_reg_write = i_EX_csr_reg_write;
-assign o_EX_csr_r_data    = i_EX_csr_r_data;
-assign o_EX_csr_dnpc      = i_EX_csr_dnpc;
+assign o_EX_timer_interreupt = i_EX_timer_interreupt;
+assign o_EX_ecall            = i_EX_ecall;
+assign o_EX_mret             = i_EX_mret;
+assign o_EX_csr_reg_write    = i_EX_csr_reg_write;
+assign o_EX_csr_r_data       = i_EX_csr_r_data;
+assign o_EX_csr_dnpc         = i_EX_csr_dnpc;
 
 wire [63:0] EX_src1, EX_src2, EX_snpc;
 

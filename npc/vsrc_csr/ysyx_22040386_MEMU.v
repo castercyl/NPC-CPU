@@ -1,3 +1,7 @@
+
+`define ADDR_MTIME          64'h200_BFF8
+`define ADDR_MTIMECMP       64'h200_4000
+
 module ysyx_22040386_MEMU (
     input wire i_MEM_clk,
     input wire i_MEM_Jal,
@@ -23,7 +27,14 @@ module ysyx_22040386_MEMU (
 
     output wire o_MEM_RegWrite,
     output wire [4:0] o_MEM_reg_wr_addr,
-    //----------------csr------------------
+    //----------Clint-------------------
+    input  wire [63:0] i_MEM_clint_rd_data,
+    output wire [63:0] o_MEM_clint_wr_data,
+    output wire [63:0] o_MEM_clint_addr,
+    output wire o_MEM_clint_wen,
+    output wire o_MEM_clint_ren,
+    //----------------Csr------------------
+    input wire i_MEM_timer_interreupt,
     input wire i_MEM_ecall,
     input wire i_MEM_mret,
     input wire [63:0] i_MEM_csr_dnpc,
@@ -31,8 +42,10 @@ module ysyx_22040386_MEMU (
     input wire i_MEM_csr_reg_write,
     input wire [63:0] i_MEM_csr_r_data,
     output wire o_MEM_csr_reg_write,
-    output wire [63:0] o_MEM_csr_r_data
+    output wire [63:0] o_MEM_csr_r_data,
     //-------------------------------------
+    //---------测试仿真需要---------
+    input wire [63:0] i_MEM_pc
 );
 
 //############ CSR #####################
@@ -40,9 +53,17 @@ module ysyx_22040386_MEMU (
 assign o_MEM_csr_reg_write = i_MEM_csr_reg_write;
 assign o_MEM_csr_r_data    = i_MEM_csr_r_data;
 
-assign o_MEM_dnpc = (i_MEM_ecall || i_MEM_mret) ? i_MEM_csr_dnpc  :
+assign o_MEM_dnpc = (i_MEM_ecall || i_MEM_timer_interreupt || i_MEM_mret) ? i_MEM_csr_dnpc  :
                     (i_MEM_Jalr)                ? i_MEM_ALUresult : i_MEM_pc_add_imm;
 //---------------------------------------
+
+//--------写 Clint -----------------
+assign o_MEM_clint_wen     = i_MEM_MemWrite;
+assign o_MEM_clint_addr    = i_MEM_ALUresult;
+assign o_MEM_clint_wr_data = i_MEM_mem_wr_data;
+assign o_MEM_clint_ren     = i_MEM_MemRead;
+//---------------------------------
+
 
 wire zero_extend;
 wire [2:0] MEM_mem_mask;
@@ -51,12 +72,12 @@ assign zero_extend = ~ MEM_mem_mask[2];//lbu, lhu
 
 wire [63:0] MEM_mem_rd_data;
 reg [63:0] reg_rd_mem_data, rmdata1;
-assign MEM_mem_rd_data = rmdata1;
+assign MEM_mem_rd_data = ((i_MEM_ALUresult == `ADDR_MTIME) || (i_MEM_ALUresult == `ADDR_MTIMECMP)) ? i_MEM_clint_rd_data : rmdata1;
 
 assign o_MEM_reg_wr_data = (i_MEM_MemRead) ? MEM_mem_rd_data : i_MEM_reg_wr_data;
 
 ysyx_22040386_Branchjuge ysyx_22040386_Branchjuge_inst (.zero(i_MEM_zero), .Jal(i_MEM_Jal), .Jalr(i_MEM_Jalr), 
-.result0(i_MEM_ALUresult[0]), .Branch_type(i_MEM_Branch_type), .ecall(i_MEM_ecall), 
+.result0(i_MEM_ALUresult[0]), .Branch_type(i_MEM_Branch_type), .ecall(i_MEM_ecall), .timer_interreupt(i_MEM_timer_interreupt), 
 .mret(i_MEM_mret), .Branch(o_MEM_Branch));
 
 //中间数据流
@@ -125,14 +146,16 @@ always @ (*) begin
 end
 
 //##DPI-C访存(写+读）##*/
+//import "DPI-C" function void pmem_read(
+  //input longint raddr, output longint rdata);
 import "DPI-C" function void pmem_read(
-  input longint raddr, output longint rdata);
+  input longint pc, input longint raddr, output longint rdata);
 import "DPI-C" function void pmem_write(
   input longint waddr, input longint wdata, input byte wmask);
 
 always @(*) begin
   if (i_MEM_MemRead)
-    pmem_read(i_MEM_ALUresult, reg_rd_mem_data);
+    pmem_read(i_MEM_pc, i_MEM_ALUresult, reg_rd_mem_data);
   else
     reg_rd_mem_data = 64'd0;
 end

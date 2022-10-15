@@ -90,7 +90,7 @@ void init_serial();
 */
 
 //##DPI-C函数，从内存读##//
-extern "C" void pmem_read(long long raddr, long long *rdata) {
+extern "C" void pmem_read(long long pc, long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
   if (raddr >= CONFIG_MBASE){
 	    //unit_64 real_raddr = raddr & ~0x7ull       //等价为 & 0xFFFF_FFFF_FFFF_FFF8,总线这样要求的
@@ -110,7 +110,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
 	}
 	else{
 		*rdata = 0;
-		printf("Warning : Invalid Instruction !\n");
+		printf("Warning : Invalid Instruction! pc is : 0x%lx !\n", pc);
 	}
 }
 

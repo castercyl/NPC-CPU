@@ -8,6 +8,9 @@ Context* __am_irq_handle(Context *c) {
     Event ev = {0};
     switch (c->mcause) {
       //I DO
+      case 0x8000000000000007: {
+        ev.event = EVENT_IRQ_TIMER; break;
+      }
       case 11: {
         if (c->gpr[17] == -1){
           ev.event = EVENT_YIELD; 
@@ -59,4 +62,14 @@ bool ienabled() {
 }
 
 void iset(bool enable) {
+  //------I DO------
+  int mie_MTIE_set = 0x80;
+  if (enable){
+    asm volatile("csrsi mstatus, 8"); // set mstatus_MIE = 1
+    asm volatile("csrs mie, %0": :"r"(mie_MTIE_set)); // set mie_MTIE = 1; csrsi只能操作5位立即数
+  }
+  else{
+    asm volatile("csrsi mstatus, 8"); // set mstatus_MIE = 1
+    asm volatile("csrs mie, 0");//不开启计时器中断
+  }
 }

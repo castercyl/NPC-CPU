@@ -37,6 +37,8 @@ always @ (*) begin
             //csr
             else if(funct3 == 3'b010)
                 reg_unkown_code = 1'b0; //csrrs
+            else if(funct3 == 3'b110)
+                reg_unkown_code = 1'b0; //csrrsi
             else if (funct3 == 3'b001)
                 reg_unkown_code = 1'b0; //csrrw
             else if (funct3 == 3'b000) begin

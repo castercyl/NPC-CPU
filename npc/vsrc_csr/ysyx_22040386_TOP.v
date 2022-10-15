@@ -41,16 +41,18 @@ wire [63:0] ID_EX_imm, ID_EX_reg_rd_data1, ID_EX_reg_rd_data2, ID_EX_pc;
 wire ID_EX_ecall, ID_EX_mret;
 //--ID/CSR---
 wire ID_CSR_csr_ren, ID_CSR_csr_wen;
-wire [1:0] ID_CSR_csr_state;
+wire [2:0] ID_CSR_csr_state;
 wire [11:0] ID_CSR_csr_waddr, ID_CSR_csr_raddr;
+wire [63:0] ID_CSR_csr_wr_data;
 //---CSR/EX----
-wire CSR_EX_csr_reg_write;
+wire CSR_EX_csr_reg_write, CSR_EX_timer_interreupt;
 wire [63:0] CSR_EX_csr_r_data, CSR_EX_csr_dnpc;
 //##EX/MEM
-wire EX_MEM_zero, EX_MEM_RegWrite, EX_MEM_MemWrite, EX_MEM_MemRead, EX_MEM_Jal, EX_MEM_Jalr;
+wire EX_MEM_zero, EX_MEM_RegWrite, EX_MEM_MemWrite, EX_MEM_MemRead, EX_MEM_Jal, EX_MEM_Jalr, EX_MEM_timer_interreupt;
 wire [2:0] EX_MEM_FUNCT3, EX_MEM_Branch_type;
 wire [4:0] EX_MEM_reg_wr_addr;
 wire [63:0] EX_MEM_pc_add_imm, EX_MEM_ALUresult, EX_MEM_mem_wr_data, EX_MEM_reg_wr_data;
+wire [63:0] EX_MEM_pc;
 
 wire EX_MEM_ecall, EX_MEM_mret, EX_MEM_csr_reg_write;
 wire [63:0] EX_MEM_csr_r_data, EX_MEM_csr_dnpc;
@@ -69,6 +71,14 @@ wire [63:0] MEM_IF_dnpc;
 wire WB_ID_RegWrite;
 wire [4:0] WB_ID_reg_wr_addr;
 wire [63:0] WB_ID_reg_wr_data;
+
+//----MEM/CLINT------
+wire MEM_CLINT_wen;
+wire [63:0] MEM_CLINT_wr_data, MEM_CLINT_addr;
+wire MEM_CLINT_ren;
+wire [63:0] MEM_CLINT_rd_data;
+//----CLINT/CSR-------
+wire CLINT_CSR_stop;
 
 //模块例化
 ysyx_22040386_IFU ysyx_22040386_IFU_inst (
@@ -112,15 +122,26 @@ ysyx_22040386_IDU ysyx_22040386_IDU_inst (
 .o_ID_csr_wen(ID_CSR_csr_wen),
 .o_ID_csr_state(ID_CSR_csr_state), 
 .o_ID_csr_waddr(ID_CSR_csr_waddr), 
-.o_ID_csr_raddr(ID_CSR_csr_raddr)
+.o_ID_csr_raddr(ID_CSR_csr_raddr),
 //.o_ID_FUNCT3(ID_EX_FUNCT3)
+.o_ID_csr_wr_data(ID_CSR_csr_wr_data)
 );
 
 csr csr_inst (
-.clk(i_TOP_clk), .rst_n(i_TOP_rst_n), .csr_state_i(ID_CSR_csr_state), .csr_w_addr_i(ID_CSR_csr_waddr),
-.csr_wen_i(ID_CSR_csr_wen), .csr_w_data_i(ID_EX_reg_rd_data1), .csr_r_addr_i(ID_CSR_csr_raddr),
-.csr_ren_i(ID_CSR_csr_ren), .csr_pc_i(ID_EX_pc), 
-.csr_reg_write_o(CSR_EX_csr_reg_write), .csr_r_data_o(CSR_EX_csr_r_data), .csr_dnpc_o(CSR_EX_csr_dnpc)
+.clk(i_TOP_clk), 
+.rst_n(i_TOP_rst_n), 
+.csr_state_i(ID_CSR_csr_state), 
+.csr_w_addr_i(ID_CSR_csr_waddr),
+.csr_wen_i(ID_CSR_csr_wen), 
+.csr_w_data_i(ID_CSR_csr_wr_data), 
+.csr_r_addr_i(ID_CSR_csr_raddr),
+.csr_ren_i(ID_CSR_csr_ren), 
+.csr_pc_i(ID_EX_pc), 
+.csr_reg_write_o(CSR_EX_csr_reg_write), 
+.csr_r_data_o(CSR_EX_csr_r_data), 
+.csr_dnpc_o(CSR_EX_csr_dnpc),
+.o_Csr_timer_interreupt(CSR_EX_timer_interreupt),
+.i_Csr_clint_stop(CLINT_CSR_stop)
 );
 
 ysyx_22040386_EXU ysyx_22040386_EXU_inst (
@@ -155,6 +176,7 @@ ysyx_22040386_EXU ysyx_22040386_EXU_inst (
 .o_EX_Jal(EX_MEM_Jal), 
 .o_EX_Jalr(EX_MEM_Jalr),
 
+.i_EX_timer_interreupt(CSR_EX_timer_interreupt),
 .i_EX_ecall(ID_EX_ecall), 
 .i_EX_mret(ID_EX_mret), 
 .i_EX_csr_reg_write(CSR_EX_csr_reg_write),
@@ -164,7 +186,10 @@ ysyx_22040386_EXU ysyx_22040386_EXU_inst (
 .o_EX_mret(EX_MEM_mret), 
 .o_EX_csr_reg_write(EX_MEM_csr_reg_write),
 .o_EX_csr_r_data(EX_MEM_csr_r_data), 
-.o_EX_csr_dnpc(EX_MEM_csr_dnpc)
+.o_EX_csr_dnpc(EX_MEM_csr_dnpc),
+.o_EX_timer_interreupt(EX_MEM_timer_interreupt),
+
+.o_EX_pc(EX_MEM_pc)
 );
 
 ysyx_22040386_MEMU ysyx_22040386_MEMU_inst (
@@ -188,13 +213,22 @@ ysyx_22040386_MEMU ysyx_22040386_MEMU_inst (
 .o_MEM_RegWrite(MEM_WB_RegWrite), 
 .o_MEM_reg_wr_addr(MEM_WB_reg_wr_addr),
 
+.i_MEM_timer_interreupt(EX_MEM_timer_interreupt),
 .i_MEM_ecall(EX_MEM_ecall), 
 .i_MEM_mret(EX_MEM_mret), 
 .i_MEM_csr_dnpc(EX_MEM_csr_dnpc), 
 .i_MEM_csr_reg_write(EX_MEM_csr_reg_write), 
 .i_MEM_csr_r_data(EX_MEM_csr_r_data),
 .o_MEM_csr_reg_write(MEM_WB_csr_reg_write), 
-.o_MEM_csr_r_data(MEM_WB_csr_r_data)
+.o_MEM_csr_r_data(MEM_WB_csr_r_data),
+
+.o_MEM_clint_wr_data(MEM_CLINT_wr_data),
+.o_MEM_clint_addr(MEM_CLINT_addr),
+.o_MEM_clint_wen(MEM_CLINT_wen),
+.o_MEM_clint_ren(MEM_CLINT_ren),
+.i_MEM_clint_rd_data(MEM_CLINT_rd_data),
+
+.i_MEM_pc(EX_MEM_pc)
 );
 
 ysyx_22040386_WBU ysyx_22040386_WBU_inst (
@@ -206,6 +240,17 @@ ysyx_22040386_WBU ysyx_22040386_WBU_inst (
 .o_WB_reg_wr_addr(WB_ID_reg_wr_addr),
 .i_WB_csr_reg_write(MEM_WB_csr_reg_write), 
 .i_WB_csr_r_data(MEM_WB_csr_r_data)
+);
+
+Clint Clint_inst (
+  .clk(i_TOP_clk),
+  .rst_n(i_TOP_rst_n),
+  .i_Clint_wr_data(MEM_CLINT_wr_data),
+  .i_Clint_addr(MEM_CLINT_addr),
+  .i_Clint_wen(MEM_CLINT_wen),
+  .i_Clint_ren(MEM_CLINT_ren),
+  .o_Clint_stop(CLINT_CSR_stop),
+  .o_Clint_rd_data(MEM_CLINT_rd_data)
 );
 
 //##DPI-C访存内存##*/

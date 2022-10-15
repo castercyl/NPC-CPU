@@ -5,11 +5,12 @@ module ysyx_22040386_Branchjuge (
     input wire result0,
     input wire [2:0] Branch_type,
     //csr
+    input wire timer_interreupt,
     input wire ecall,
     input wire mret,
     //input wire [63:0] csr_dnpc,
     
-    output Branch
+    output wire Branch
 );
 
 reg w1;
@@ -28,6 +29,6 @@ always @ (*) begin
 end
 
 assign w2 = (Jal) ? 1'b1 : w1;
-assign Branch = (Jalr || mret || ecall) ? 1'b1 : w2;
+assign Branch = (Jalr || mret || ecall || timer_interreupt) ? 1'b1 : w2;
 
 endmodule

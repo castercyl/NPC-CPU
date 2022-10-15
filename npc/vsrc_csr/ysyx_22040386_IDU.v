@@ -7,10 +7,11 @@
 `define CSR_MIE             12'h304
 `define CSR_MIP             12'h344
 `define CSR_MSCRATCH        12'h340
-`define CSR_STATE_IDLE      2'b00
-`define CSR_STATE_RW        2'b01
-`define CSR_STATE_ECALL     2'b10
-`define CSR_STATE_MRET      2'b11
+`define CSR_STATE_IDLE      3'b000
+`define CSR_STATE_CSRRS     3'b001
+`define CSR_STATE_CSRRW     3'b010
+`define CSR_STATE_ECALL     3'b011
+`define CSR_STATE_MRET      3'b100
 
 
 module ysyx_22040386_IDU (
@@ -50,9 +51,10 @@ module ysyx_22040386_IDU (
     //------to CSR-------------------
     output wire        o_ID_csr_ren,
     output wire        o_ID_csr_wen,
-    output wire [1:0]  o_ID_csr_state,
+    output wire [2:0]  o_ID_csr_state,
     output wire [11:0] o_ID_csr_waddr,
-    output wire [11:0] o_ID_csr_raddr
+    output wire [11:0] o_ID_csr_raddr,
+    output wire [63:0] o_ID_csr_wr_data
 );
 
 //初次关键标志拆分
@@ -74,11 +76,16 @@ assign o_ID_FUNCT3 = ID_funct3;
 assign o_ID_pc = i_ID_pc;
 
 //-------------------------CSR--------------------------------------------
-wire ID_csrrw, ID_csrrs, ID_ecall, ID_mret;
-assign ID_csrrs = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b010);
-assign ID_csrrw = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b001);
-assign ID_ecall = (ID_opcode == 7'b111_0011) && (i_ID_inst[31:8] == 'd0);
-assign ID_mret  = (ID_opcode == 7'b111_0011) && (i_ID_inst[19:7] == 'd0) && (i_ID_inst[24:20] == 5'b0_0010) && (ID_funct7 == 7'b001_1000);
+wire ID_csrrw, ID_csrrs, ID_csrrsi, ID_csrrwi, ID_ecall, ID_mret;
+wire [63:0] ID_csr_imm;
+assign ID_csr_imm = {59'd0, i_ID_inst[19:15]}; 
+
+assign ID_csrrs  = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b010);
+assign ID_csrrw  = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b001);
+assign ID_csrrsi = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b110);
+assign ID_csrrwi = (ID_opcode == 7'b111_0011) && (ID_funct3 == 3'b101);
+assign ID_ecall  = (ID_opcode == 7'b111_0011) && (i_ID_inst[31:8] == 'd0);
+assign ID_mret   = (ID_opcode == 7'b111_0011) && (i_ID_inst[19:7] == 'd0) && (i_ID_inst[24:20] == 5'b0_0010) && (ID_funct7 == 7'b001_1000);
 
 assign o_ID_ecall = ID_ecall;
 assign o_ID_mret  = ID_mret;
@@ -86,12 +93,15 @@ assign o_ID_mret  = ID_mret;
 assign o_ID_csr_raddr = i_ID_inst[31:20];
 assign o_ID_csr_waddr = i_ID_inst[31:20];
 
-assign o_ID_csr_ren = ID_csrrs || ID_mret || ID_ecall;
-assign o_ID_csr_wen = ID_csrrw || ID_ecall;
+assign o_ID_csr_ren = ID_csrrs || ID_csrrsi || ID_csrrw || ID_csrrwi || ID_mret || ID_ecall;
+assign o_ID_csr_wen = ID_csrrs || ID_csrrsi || ID_csrrw || ID_csrrwi || ID_ecall;
 
-assign o_ID_csr_state = (ID_csrrs || ID_csrrw) ? `CSR_STATE_RW   : 
-                        (ID_ecall)             ? `CSR_STATE_ECALL:
-                        (ID_mret)              ? `CSR_STATE_MRET : `CSR_STATE_IDLE;
+assign o_ID_csr_state = (ID_csrrs || ID_csrrsi) ? `CSR_STATE_CSRRS :
+                        (ID_csrrw || ID_csrrwi) ? `CSR_STATE_CSRRW :
+                        (ID_ecall)              ? `CSR_STATE_ECALL :
+                        (ID_mret)               ? `CSR_STATE_MRET  : `CSR_STATE_IDLE;
+
+assign o_ID_csr_wr_data = (ID_csrrsi || ID_csrrwi) ? ID_csr_imm : o_ID_reg_rd_data1;
 //-----------------------------------------------------------------------
 
 /*### 数据通路控制信号生成 ###*/

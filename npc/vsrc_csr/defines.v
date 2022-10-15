@@ -7,8 +7,9 @@
 `define CSR_MIE             12'h304
 `define CSR_MIP             12'h344
 `define CSR_MSCRATCH        12'h340
-`define CSR_STATE_IDLE      2'b00
-`define CSR_STATE_RW        2'b01
-`define CSR_STATE_ECALL     2'b10
-`define CSR_STATE_MRET      2'b11
+`define CSR_STATE_IDLE      3'b000
+`define CSR_STATE_CSRRS     3'b001
+`define CSR_STATE_CSRRW     3'b010
+`define CSR_STATE_ECALL     3'b011
+`define CSR_STATE_MRET      3'b100
 

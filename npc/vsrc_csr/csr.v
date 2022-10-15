@@ -7,10 +7,11 @@
 `define CSR_MIE             12'h304
 `define CSR_MIP             12'h344
 `define CSR_MSCRATCH        12'h340
-`define CSR_STATE_IDLE      2'b00
-`define CSR_STATE_RW        2'b01
-`define CSR_STATE_ECALL     2'b10
-`define CSR_STATE_MRET      2'b11
+`define CSR_STATE_IDLE      3'b000
+`define CSR_STATE_CSRRS     3'b001
+`define CSR_STATE_CSRRW     3'b010
+`define CSR_STATE_ECALL     3'b011
+`define CSR_STATE_MRET      3'b100
 
 
 module csr (
@@ -18,7 +19,7 @@ module csr (
     input wire                          rst_n,
 
     //from ID
-    input wire [1:0]                    csr_state_i,
+    input wire [2:0]                    csr_state_i,
     input wire [11:0]                   csr_w_addr_i,
     input wire                          csr_wen_i,
     input wire [63:0]                   csr_w_data_i,
@@ -26,23 +27,24 @@ module csr (
     input wire                          csr_ren_i,
     input wire [63:0]                   csr_pc_i,
     //from Clint
-    input wire                          i_clint_stop,
+    input wire                          i_Csr_clint_stop,
     //to ex
     output wire                         csr_reg_write_o,
     output wire [63:0]                  csr_r_data_o,
     output wire [63:0]                  csr_dnpc_o,
-    output wire                         o_timer_interreupt
+    output wire                         o_Csr_timer_interreupt
 );
 
     reg [63:0] mstatus, mepc, mcause, mtevc;
+    //wire [63:0] tmpvalue_t;
 //---------计时器中断相关---------
     reg [63:0] mie, mip;
     wire timer_interreupt_flag;
     wire [63:0] mip_newvalue;
 
-    assign timer_interreupt_flag = ((mstatus[3] == 1'b1) && (mie[7] == 1'b1) && (i_clint_stop)) ? 1'b1 : 1'b0;
-    assign mip_newvalue          = ((mstatus[3] == 1'b1) && (mie[7] == 1'b1) && (i_clint_stop)) ? 64'h80 : 64'h0;
-    assign o_timer_interreupt    = timer_interreupt_flag;
+    assign timer_interreupt_flag = ((mstatus[3] == 1'b1) && (mie[7] == 1'b1) && (i_Csr_clint_stop)) ? 1'b1 : 1'b0;
+    assign mip_newvalue          = ((mstatus[3] == 1'b1) && (mie[7] == 1'b1) && (i_Csr_clint_stop)) ? 64'h80 : 64'h0;
+    assign o_Csr_timer_interreupt    = timer_interreupt_flag;
 //--------------------------------
 
     //assign mip = 64'd0;     //暂时没搞懂这个寄存器
@@ -51,7 +53,9 @@ module csr (
 
     assign csr_reg_write_o = csr_ren_i;
 
-    //CSRW
+    //assign tmpvalue_t = (csr_state_i == `CSR_STATE_CSRRS) ? 
+
+    //CSRRS, CSRRW
     always @ (posedge clk) begin
       if (~rst_n) begin
           mstatus <= 64'ha00001800;   //为了通过DIFTEST
@@ -61,7 +65,18 @@ module csr (
           mie     <= 64'd0;
           mip     <= 64'd0;
       end
-      else if (csr_wen_i && (csr_state_i == `CSR_STATE_RW)) begin
+      else if (csr_wen_i && (csr_state_i == `CSR_STATE_CSRRS)) begin
+          case(csr_w_addr_i)
+            `CSR_MSTATUS: mstatus <= csr_w_data_i | csr_w_data_i;
+            `CSR_MEPC   : mepc    <= csr_w_data_i | csr_w_data_i;
+            `CSR_MCAUSE : mcause  <= csr_w_data_i | csr_w_data_i;
+            `CSR_MTVEC  : mtevc   <= csr_w_data_i | csr_w_data_i;
+            `CSR_MIE    : mie     <= csr_w_data_i | csr_w_data_i;
+            `CSR_MIP    : mip     <= csr_w_data_i | csr_w_data_i;
+            default     : ;
+          endcase
+      end
+      else if (csr_wen_i && (csr_state_i == `CSR_STATE_CSRRW)) begin
           case(csr_w_addr_i)
             `CSR_MSTATUS: mstatus <= csr_w_data_i;
             `CSR_MEPC   : mepc    <= csr_w_data_i;
@@ -109,5 +124,11 @@ module csr (
                         (csr_state_i == `CSR_STATE_MRET)  ? mepc  :
                         64'd0;
 
+    //----to fix verilator------
+    wire _unused_ok = &{1'b0,
+                        mip,
+                        mie[63:8],
+                        mie[6:0],
+                        1'b0};
 
 endmodule
