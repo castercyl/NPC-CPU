@@ -28,9 +28,9 @@ Context* __am_irq_handle(Context *c) {
       default: ev.event = EVENT_ERROR; break;
     }
  
-  printf("mcause= %x\n",c->mcause); //I DO   这里调用的是自己写的printf函数 
-  printf("mstatus= %x\n",c->mstatus); //I DO
-  printf("mepc= %x\n",c->mepc); //I DO
+  //printf("mcause= %x\n",c->mcause); //I DO   这里调用的是自己写的printf函数 
+  //printf("mstatus= %x\n",c->mstatus); //I DO
+  //printf("mepc= %x\n",c->mepc); //I DO
 
     c = user_handler(ev, c);  //这里相当于执行 c = do_event(ev, c);
     assert(c != NULL);

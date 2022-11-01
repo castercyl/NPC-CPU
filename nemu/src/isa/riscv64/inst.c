@@ -122,16 +122,16 @@ static int decode_exec(Decode *s) {
   INSTPAT("010000? ????? ????? 101 ????? 00100 11", srai   , I, R(dest) = (SEXT(src1, 64) >> SEXT(BITS(src2, 5, 0), 6))); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>s shamt) 立即数算术右移
   INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(dest) = SEXT((Mr(src1 + src2,1) & 255), 9)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = M[x[rs1] + sext(offset)][7:0] 无符号字节加载
 
-  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, s->dnpc = isa_raise_intr(11, s->pc), printf("ecall ! pc = 0x%lx, snpc = 0x%lx, a7=0x%lx\n",s->pc,s->snpc,cpu.gpr[17])); //I DO
-  INSTPAT("0011000 00101 ????? 001 00000 11100 11", csrw_mtvec   , I, t = cpu.mtvec, cpu.mtvec = src1, R(dest) = t, printf("Csrw_mtvec! mtvec=0x%08lx\n",cpu.mtvec)); //I DO
-  INSTPAT("0011000 00000 ????? 001 00000 11100 11", csrw_mstatus , I, t = cpu.mstatus, cpu.mstatus = src1, R(dest) = t, printf("Csrw_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
-  INSTPAT("0011010 00001 ????? 001 00000 11100 11", csrw_mepc    , I, t = cpu.mepc, cpu.mepc = src1, R(dest) = t, printf("Csrw_mepc! mepc=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mepc,t,src1)); //I DO
-  INSTPAT("0011010 00010 ????? 001 00000 11100 11", csrw_macuse  , I, t = cpu.mcause, cpu.mcause = src1, R(dest) = t, printf("Csrw_mcause! mcause=0x%08lx\n",cpu.mcause)); //I DO
-  INSTPAT("0011010 00010 00000 010 ????? 11100 11", csrr_macuse   , I, t = cpu.mcause, cpu.mcause = t | src1, R(dest) = t, printf("Csrr_macuse! mcause=0x%08lx\n",cpu.mcause)); //I DO
-  INSTPAT("0011000 00000 00000 010 ????? 11100 11", csrr_mstatus  , I, t = cpu.mstatus, cpu.mstatus = t | src1, R(dest) = t, printf("Csrr_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
-  INSTPAT("0011010 00001 00000 010 ????? 11100 11", csrr_mepc,      I, t = cpu.mepc, cpu.mepc = t | src1, R(dest) = t, printf("Csrr_mepc! mepc=0x%08lx\n",cpu.mepc)); //I DO
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, s->dnpc = isa_raise_intr(11, s->pc)); //printf("ecall ! pc = 0x%lx, snpc = 0x%lx, a7=0x%lx\n",s->pc,s->snpc,cpu.gpr[17])); //I DO
+  INSTPAT("0011000 00101 ????? 001 00000 11100 11", csrw_mtvec   , I, t = cpu.mtvec, cpu.mtvec = src1, R(dest) = t); //printf("Csrw_mtvec! mtvec=0x%08lx\n",cpu.mtvec)); //I DO
+  INSTPAT("0011000 00000 ????? 001 00000 11100 11", csrw_mstatus , I, t = cpu.mstatus, cpu.mstatus = src1, R(dest) = t); //printf("Csrw_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
+  INSTPAT("0011010 00001 ????? 001 00000 11100 11", csrw_mepc    , I, t = cpu.mepc, cpu.mepc = src1, R(dest) = t); //printf("Csrw_mepc! mepc=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mepc,t,src1)); //I DO
+  INSTPAT("0011010 00010 ????? 001 00000 11100 11", csrw_macuse  , I, t = cpu.mcause, cpu.mcause = src1, R(dest) = t); //printf("Csrw_mcause! mcause=0x%08lx\n",cpu.mcause)); //I DO
+  INSTPAT("0011010 00010 00000 010 ????? 11100 11", csrr_macuse   , I, t = cpu.mcause, cpu.mcause = t | src1, R(dest) = t); //printf("Csrr_macuse! mcause=0x%08lx\n",cpu.mcause)); //I DO
+  INSTPAT("0011000 00000 00000 010 ????? 11100 11", csrr_mstatus  , I, t = cpu.mstatus, cpu.mstatus = t | src1, R(dest) = t); //printf("Csrr_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
+  INSTPAT("0011010 00001 00000 010 ????? 11100 11", csrr_mepc,      I, t = cpu.mepc, cpu.mepc = t | src1, R(dest) = t); //printf("Csrr_mepc! mepc=0x%08lx\n",cpu.mepc)); //I DO
 
-  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , I, s->dnpc = cpu.mepc, cpu.mstatus = 0xa00001800, printf("mret! mepc=0x%08lx; dnpc=0x%08lx; mstatus=0x%08lx\n",cpu.mepc,s->dnpc,cpu.mstatus)); //I DO
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , I, s->dnpc = cpu.mepc, cpu.mstatus = 0xa00001800); //printf("mret! mepc=0x%08lx; dnpc=0x%08lx; mstatus=0x%08lx\n",cpu.mepc,s->dnpc,cpu.mstatus)); //I DO
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10)), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // R(10) is $a0
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));

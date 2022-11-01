@@ -56,14 +56,18 @@ void _exit(int status) {
 }
 
 int _open(const char *path, int flags, mode_t mode) {
-  _exit(SYS_open);
-  return 0;
+//------------------I DO------------------------------
+  return _syscall_(SYS_open, (intptr_t)path, flags, mode); 
+  //return 0;
+//------------------------------------------------
+  //_exit(SYS_open);
+  //return 0;
 }
 
 int _write(int fd, void *buf, size_t count) {
-  _syscall_(SYS_write, fd, (intptr_t)buf, count);  //I DO 触发 SYS_write
+  return _syscall_(SYS_write, fd, (intptr_t)buf, count);  //I DO 触发 SYS_write
   //_exit(SYS_write);   //注释掉，不希望每次write异常后直接就退出程序了
-  return 0;
+  //return 0;
 }
 
 extern char _end;                   //I DO
@@ -80,22 +84,38 @@ void *_sbrk(intptr_t increment) {
 }
 
 int _read(int fd, void *buf, size_t count) {
-  _exit(SYS_read);
-  return 0;
+//------------------I DO------------------------------
+  return _syscall_(SYS_read, fd, (intptr_t)buf, count); 
+  //return 0;
+//------------------------------------------------
+  //_exit(SYS_read);
+  //return 0;
 }
 
 int _close(int fd) {
-  _exit(SYS_close);
-  return 0;
+//------------------I DO------------------------------
+  return _syscall_(SYS_close, fd, 0, 0); 
+  //return 0;
+//------------------------------------------------
+  //_exit(SYS_close);
+  //return 0;
 }
 
 off_t _lseek(int fd, off_t offset, int whence) {
-  _exit(SYS_lseek);
-  return 0;
+//------------------I DO------------------------------
+  return _syscall_(SYS_lseek, fd, offset, whence);
+  //return 0;
+//------------------------------------------------
+  //_exit(SYS_lseek);
+  //return 0;
 }
 
 int _gettimeofday(struct timeval *tv, struct timezone *tz) {
-  _exit(SYS_gettimeofday);
+//----------------I DO--------------
+  int time_add = _syscall_(SYS_gettimeofday, 0, 0, 0);
+  tv->tv_sec = time_add / 1000000;
+  tv->tv_usec = time_add % 1000000;
+  //_exit(SYS_gettimeofday);
   return 0;
 }
 
