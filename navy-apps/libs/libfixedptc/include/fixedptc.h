@@ -103,7 +103,7 @@ typedef	__uint128_t fixedptud;
 #define FIXEDPT_VCSID "$Id$"
 
 #define FIXEDPT_FBITS	(FIXEDPT_BITS - FIXEDPT_WBITS)
-#define FIXEDPT_FMASK	(((fixedpt)1 << FIXEDPT_FBITS) - 1)
+#define FIXEDPT_FMASK	(((fixedpt)1 << FIXEDPT_FBITS) - 1)    //0b 1111_1111
 
 #define fixedpt_rconst(R) ((fixedpt)((R) * FIXEDPT_ONE + ((R) >= 0 ? 0.5 : -0.5)))
 #define fixedpt_fromint(I) ((fixedptd)(I) << FIXEDPT_FBITS)
@@ -127,35 +127,71 @@ typedef	__uint128_t fixedptud;
 
 /* Multiplies a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_muli(fixedpt A, int B) {
-	return 0;
+//------------I DO------------------------
+	//return fixedpt_fromint((fixedpt_toint(A) * B));
+	return (A * B);
+//========================================
+	//return 0;
 }
 
 /* Divides a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_divi(fixedpt A, int B) {
-	return 0;
+//-------------------I DO--------------------
+	//return fixedpt_fromint((fixedpt_toint(A) / B));
+	return (A / B);
+//===========================================
+	//return 0;
 }
 
 /* Multiplies two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
-	return 0;
+//-------------I DO----------------------------
+	return ((A * B) >> 8);
+//=============================================
+	//return 0;
 }
 
 
 /* Divides two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_div(fixedpt A, fixedpt B) {
+//---------------I DO----------------
+	return ((A / B) << 8);
+//===================================
 	return 0;
 }
 
 static inline fixedpt fixedpt_abs(fixedpt A) {
-	return 0;
+//-----------I DO---------------------
+	if (A >= 0)
+	{
+		return A;
+	}
+	else{
+		return (-A);
+	}
+//====================================
+	//return 0;
 }
 
 static inline fixedpt fixedpt_floor(fixedpt A) {
-	return 0;
+//--------------I DO 浮点数地板除法-----------------
+	//return ((A / 2**8) << 8);
+	return (A & ~(FIXEDPT_FMASK)); //后8位的数就是小数位，直接把小数位抹0
+//===============================================
+	//return 0;
 }
 
 static inline fixedpt fixedpt_ceil(fixedpt A) {
-	return 0;
+//--------------I DO 浮点数天花板除法-------------
+	if ((A & FIXEDPT_FMASK) == 0) //无小数部分
+	{
+		return A;
+	}
+	else{
+		return ((A & ~(FIXEDPT_FMASK)) + FIXEDPT_ONE); //去除小数部分后加2**8
+	}
+//=============================================
+	//return 0;
 }
 
 /*

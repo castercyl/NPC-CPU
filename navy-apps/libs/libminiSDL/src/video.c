@@ -4,6 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+//-----------I DO----------------
+static inline clolour8_to_32(SDL_Color *colors) {//按00RRGGBB的方式调色
+  return (colors->a << 24 | colors->r << 16 | colors->g << 8 | colors->b);
+}
+//===============================
+
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
@@ -13,6 +19,53 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+//---------------------I DO--------------------
+//将画布中的(x,y)点处的w*h的矩形区域同步到屏幕上
+  if (s->format->BitsPerPixel == 32) //每个像素是32位,24位以上直接存值
+  {
+    if (x==0 && y==0 && w==0 && h==0) 
+    { //如果x,y,w,h均为0，则改为更新到整个画布
+      NDL_DrawRect((uint32_t *)s->pixels, 0, 0, s->w, s->y);
+      return;
+    }
+    //指定矩形小于画布的总体内容，需要将指定部分的内容切取出来
+    uint32_t *SDL_pixels_32 = malloc(w * h * sizeof(uint32_t));
+    assert(SDL_pixels_32);
+    uint32_t *surface_src_32 = (uint32_t *)s->pixels;
+    for (int i = 0; i < h; i++)
+    { //按行优先排列
+      memccpy(SDL_pixels_32 + i * w, surface_src_32 + (i + y) * s->w + x, w * sizeof(uint32_t));
+    }
+    NDL_DrawRect((uint32_t *)SDL_pixels_32, x, y, w, h);
+    free(SDL_pixels_32);
+  }
+
+  else if (s->format->BitsPerPixel == 8) //每个像素是8位，但自己实现的NDL_DrawRect只支持32位，需要转换下
+  //24位以下存储的是调色索引
+  {
+    if (x==0 && y==0 && w==0 && h==0)
+    {
+      w = s->w; h = s->h;
+    }
+    uint32_t *SDL_pixels_8_to_32 = malloc(w * h * sizeof(uint32_t));
+    assert(SDL_pixels_8_to_32);
+    uint8_t *surface_src_8 = (uint8_t *)s->pixels;
+    for (int i = 0; i < h; i++)
+    {
+      for (int j = 0; j < w; j++)
+      {
+        SDL_pixels_8_to_32[i * w + j] = clolour8_to_32(s->format->palette->colors[surface_src_8[(y + i)*s->w+x+j]]);
+      }
+    }
+    NDL_DrawRect((uint8_t *)SDL_pixels_8_to_32, x, y, w, h);
+    free(SDL_pixels_8_to_32);
+
+  }
+  else
+  {
+    assert(0);
+  }
+//=============================================
 }
 
 // APIs below are already implemented.
