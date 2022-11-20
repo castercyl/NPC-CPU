@@ -4,18 +4,134 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <stdio.h> //I DO
+
 //-----------I DO----------------
-static inline clolour8_to_32(SDL_Color *colors) {//按00RRGGBB的方式调色
+static inline uint32_t clolour8_to_32(SDL_Color *colors) {//按00RRGGBB的方式调色
   return (colors->a << 24 | colors->r << 16 | colors->g << 8 | colors->b);
 }
 //===============================
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
-  assert(dst && src);
-  assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
+  printf("run SDL_BlitSurface !\n");//I DO
+  assert(dst && src);  //两张画布不能为空
+  assert(dst->format->BitsPerPixel == src->format->BitsPerPixel); //两张画布的像素格式要一致
+//--------------------I DO----------------------------------------
+//---------------将一张画布中的指定矩形区域复制到另一张画布的指定位置----------------
+int src_rect_x, src_rect_y, src_rect_w, src_rect_h, dst_rect_x, dst_rect_y;
+
+if (src->format->BitsPerPixel == 32)
+{
+  uint32_t *src_pixels_32 = (uint32_t *)src->pixels;
+  uint32_t *dst_pixels_32 = (uint32_t *)dst->pixels;
+  if (srcrect)
+  {
+    src_rect_x = srcrect->x;
+    src_rect_y = srcrect->y;
+    src_rect_w = srcrect->w;
+    src_rect_h = srcrect->h;
+  }
+  else
+  {
+    src_rect_x = 0;
+    src_rect_y = 0;
+    src_rect_w = src->w;
+    src_rect_h = src->h;
+  }
+  if (dstrect)
+  {
+    dst_rect_x = dstrect->x;
+    dst_rect_y = dstrect->y;
+  }
+  else
+  {
+    dst_rect_x = 0;
+    dst_rect_y = 0;
+  }
+
+  for (int i = 0; i < src_rect_h; i++)
+  {
+    for (int j = 0; j < src_rect_w; j++)
+    {
+      dst_pixels_32[(dst_rect_y + i) * dst->w + dst_rect_x + j] = src_pixels_32[(src_rect_y + i) * src->w + src_rect_x + j];
+    }
+  }
+}
+
+else if (src->format->BitsPerPixel == 8) //默认调色板是一致的
+{
+  uint8_t *src_pixels_8 = (uint8_t *)src->pixels;
+  uint8_t *dst_pixels_8 = (uint8_t *)dst->pixels;
+  if (srcrect)
+  {
+    src_rect_x = srcrect->x;
+    src_rect_y = srcrect->y;
+    src_rect_w = srcrect->w;
+    src_rect_h = srcrect->h;
+  }
+  else
+  {
+    src_rect_x = 0;
+    src_rect_y = 0;
+    src_rect_w = src->w;
+    src_rect_h = src->h;
+  }
+  if (dstrect)
+  {
+    dst_rect_x = dstrect->x;
+    dst_rect_y = dstrect->y;
+  }
+  else
+  {
+    dst_rect_x = 0;
+    dst_rect_y = 0;
+  }
+
+  for (int m = 0; m < src_rect_h; m++)
+  {
+    for (int n = 0; n < src_rect_w; n++)
+    {
+      dst_pixels_8[(dst_rect_y + m) * dst->w + dst_rect_x + n] = src_pixels_8[(src_rect_y + m) * src->w + src_rect_x + n];
+    }
+  }
+}
+
+else
+{
+  assert(0);
+}
+
+//================================================================
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+//-------------I DO----------------------
+//------------往画布的指定矩形区域中填充指定的颜色---------- 
+  printf("run SDL_FillRect !\n");//I DO
+  int rect_x, rect_y, rect_w, rect_h; //目标矩形的起点，长，宽
+  if(dstrect == NULL)   //如没有指定区域，则默认填充整个画布
+  {
+    rect_x = 0;
+    rect_y = 0;
+    rect_w = dst->w;
+    rect_h = dst->h;
+  }
+  else
+  {
+    rect_x = dstrect->x;
+    rect_y = dstrect->y;
+    rect_w = dstrect->w;
+    rect_h = dstrect->h;
+  }
+  uint32_t *rect_pixels = (uint32_t *)dst->pixels;
+  for(int i = 0; i < rect_h; i++)
+  {
+    for(int j = 0; j < rect_w; j++)
+    {
+      rect_pixels[(rect_y + i) * dst->w + rect_x + j] = color;
+    }
+  }
+//======================================================
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
@@ -25,7 +141,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   {
     if (x==0 && y==0 && w==0 && h==0) 
     { //如果x,y,w,h均为0，则改为更新到整个画布
-      NDL_DrawRect((uint32_t *)s->pixels, 0, 0, s->w, s->y);
+      NDL_DrawRect((uint32_t *)s->pixels, 0, 0, s->w, s->h);
       return;
     }
     //指定矩形小于画布的总体内容，需要将指定部分的内容切取出来
@@ -34,7 +150,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     uint32_t *surface_src_32 = (uint32_t *)s->pixels;
     for (int i = 0; i < h; i++)
     { //按行优先排列
-      memccpy(SDL_pixels_32 + i * w, surface_src_32 + (i + y) * s->w + x, w * sizeof(uint32_t));
+      memcpy(SDL_pixels_32 + i * w, surface_src_32 + (i + y) * s->w + x, w * sizeof(uint32_t));
     }
     NDL_DrawRect((uint32_t *)SDL_pixels_32, x, y, w, h);
     free(SDL_pixels_32);
@@ -54,10 +170,10 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     {
       for (int j = 0; j < w; j++)
       {
-        SDL_pixels_8_to_32[i * w + j] = clolour8_to_32(s->format->palette->colors[surface_src_8[(y + i)*s->w+x+j]]);
+        SDL_pixels_8_to_32[i * w + j] = clolour8_to_32(&s->format->palette->colors[surface_src_8[(y + i)*s->w+x+j]]);
       }
     }
-    NDL_DrawRect((uint8_t *)SDL_pixels_8_to_32, x, y, w, h);
+    NDL_DrawRect(SDL_pixels_8_to_32, x, y, w, h);
     free(SDL_pixels_8_to_32);
 
   }
@@ -83,6 +199,7 @@ static inline int maskToShift(uint32_t mask) {
 
 SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int depth,
     uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) {
+  printf("run SDL_CreateRGBSurface !\n");//I DO
   assert(depth == 8 || depth == 32);
   SDL_Surface *s = malloc(sizeof(SDL_Surface));
   assert(s);
@@ -117,6 +234,8 @@ SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
     assert(s->pixels);
   }
 
+  printf("finish SDL_CreateRGBSurface !\n");//I DO
+
   return s;
 }
 
@@ -130,6 +249,7 @@ SDL_Surface* SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int d
 }
 
 void SDL_FreeSurface(SDL_Surface *s) {
+  printf("run SDL_FreeSurface !\n");//I DO
   if (s != NULL) {
     if (s->format != NULL) {
       if (s->format->palette != NULL) {
@@ -141,10 +261,13 @@ void SDL_FreeSurface(SDL_Surface *s) {
     if (s->pixels != NULL && !(s->flags & SDL_PREALLOC)) free(s->pixels);
     free(s);
   }
+  printf("finish SDL_FreeSurface !\n");//I DO
 }
 
 SDL_Surface* SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags) {
+  printf("run SDL_SetVideoMode!\n");//I DO
   if (flags & SDL_HWSURFACE) NDL_OpenCanvas(&width, &height);
+  printf("run SDL_SetVideoMode 1!\n");//I DO
   return SDL_CreateRGBSurface(flags, width, height, bpp,
       DEFAULT_RMASK, DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
 }
@@ -246,8 +369,12 @@ uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint
 }
 
 int SDL_LockSurface(SDL_Surface *s) {
+  assert(0);//I DO
+  printf("SDL_LockSurface is uncompleted !\n");//I DO
   return 0;
 }
 
 void SDL_UnlockSurface(SDL_Surface *s) {
+  assert(0);//I DO
+  printf("SDL_LockSurface is uncompleted !\n");//I DO
 }

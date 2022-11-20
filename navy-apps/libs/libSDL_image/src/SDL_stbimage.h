@@ -140,6 +140,9 @@ SDL_STBIMG_DEF SDL_Surface* STBIMG_CreateSurface(unsigned char* pixelData, int w
 #endif
 #include "stb_image.h"
 
+#include <stdio.h> //I DO
+
+
 typedef struct {
 	unsigned char* data;
 	int w;
@@ -191,6 +194,9 @@ SDL_STBIMG_DEF SDL_Surface* STBIMG_LoadFromMemory(const unsigned char* buffer, i
 	SDL_Surface* ret = NULL;
 	int origin_has_alpha;
 
+	printf("STBIMG_LoadFromMemory 0\n"); //I DO
+
+
 	if(buffer == NULL)
 	{
 		SDL_SetError("STBIMG_LoadFromMemory(): passed buffer was NULL!");
@@ -202,7 +208,12 @@ SDL_STBIMG_DEF SDL_Surface* STBIMG_LoadFromMemory(const unsigned char* buffer, i
 		return NULL;
 	}
 
+	printf("STBIMG_LoadFromMemory 1\n"); //I DO
+
 	inforet = stbi_info_from_memory(buffer, length, &img.w, &img.h, &img.format);
+
+	printf("STBIMG_LoadFromMemory 2\n"); //I DO
+
 	if(!inforet)
 	{
 		SDL_SetError("STBIMG_LoadFromMemory(): Couldn't get image info: %s!\n", stbi_failure_reason());
@@ -213,7 +224,12 @@ SDL_STBIMG_DEF SDL_Surface* STBIMG_LoadFromMemory(const unsigned char* buffer, i
 	origin_has_alpha = !(img.format == STBI_grey || img.format == STBI_rgb);
 	bppToUse = STBI_rgb_alpha;
 
+	printf("STBIMG_LoadFromMemory 3\n"); //I DO
+
 	img.data = stbi_load_from_memory(buffer, length, &img.w, &img.h, &img.format, bppToUse);
+
+	printf("STBIMG_LoadFromMemory 4\n"); //I DO
+
 	if(img.data == NULL)
 	{
 		SDL_SetError("STBIMG_LoadFromMemory(): Couldn't load image: %s!\n", stbi_failure_reason());

@@ -43,11 +43,11 @@ size_t events_read(void *buf, size_t offset, size_t len) {
       len = sprintf(buf, "ku %s\n", keyname[event_kbd.keycode]);
     }
   }
-  
+  /*
   else{
     len = sprintf(buf, "t  %d\n", fs_gettimeofday()); //us
   }
-  
+  */
   return len;
 //-----------------------------------------
   //return 0;

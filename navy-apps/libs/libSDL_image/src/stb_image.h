@@ -499,6 +499,8 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
 #include <string.h>
 #include <limits.h>
 
+#include <stdio.h> //I DO
+
 
 
 #ifndef STBI_ASSERT
@@ -929,7 +931,9 @@ STBIDEF stbi_us *stbi_load_16_from_memory(stbi_uc const *buffer, int len, int *x
 STBIDEF stbi_uc *stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp)
 {
    stbi__context s;
+   printf("stbi_load_from_memory 0\n");//I DO
    stbi__start_mem(&s,buffer,len);
+   printf("stbi_load_from_memory 1\n");//I DO
    return stbi__load_and_postprocess_8bit(&s,x,y,comp,req_comp);
 }
 
@@ -3704,7 +3708,8 @@ static void stbi__de_iphone(stbi__png *z)
 #define STBI__PNG_TYPE(a,b,c,d)  (((unsigned) (a) << 24) + ((unsigned) (b) << 16) + ((unsigned) (c) << 8) + (unsigned) (d))
 
 static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
-{
+{  
+   printf("start stbi__parse_png_file\n");//I DO
    stbi_uc palette[1024], pal_img_n=0;
    stbi_uc has_trans=0, tc[3]={0};
    stbi__uint16 tc16[3];
@@ -3736,8 +3741,9 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
             s->img_y = stbi__get32be(s);
             if (s->img_y > STBI_MAX_DIMENSIONS) return stbi__err("too large","Very large image (corrupt?)");
             if (s->img_x > STBI_MAX_DIMENSIONS) return stbi__err("too large","Very large image (corrupt?)");
-            z->depth = stbi__get8(s);  if (z->depth != 1 && z->depth != 2 && z->depth != 4 && z->depth != 8 && z->depth != 16)  return stbi__err("1/2/4/8/16-bit only","PNG not supported: 1/2/4/8/16-bit only");
-            color = stbi__get8(s);  if (color > 6)         return stbi__err("bad ctype","Corrupt PNG");
+            printf("flag11.1\n");//I DO
+            z->depth = stbi__get8(s); printf("flag11.2 depth = %d\n", z->depth); if (z->depth != 1 && z->depth != 2 && z->depth != 4 && z->depth != 8 && z->depth != 16) return stbi__err("1/2/4/8/16-bit only","PNG not supported: 1/2/4/8/16-bit only");
+            printf("flag11.3\n");color = stbi__get8(s); printf("flag11.4\n"); if (color > 6)         return stbi__err("bad ctype","Corrupt PNG");
             if (color == 3 && z->depth == 16)                  return stbi__err("bad ctype","Corrupt PNG");
             if (color == 3) pal_img_n = 3; else if (color & 1) return stbi__err("bad ctype","Corrupt PNG");
             comp  = stbi__get8(s);  if (comp) return stbi__err("bad comp method","Corrupt PNG");
@@ -3877,6 +3883,7 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
       // end of PNG chunk, read and skip CRC
       stbi__get32be(s);
    }
+   printf("finish stbi__parse_png_file\n");//I DO
 }
 
 static void *stbi__do_png(stbi__png *p, int *x, int *y, int *n, int req_comp, stbi__result_info *ri)
@@ -3929,12 +3936,15 @@ static int stbi__png_test(stbi__context *s)
 static int stbi__png_info_raw(stbi__png *p, int *x, int *y, int *comp)
 {
    if (!stbi__parse_png_file(p, STBI__SCAN_header, 0)) {
+      printf("stbi__parse_png_file finish!\n");//I DO
       stbi__rewind( p->s );
       return 0;
    }
+   printf("stbi__rewind finish!\n");//I DO
    if (x) *x = p->s->img_x;
    if (y) *y = p->s->img_y;
    if (comp) *comp = p->s->img_n;
+   printf("stbi__png_info_raw finish!\n");//I DO
    return 1;
 }
 
@@ -3942,6 +3952,7 @@ static int stbi__png_info(stbi__context *s, int *x, int *y, int *comp)
 {
    stbi__png p;
    p.s = s;
+   printf("stbi__png_info 0\n");//I DO
    return stbi__png_info_raw(&p, x, y, comp);
 }
 
@@ -5344,6 +5355,7 @@ static int      stbi__pnm_info(stbi__context *s, int *x, int *y, int *comp)
 
 static int stbi__info_main(stbi__context *s, int *x, int *y, int *comp)
 {
+   printf("stbi__info_main 0\n");//I DO
    #ifndef STBI_NO_JPEG
    if (stbi__jpeg_info(s, x, y, comp)) return 1;
    #endif
@@ -5372,6 +5384,9 @@ static int stbi__info_main(stbi__context *s, int *x, int *y, int *comp)
    if (stbi__tga_info(s, x, y, comp))
        return 1;
    #endif
+
+   printf("stbi__info_main 1\n");//I DO
+
    return stbi__err("unknown image type", "Image not of any known type, or corrupt");
 }
 
@@ -5389,7 +5404,9 @@ static int stbi__is_16_main(stbi__context *s)
 STBIDEF int stbi_info_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp)
 {
    stbi__context s;
+   printf("stbi_info_from_memory 0\n");//I DO
    stbi__start_mem(&s,buffer,len);
+   printf("stbi_info_from_memory 1\n");//I DO
    return stbi__info_main(&s,x,y,comp);
 }
 

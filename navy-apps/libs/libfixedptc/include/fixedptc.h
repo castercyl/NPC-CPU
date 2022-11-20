@@ -129,7 +129,7 @@ typedef	__uint128_t fixedptud;
 static inline fixedpt fixedpt_muli(fixedpt A, int B) {
 //------------I DO------------------------
 	//return fixedpt_fromint((fixedpt_toint(A) * B));
-	return (A * B);
+	return (fixedpt)(A * B);
 //========================================
 	//return 0;
 }
@@ -138,7 +138,7 @@ static inline fixedpt fixedpt_muli(fixedpt A, int B) {
 static inline fixedpt fixedpt_divi(fixedpt A, int B) {
 //-------------------I DO--------------------
 	//return fixedpt_fromint((fixedpt_toint(A) / B));
-	return (A / B);
+	return (fixedpt)(A / B);
 //===========================================
 	//return 0;
 }
@@ -146,7 +146,8 @@ static inline fixedpt fixedpt_divi(fixedpt A, int B) {
 /* Multiplies two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
 //-------------I DO----------------------------
-	return ((A * B) >> 8);
+	//return ((A * B) >> 8);
+	return (fixedpt)((((fixedptd)A) * ((fixedptd)B)) >> FIXEDPT_FBITS);
 //=============================================
 	//return 0;
 }
@@ -155,13 +156,15 @@ static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
 /* Divides two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_div(fixedpt A, fixedpt B) {
 //---------------I DO----------------
-	return ((A / B) << 8);
+	//return ((A / B) << 8);
+	return (fixedpt)((((fixedptd)A) / ((fixedptd)B)) << FIXEDPT_FBITS);
 //===================================
-	return 0;
+	//return 0;
 }
 
 static inline fixedpt fixedpt_abs(fixedpt A) {
 //-----------I DO---------------------
+/*
 	if (A >= 0)
 	{
 		return A;
@@ -169,6 +172,8 @@ static inline fixedpt fixedpt_abs(fixedpt A) {
 	else{
 		return (-A);
 	}
+*/
+	return A >= 0 ? A : (-A);
 //====================================
 	//return 0;
 }
@@ -176,13 +181,15 @@ static inline fixedpt fixedpt_abs(fixedpt A) {
 static inline fixedpt fixedpt_floor(fixedpt A) {
 //--------------I DO 浮点数地板除法-----------------
 	//return ((A / 2**8) << 8);
-	return (A & ~(FIXEDPT_FMASK)); //后8位的数就是小数位，直接把小数位抹0
+	//return (A & ~(FIXEDPT_FMASK)); //后8位的数就是小数位，直接把小数位抹0
+	return A & (~FIXEDPT_FMASK);
 //===============================================
 	//return 0;
 }
 
 static inline fixedpt fixedpt_ceil(fixedpt A) {
 //--------------I DO 浮点数天花板除法-------------
+/*
 	if ((A & FIXEDPT_FMASK) == 0) //无小数部分
 	{
 		return A;
@@ -190,6 +197,8 @@ static inline fixedpt fixedpt_ceil(fixedpt A) {
 	else{
 		return ((A & ~(FIXEDPT_FMASK)) + FIXEDPT_ONE); //去除小数部分后加2**8
 	}
+*/
+	return ((A & FIXEDPT_FMASK) == 0) ? A : ((A & (~FIXEDPT_FMASK)) + FIXEDPT_ONE);
 //=============================================
 	//return 0;
 }

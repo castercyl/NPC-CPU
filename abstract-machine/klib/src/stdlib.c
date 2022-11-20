@@ -61,12 +61,14 @@ void *malloc(size_t size) {
   //assert((uintptr_t)hbrk - (uintptr_t)heap.start <= setting->mlim);
   //return old;
   //return NULL;
+  
   if (!addr){
     addr = heap.start;
   }
   void *t = addr;
   addr = addr + size;
   return t;
+  
 }
 
 void free(void *ptr) {

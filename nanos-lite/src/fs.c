@@ -40,12 +40,12 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
   */
-  [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write, 0}, //I DO 因为我自己添加了一个量 openoffset
-  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write, 0},//I DO
-  [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write, 0},//I DO
-  [FD_FB]     = {"fb", 0, 0, invalid_read, fb_write, 0}, //I DO
-  [FD_EVENTS] = {"events", 0, 0, events_read, invalid_write, 0},//I DO
-  [FD_DISPINFO] = {"dispinfo", 0, 0, dispinfo_read, invalid_write, 0},//I DO
+  [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write}, //I DO 因为我自己添加了一个量 openoffset
+  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},//I DO
+  [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},//I DO
+  [FD_FB]     = {"fb", 0, 0, invalid_read, fb_write}, //I DO
+  [FD_EVENTS] = {"events", 0, 0, events_read, invalid_write},//I DO
+  [FD_DISPINFO] = {"dispinfo", 0, 0, dispinfo_read, invalid_write},//I DO
 #include "files.h"
 };
 
@@ -58,7 +58,7 @@ void init_fs() {
 //-----I DO------------------
 int fs_open(const char *pathname, int flags, int mode) {
   //函数入口：输入文件名，返回文件名对应的文件编号
-  int FILE_NUMBER = 23;   //通过#include <fs.h>可查询到固定共有20个文件 + 3个特殊文件：stdin,stdout,stderr
+  int FILE_NUMBER = sizeof(file_table) / sizeof(Finfo);   //需要实时计算，不要固定，因为后面在不断的地加入Test和APP
   for (int i = 0; i < FILE_NUMBER; i++){
     if (strcmp(pathname, file_table[i].name) == 0){
       file_table[i].open_offset = 0;
@@ -72,6 +72,7 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 int fs_close(int fd) {
   //函数入口：输入文件编号，返回0，总表示文件关闭成功
+  file_table[fd].open_offset = 0;
   return 0; //sfs没有维护文件打开的状态，返回0表示总是关闭成功
 }
 

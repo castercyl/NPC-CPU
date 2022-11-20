@@ -41,6 +41,7 @@ uint32_t NDL_GetTicks() {
 
 int NDL_PollEvent(char *buf, int len) {
 //-----------------I DO-----------------
+//-----读取键盘是否按下或松开---------------
   int NDL_fd = _open("events", 0, 0);
   size_t NDL_size = _read(NDL_fd, buf, len);
   _close(NDL_fd);
