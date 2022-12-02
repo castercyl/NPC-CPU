@@ -23,6 +23,8 @@ size_t fs_offset(int fd);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
+  //return 0;
+
 //---------------------I DO----------------------
   //函数入口：输入文件名，根据文件名从ramdisk中加载对应文件，返回加载文件的函数入口地址
   Elf_Ehdr elfhdr = {};   //管理整个ELF文件的表头
@@ -34,6 +36,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   printf("FS_NUMBER = %d\n", FS_NUMBER);
   fs_read(FS_NUMBER, &elfhdr, sizeof(elfhdr));
   fs_close(FS_NUMBER);
+
+  printf("sizeof_phdr = %d; ehdr_phentsize = %d\n", sizeof(elfphdr), elfhdr.e_phentsize);
 
   //ramdisk_read(&elfhdr, 0, sizeof(elfhdr));
   assert(*(uint32_t *)elfhdr.e_ident == 0x464c457f); //ELF文件的魔数断言
@@ -47,9 +51,15 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if(elfphdr.p_type == PT_LOAD){
       //ramdisk_read((void*)0x83000000, 0, 0x4f88);
       //ramdisk_read((void*)elfphdr.p_paddr, elfphdr.p_offset, elfphdr.p_memsz);
+      printf("vaddr = 0X%x; paddr = 0X%x\n", elfphdr.p_vaddr, elfphdr.p_paddr);
+
       ramdisk_read((void*)elfphdr.p_paddr, elfphdr.p_offset + file_offset, elfphdr.p_memsz);
+
+      printf("11111\n");
+
       //ramdisk_read((void*)elfphdr.p_paddr, elfphdr.p_offset, (size_t*)elfphdr.p_memsz);
-      memset((void *)(elfphdr.p_vaddr+elfphdr.p_filesz), 0, (elfphdr.p_memsz-elfphdr.p_filesz));
+      //memset((void *)(elfphdr.p_vaddr+elfphdr.p_filesz), 0, (elfphdr.p_memsz-elfphdr.p_filesz));
+      memset((void *)(elfphdr.p_paddr+elfphdr.p_filesz), 0, (elfphdr.p_memsz-elfphdr.p_filesz));
       
     }
   }

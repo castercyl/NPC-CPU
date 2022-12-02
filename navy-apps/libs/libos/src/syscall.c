@@ -71,16 +71,24 @@ int _write(int fd, void *buf, size_t count) {
 }
 
 extern char _end;                   //I DO
-intptr_t end = (intptr_t)&_end;     //I DO
+void * program_break = NULL;              //I DO
+//intptr_t end = (intptr_t)&_end;     //I DO
 
 
 void *_sbrk(intptr_t increment) {
-  intptr_t old = end; //I DO
-  if(_syscall_(SYS_brk, old + increment, 0, 0) == 0){  //I DO
-    end = end + increment;
-    return (void*)old;
+  if (program_break == NULL)
+  {
+    program_break = &_end;
   }
-  return (void *)-1;
+  void * old_program_brak = program_break;
+  
+  if(_syscall_(SYS_brk, (intptr_t)(program_break + increment), 0, 0) == 0){  //I DO
+    program_break = program_break + increment;
+    return old_program_brak;
+  }
+  else{
+    assert(0);
+  }
 }
 
 int _read(int fd, void *buf, size_t count) {
@@ -112,11 +120,11 @@ off_t _lseek(int fd, off_t offset, int whence) {
 
 int _gettimeofday(struct timeval *tv, struct timezone *tz) {
 //----------------I DO--------------
-  int time_add = _syscall_(SYS_gettimeofday, 0, 0, 0);
-  tv->tv_sec = time_add / 1000000;
-  tv->tv_usec = time_add % 1000000;
+  return _syscall_(SYS_gettimeofday, (intptr_t)tv, (intptr_t)tz, 0);
+  //tv->tv_sec = time_add / 1000000;
+  //tv->tv_usec = time_add % 1000000;
   //_exit(SYS_gettimeofday);
-  return 0;
+  //return 0;
 }
 
 int _execve(const char *fname, char * const argv[], char *const envp[]) {

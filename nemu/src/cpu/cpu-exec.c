@@ -25,7 +25,8 @@ void iring(int iring_num, Decode *s){  //I DO
 }*/
 
 //CPU_state cpu = {};
-CPU_state cpu = {.mstatus=0xa00001800}; //I DO 为了配合DIFTEST
+CPU_state cpu = {.mstatus.value = 0xa00001800}; //I DO 为了配合DIFTEST
+//CSR_state csr = {.mstatus.value =0xa00001800}; //I DO 为了配合DIFTEST
 
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us

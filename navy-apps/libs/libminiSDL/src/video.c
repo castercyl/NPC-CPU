@@ -17,7 +17,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   assert(dst && src);  //两张画布不能为空
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel); //两张画布的像素格式要一致
 //--------------------I DO----------------------------------------
-//---------------将一张画布中的指定矩形区域复制到另一张画布的指定位置----------------
+//---------------将一张画布中的指定矩形区域复制到另一张画布的指定位置----------------这里不用考虑32和8？
 int src_rect_x, src_rect_y, src_rect_w, src_rect_h, dst_rect_x, dst_rect_y;
 
 if (src->format->BitsPerPixel == 32)

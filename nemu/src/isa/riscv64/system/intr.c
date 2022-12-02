@@ -6,6 +6,8 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
    */
   cpu.mepc = epc; // I DO
   cpu.mcause = NO; // I DO
+  cpu.mstatus.m.MPIE = cpu.mstatus.m.MIE;//I DO
+  cpu.mstatus.m.MIE = 0;//I DO
   return cpu.mtvec; // I DO 
 
   //return 0;

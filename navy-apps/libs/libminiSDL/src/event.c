@@ -12,10 +12,12 @@ static const char *keyname[] = {
   _KEYS(keyname)
 };
 
+static uint8_t key_state[sizeof(keyname) / sizeof(keyname[0])] = {0}; //按键记录的备份（快照）
+
 //-----------I DO--------------
 static char key_buf[64], *keycode, *keyaction;
 static int inline SDL_getkey(uint8_t *type, uint8_t *sym) {
-//---调用NDL_PollEvent，把按键的状态和按键名称写入SDL_EVENT中
+//---调用NDL_PollEvent，把按键的状态和按键名称写入SDL_EVENT中,sym是按键的编号
   memset(key_buf, '\0', sizeof(key_buf));
   int ret = NDL_PollEvent(key_buf, sizeof(key_buf));
   if(ret == 0)
@@ -77,12 +79,26 @@ int SDL_PushEvent(SDL_Event *ev) {
 int SDL_PollEvent(SDL_Event *ev) {
 //--------------I DO---------------
 printf("run SDL_PollEvent !\n");
-//----------如果当前没有任何事件，就立即返回;有事件返回1，无事件返回0------------
+//----------如果当前没有任何事件，就立即返回;轮询，有事件返回1，无事件返回0------------
   uint8_t type = 0, sym = 0;
   if (SDL_getkey(&type, &sym))
   {
     ev->type = type;
     ev->key.keysym.sym = sym;
+
+    if(type == SDL_KEYDOWN)
+    {
+      key_state[sym] = 1;
+    }
+    else if(type == SDL_KEYUP)
+    {
+      key_state[sym] = 0;
+    }
+    else
+    {
+      assert(0);
+    }
+
     return 1;
   }
   else
@@ -106,6 +122,20 @@ printf("run SDL_WaitEvent !\n");
 
   event->type = type;
   event->key.keysym.sym = sym;
+
+  if(type == SDL_KEYDOWN)
+    {
+      key_state[sym] = 1;
+    }
+    else if(type == SDL_KEYUP)
+    {
+      key_state[sym] = 0;
+    }
+    else
+    {
+      assert(0);
+    }
+
   printf("event.type = %d; event.sym = %d\n", event->type, event->key.keysym.sym);
 //================================
 
@@ -119,7 +149,15 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
-  assert(0);//I DO
+//----------------I DO---------------------
+//返回按键的快照,numkey中存放按键快照中按键的数量
+  if(numkeys)
+  {
+    *numkeys = sizeof(key_state) / sizeof(key_state[0]);
+  }
+  return key_state;
+//=========================================
+  //assert(0);//I DO
   printf("SDL_GetKeyState Not implemented !\n");//I DO
   return NULL;
 }

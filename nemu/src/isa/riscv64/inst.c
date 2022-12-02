@@ -69,10 +69,11 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu    , I, R(dest) = SEXT(Mr(src1+src2,2)&65535, 17)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = M[x[rs1] + sext(offset)][15:0], 无符号半字加载
   INSTPAT("??????? ????? ????? 110 ????? 00000 11", lwu    , I, R(dest) = SEXT(Mr(src1+src2,4)&4294967295, 33)); //I DO
   INSTPAT("000000? ????? ????? 001 ????? 00100 11", slli   , I, R(dest) = (src1 << src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
-  INSTPAT("000000? ????? ????? 001 ????? 00110 11", slliw  , I, R(dest) = SEXT(BITS(src1<<src2,31,0), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ shamt)[31: 0]), 立即数逻辑左移字
-  INSTPAT("010000? ????? ????? 101 ????? 00110 11", sraiw  , I, R(dest) = SEXT(BITS(src1,31,0),32) >> src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] >>s shamt),立即数算术右移字
-  INSTPAT("000000? ????? ????? 101 ????? 00100 11", srli   , I, R(dest) = (src1 >> src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>u shamt) 立即数逻辑右移
-  INSTPAT("000000? ????? ????? 101 ????? 00110 11", srliw  , I, R(dest) = SEXT((src1&4294967295) >> src2, 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DOx[rd] = sext(x[rs1][31: 0] >>u shamt), 立即数逻辑右移字
+  INSTPAT("0000000 ????? ????? 001 ????? 00110 11", slliw  , I, R(dest) = SEXT(BITS(src1<<src2,31,0), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext((x[rs1] ≪ shamt)[31: 0]), 立即数逻辑左移字
+  INSTPAT("0100000 ????? ????? 101 ????? 00110 11", sraiw  , I, R(dest) = SEXT(BITS(src1,31,0),32) >> src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31: 0] >>s shamt),立即数算术右移字
+  //INSTPAT("000000? ????? ????? 101 ????? 00100 11", srli   , I, R(dest) = (src1 >> src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = (x[rs1] >>u shamt) 立即数逻辑右移
+  INSTPAT("000000? ????? ????? 101 ????? 00100 11", srli   , I, R(dest) = BITS((src1 >> src2), 63-src2, 0) ); //I DO
+  INSTPAT("0000000 ????? ????? 101 ????? 00110 11", srliw  , I, R(dest) = SEXT((src1&4294967295) >> src2, 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DOx[rd] = sext(x[rs1][31: 0] >>u shamt), 立即数逻辑右移字
   INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori   , I, R(dest) = src1 ^ src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] ^ sext(immediate), 立即数异或
   INSTPAT("??????? ????? ????? 110 ????? 00100 11", ori    , I, R(dest) = src1 | src2 ); //I DO
 
@@ -85,6 +86,10 @@ static int decode_exec(Decode *s) {
   //INSTPAT("??????? ????? ????? 011 ????? 01000 11", sd     , S, Mw(src1 + dest, 8, src2));      //I DO sd: M[x[rs1] + sext(offset)}]= x[rs2][63: 0]
   INSTPAT("0000000 00000 00001 000 00000 11001 11", ret    , I, s->dnpc = src1); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));//I DO pc = X[1]
   
+  INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div    , R, R(dest) = src1 / src2); //I DO
+  //INSTPAT("0000000 ????? ????? 101 ????? 01100 11", srl   ,  R, R(dest) = (src1 >> BITS(src2, 5, 0)));//I DO
+  INSTPAT("0000000 ????? ????? 101 ????? 01100 11", srl   ,  R, R(dest) = BITS((src1 >> BITS(src2, 5, 0)), 63-BITS(src2, 5, 0), 0) );//I DO
+
   INSTPAT("0000001 ????? ????? 100 ????? 01110 11", divw   , R, R(dest) = SEXT(SEXT(BITS(src1,31,0), 32) / SEXT(BITS(src2,31,0), 32), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = sext(x[rs1][31:0] ÷s x[rs2][31:0]), 字除法
   INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , R, R(dest) = src1 * src2); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO x[rd] = x[rs1] × x[rs2], 乘
   INSTPAT("0000001 ????? ????? 000 ????? 01110 11", mulw   , R, R(dest) = SEXT(BITS(src1*src2, 31, 0), 32)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO x[rd] = sext((x[rs1] × x[rs2])[31: 0]), 乘字
@@ -106,10 +111,12 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem   ,  R, R(dest) = SEXT(src1,64) % SEXT(src2,64)); //I DO
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu   , R, R(dest) = src1 % src2); //I DO
 
-  INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(dest) = (src1 < src2)); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc), printf("src1= 0x%lx, src2 = 0x%lx, R(dest) = 0x%lx\n",src1,src2,R(dest))); //I DO 无符号小于立即数则置位 x[rd] = (x[rs1] < u_sext(immediate))
+  INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti   , I, R(dest) = (SEXT(src1,64) < SEXT(src2,64)));//I DO
+
+  INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(dest) = (src1 < src2) ); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc), printf("src1= 0x%lx, src2 = 0x%lx, R(dest) = 0x%lx\n",src1,src2,R(dest))); //I DO 无符号小于立即数则置位 x[rd] = (x[rs1] < u_sext(immediate))
   INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc = (src1 == src2)? s->pc+dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO    if(rs1 == rs2) pc += sext(offset)
   INSTPAT("??????? ????? ????? 100 ????? 11000 11", blt    , B, s->dnpc = (SEXT(src1,64) < SEXT(src2,64))? s->pc+dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <s rs2) pc += sext(offset), 小于时分支
-  INSTPAT("??????? ????? ????? 110 ????? 11000 11", blu    , B, s->dnpc = (src1 < src2)? s->pc + dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <u rs2) pc += sext(offset), 无符号小于时分支
+  INSTPAT("??????? ????? ????? 110 ????? 11000 11", bltu   , B, s->dnpc = (src1 < src2)? s->pc + dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 <u rs2) pc += sext(offset), 无符号小于时分支
   INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, s->dnpc = (src1 != src2)? s->pc+dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // I DO   if (rs1 != rs2) pc += sext(offset)
   INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc = (SEXT(src1,64) >= SEXT(src2,64))? s->pc + dest : s->dnpc); //isa_reg_display(), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); //I DO if (rs1 ≥s rs2) pc += sext(offset), 大于等于时分支
   INSTPAT("??????? ????? ????? 111 ????? 11000 11", bgeu   , B, s->dnpc = (src1 >= src2) ? s->pc + dest : s->dnpc); //I DO
@@ -124,14 +131,15 @@ static int decode_exec(Decode *s) {
 
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, s->dnpc = isa_raise_intr(11, s->pc)); //printf("ecall ! pc = 0x%lx, snpc = 0x%lx, a7=0x%lx\n",s->pc,s->snpc,cpu.gpr[17])); //I DO
   INSTPAT("0011000 00101 ????? 001 00000 11100 11", csrw_mtvec   , I, t = cpu.mtvec, cpu.mtvec = src1, R(dest) = t); //printf("Csrw_mtvec! mtvec=0x%08lx\n",cpu.mtvec)); //I DO
-  INSTPAT("0011000 00000 ????? 001 00000 11100 11", csrw_mstatus , I, t = cpu.mstatus, cpu.mstatus = src1, R(dest) = t); //printf("Csrw_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
+  INSTPAT("0011000 00000 ????? 001 00000 11100 11", csrw_mstatus , I, t = cpu.mstatus.value, cpu.mstatus.value = src1, R(dest) = t); //printf("Csrw_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
   INSTPAT("0011010 00001 ????? 001 00000 11100 11", csrw_mepc    , I, t = cpu.mepc, cpu.mepc = src1, R(dest) = t); //printf("Csrw_mepc! mepc=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mepc,t,src1)); //I DO
-  INSTPAT("0011010 00010 ????? 001 00000 11100 11", csrw_macuse  , I, t = cpu.mcause, cpu.mcause = src1, R(dest) = t); //printf("Csrw_mcause! mcause=0x%08lx\n",cpu.mcause)); //I DO
-  INSTPAT("0011010 00010 00000 010 ????? 11100 11", csrr_macuse   , I, t = cpu.mcause, cpu.mcause = t | src1, R(dest) = t); //printf("Csrr_macuse! mcause=0x%08lx\n",cpu.mcause)); //I DO
-  INSTPAT("0011000 00000 00000 010 ????? 11100 11", csrr_mstatus  , I, t = cpu.mstatus, cpu.mstatus = t | src1, R(dest) = t); //printf("Csrr_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
+  INSTPAT("0011010 00010 ????? 001 00000 11100 11", csrw_mcause  , I, t = cpu.mcause, cpu.mcause = src1, R(dest) = t); //printf("Csrw_mcause! mcause=0x%08lx\n",cpu.mcause)); //I DO
+  INSTPAT("0011000 00101 00000 010 ????? 11100 11", csrr_mtvec    , I, t = cpu.mtvec, cpu.mtvec = t | src1, R(dest) = t);// I DO
+  INSTPAT("0011010 00010 00000 010 ????? 11100 11", csrr_mcause   , I, t = cpu.mcause, cpu.mcause = t | src1, R(dest) = t); //printf("Csrr_macuse! mcause=0x%08lx\n",cpu.mcause)); //I DO
+  INSTPAT("0011000 00000 00000 010 ????? 11100 11", csrr_mstatus  , I, t = cpu.mstatus.value, cpu.mstatus.value = t | src1, R(dest) = t); //printf("Csrr_mstatus! mstatus=0x%08lx; t=0x%08lx; src1=0x%08lx\n",cpu.mstatus,t,src1)); //I DO
   INSTPAT("0011010 00001 00000 010 ????? 11100 11", csrr_mepc,      I, t = cpu.mepc, cpu.mepc = t | src1, R(dest) = t); //printf("Csrr_mepc! mepc=0x%08lx\n",cpu.mepc)); //I DO
 
-  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , I, s->dnpc = cpu.mepc, cpu.mstatus = 0xa00001800); //printf("mret! mepc=0x%08lx; dnpc=0x%08lx; mstatus=0x%08lx\n",cpu.mepc,s->dnpc,cpu.mstatus)); //I DO
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , I, s->dnpc = cpu.mepc, cpu.mstatus.m.MIE = cpu.mstatus.m.MPIE); //printf("mret! mepc=0x%08lx; dnpc=0x%08lx; mstatus=0x%08lx\n",cpu.mepc,s->dnpc,cpu.mstatus)); //I DO
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10)), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc)); // R(10) is $a0
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc), printf("pc = 0x%lx dnpc = 0x%lx\n",s->pc,s->dnpc));

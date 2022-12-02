@@ -26,6 +26,14 @@ printf("run SDL_GetTicks !\n");//I DO
 }
 
 void SDL_Delay(uint32_t ms) {
-  assert(0);//I DO
-  printf("SDL_Delay is uncompleted !\n");//I DO
+//------------------I DO----------------------
+//等待ms时间
+  uint32_t time_start = NDL_GetTicks();
+  while((NDL_GetTicks() - time_start) <= ms)
+  {
+
+  }
+  //assert(0);//I DO
+  //printf("SDL_Delay is uncompleted !\n");//I DO
+//==============================================
 }
