@@ -78,7 +78,7 @@ int SDL_PushEvent(SDL_Event *ev) {
 
 int SDL_PollEvent(SDL_Event *ev) {
 //--------------I DO---------------
-printf("run SDL_PollEvent !\n");
+//printf("run SDL_PollEvent !\n");
 //----------如果当前没有任何事件，就立即返回;轮询，有事件返回1，无事件返回0------------
   uint8_t type = 0, sym = 0;
   if (SDL_getkey(&type, &sym))
@@ -112,7 +112,7 @@ printf("run SDL_PollEvent !\n");
 int SDL_WaitEvent(SDL_Event *event) {
 
 //----------I DO------------------
-printf("run SDL_WaitEvent !\n");
+//printf("run SDL_WaitEvent !\n");
 //----------等待将键盘按键的信息写入SDL_Event中----------
   uint8_t type = 0, sym = 0;
   while (!SDL_getkey(&type, &sym))

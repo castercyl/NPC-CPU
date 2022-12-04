@@ -18,7 +18,7 @@ int SDL_RemoveTimer(SDL_TimerID id) {
 
 uint32_t SDL_GetTicks() {
 //----------------I DO-----------------
-printf("run SDL_GetTicks !\n");//I DO
+//printf("run SDL_GetTicks !\n");//I DO
 //以毫秒为单位返回系统时间
   return NDL_GetTicks();
 //=====================================

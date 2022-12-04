@@ -13,7 +13,7 @@ static inline uint32_t clolour8_to_32(SDL_Color *colors) {//按00RRGGBB的方式
 //===============================
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
-  printf("run SDL_BlitSurface !\n");//I DO
+  //printf("run SDL_BlitSurface !\n");//I DO
   assert(dst && src);  //两张画布不能为空
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel); //两张画布的像素格式要一致
 //--------------------I DO----------------------------------------
@@ -107,7 +107,7 @@ else
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 //-------------I DO----------------------
 //------------往画布的指定矩形区域中填充指定的颜色---------- 
-  printf("run SDL_FillRect !\n");//I DO
+  //printf("run SDL_FillRect !\n");//I DO
   int rect_x, rect_y, rect_w, rect_h; //目标矩形的起点，长，宽
   if(dstrect == NULL)   //如没有指定区域，则默认填充整个画布
   {
@@ -199,7 +199,7 @@ static inline int maskToShift(uint32_t mask) {
 
 SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int depth,
     uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) {
-  printf("run SDL_CreateRGBSurface !\n");//I DO
+  //printf("run SDL_CreateRGBSurface !\n");//I DO
   assert(depth == 8 || depth == 32);
   SDL_Surface *s = malloc(sizeof(SDL_Surface));
   assert(s);
@@ -234,7 +234,7 @@ SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
     assert(s->pixels);
   }
 
-  printf("finish SDL_CreateRGBSurface !\n");//I DO
+  //printf("finish SDL_CreateRGBSurface !\n");//I DO
 
   return s;
 }
@@ -249,7 +249,7 @@ SDL_Surface* SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int d
 }
 
 void SDL_FreeSurface(SDL_Surface *s) {
-  printf("run SDL_FreeSurface !\n");//I DO
+  //printf("run SDL_FreeSurface !\n");//I DO
   if (s != NULL) {
     if (s->format != NULL) {
       if (s->format->palette != NULL) {
@@ -261,13 +261,13 @@ void SDL_FreeSurface(SDL_Surface *s) {
     if (s->pixels != NULL && !(s->flags & SDL_PREALLOC)) free(s->pixels);
     free(s);
   }
-  printf("finish SDL_FreeSurface !\n");//I DO
+  //printf("finish SDL_FreeSurface !\n");//I DO
 }
 
 SDL_Surface* SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags) {
-  printf("run SDL_SetVideoMode!\n");//I DO
+  //printf("run SDL_SetVideoMode!\n");//I DO
   if (flags & SDL_HWSURFACE) NDL_OpenCanvas(&width, &height);
-  printf("run SDL_SetVideoMode 1!\n");//I DO
+  //printf("run SDL_SetVideoMode 1!\n");//I DO
   return SDL_CreateRGBSurface(flags, width, height, bpp,
       DEFAULT_RMASK, DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
 }

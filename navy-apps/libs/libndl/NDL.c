@@ -124,7 +124,7 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   for (int i = 0; i < h; i++) {
     int open_offset = lseek(draw_fd, (((y + canvas_y + i) * screen_w) + (x + canvas_x)) * sizeof(uint32_t), SEEK_SET); //每次跨行均需重新改变读写位置
     write(draw_fd, pixels + w * i, w * sizeof(uint32_t));
-    printf("i=%d, open_offset=%d\n",i,open_offset);
+    //printf("i=%d, open_offset=%d\n",i,open_offset);
   }
 
   //close(draw_fd); //不能引入close，否则在navy的native上无法翻页

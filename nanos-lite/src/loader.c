@@ -31,7 +31,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Phdr elfphdr = {};  //管理单个segment信息的表头
   int FS_NUMBER = 0;      //文件编号
 
-  FS_NUMBER = fs_open("/bin/pal", 0, 0);
+  FS_NUMBER = fs_open(filename, 0, 0);
   size_t file_offset = fs_offset(FS_NUMBER);
   printf("FS_NUMBER = %d\n", FS_NUMBER);
   fs_read(FS_NUMBER, &elfhdr, sizeof(elfhdr));
