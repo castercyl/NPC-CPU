@@ -59,12 +59,13 @@ void vga_update_screen() {
   // TODO: call `update_screen()` when the sync register is non-zero,
   // then zero out the sync register
   // I DO
-  
+  //printf("vgactl_port_base[1] = %d\n", vgactl_port_base[1]);//I DO
   if (vgactl_port_base[1]){
     //printf("vgactl_port_base[1] = %d\n",vgactl_port_base[1]);
     //printf("111\n");
     update_screen();
-    *(vgactl_port_base) = 0;
+    //*(vgactl_port_base) = 0;
+    vgactl_port_base[1] = 0;
   }
   
  //update_screen();

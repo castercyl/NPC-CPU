@@ -22,10 +22,6 @@ Context* __am_irq_handle(Context *c) {
           c->mepc += 4;    //I DO
           break;
         }
-        /*
-        else {
-          ev.event = EVENT_ERROR; break;
-        }*/
       }
       default: ev.event = EVENT_ERROR; break;
     }

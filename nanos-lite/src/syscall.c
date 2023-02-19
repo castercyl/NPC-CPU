@@ -48,21 +48,21 @@ void do_syscall(Context *c) {
   a[3] = c->GPR4; //I DO   $a2
 
   switch (a[0]) {
-    //case SYS_exit  : /*printf("Do SYS_exit\n"); printf("a0 = %d\n", a[1]);*/ halt(a[1]); break; //I DO SYS_exit 接收的是哪个参数？$a0
+    case SYS_exit  : printf("Do SYS_exit\n"); printf("a0 = %d\n", a[1]); halt(a[1]); break; //I DO SYS_exit 接收的是哪个参数？$a0
     //case SYS_exit: {naive_uload(NULL, "/bin/menu"); c->GPRx = 0; break;} //I DO
-    case SYS_exit: {naive_uload(NULL, "/bin/nterm"); c->GPRx = 0; break;} //I DO
+    //case SYS_exit: {naive_uload(NULL, "/bin/nterm"); c->GPRx = 0; break;} //I DO
     //case SYS_yield : printf("Do SYS_yield\n"); yield(); c->GPRx = 0; break; //I DO SYS_yield
-    case SYS_yield : /*printf("Do SYS_yield\n");*/ yield(); c->GPRx = 0; break; //I DO SYS_yield
-    case SYS_open  : /*printf("Do SYS_open\n");*/ c->GPRx = fs_open((char*)a[1], a[2], a[3]); break;
-    case SYS_read  : /*printf("Do SYS_read\n");*/ c->GPRx = fs_read((int)a[1], (void*)a[2], (size_t)a[3]); break;
-    case SYS_write : /*printf("Do SYS_write\n");*/ c->GPRx = fs_write((int)a[1], (void*)a[2], (size_t)a[3]); break;
-    case SYS_close : /*printf("Do SYS_close\n");*/ c->GPRx = fs_close((int)a[1]); break;
-    case SYS_lseek : /*printf("Do SYS_lseek\n");*/ c->GPRx = fs_lseek((int)a[1], (size_t)a[2], (int)a[3]); break;
+    case SYS_yield : printf("Do SYS_yield\n"); yield(); c->GPRx = 0; break; //I DO SYS_yield
+    case SYS_open  : printf("Do SYS_open\n"); c->GPRx = fs_open((char*)a[1], a[2], a[3]); break;
+    case SYS_read  : printf("Do SYS_read\n"); c->GPRx = fs_read((int)a[1], (void*)a[2], (size_t)a[3]); break;
+    case SYS_write : printf("Do SYS_write,a[0] = %d, a[1] = %d, a[2] =%d, a[3]=%d\n",a[0],a[1],a[2],a[3]); c->GPRx = fs_write((int)a[1], (void*)a[2], (size_t)a[3]); break;
+    case SYS_close : printf("Do SYS_close\n"); c->GPRx = fs_close((int)a[1]); break;
+    case SYS_lseek : printf("Do SYS_lseek\n"); c->GPRx = fs_lseek((int)a[1], (size_t)a[2], (int)a[3]); break;
     //case SYS_write : printf("Do SYS_write\n"); c->GPRx = sys_write((int)a[1], (void*)a[2], (size_t)a[3]); break; //I DO SYS_write
-    case SYS_brk   : /*printf("Do SYS_brk\n");*/ c->GPRx = 0; break; //I DO SYS_brk 当前默认为总是申请成功
+    case SYS_brk   : printf("Do SYS_brk\n"); c->GPRx = 0; break; //I DO SYS_brk 当前默认为总是申请成功
     //case SYS_gettimeofday:{/*printf("SYS_gettimeofday\n");*/ struct timeval now1; fs_gettimeofday(&now1, NULL); c->GPRx = now1.tv_sec*1000000 + now1.tv_usec; break;}
-    case SYS_execve: {const char *filename = (const char *)a[1]; naive_uload(NULL, filename); c->GPRx = 0; break;} //I DO
-    case SYS_gettimeofday:{/*printf("SYS_gettimeofday\n");*/ sys_gettimeofday(c);  break;}
+    case SYS_execve: {printf("Do_SYS_execve\n"); const char *filename = (const char *)a[1]; naive_uload(NULL, filename); c->GPRx = 0; break;} //I DO
+    case SYS_gettimeofday:{printf("SYS_gettimeofday\n"); sys_gettimeofday(c);  break;}
     //case SYS_gettimeofday: printf("SYS_gettimeofday\n"); c->GPRx = get_time(); break;
     //case SYS_brk   : printf("Do SYS_brk\n"); break; //I DO SYS_brk 当前默认为总是申请成功
     default: panic("Unhandled syscall ID = %d", a[0]);

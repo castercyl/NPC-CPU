@@ -58,6 +58,7 @@ void init_fs() {
 //-----I DO------------------
 int fs_open(const char *pathname, int flags, int mode) {
   //函数入口：输入文件名，返回文件名对应的文件编号
+  //printf("fnanme=%s\n", pathname);
   int FILE_NUMBER = sizeof(file_table) / sizeof(Finfo);   //需要实时计算，不要固定，因为后面在不断的地加入Test和APP
   for (int i = 0; i < FILE_NUMBER; i++){
     if (strcmp(pathname, file_table[i].name) == 0){
@@ -139,11 +140,13 @@ size_t fs_write(int fd, const void *buf, size_t len) {
   */
   if (file_table[fd].write) //VFS
   {
+    printf("fb_write1, fd = %d\n",fd);
     WRITE_LENGTH = file_table[fd].write(buf, file_table[fd].open_offset, len);
     file_table[fd].open_offset = file_table[fd].open_offset + WRITE_LENGTH;
   }
   else
   {
+    printf("fb_write2, fd = %d\n",fd);
     if(file_table[fd].open_offset +  len <= file_table[fd].size){ //不允许写越界
         WRITE_LENGTH = ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
         file_table[fd].open_offset = file_table[fd].open_offset + WRITE_LENGTH;

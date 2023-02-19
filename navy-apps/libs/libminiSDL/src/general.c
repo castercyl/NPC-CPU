@@ -3,7 +3,7 @@
 #include <assert.h> //I DO
 
 int SDL_Init(uint32_t flags) {
-  printf("run SDL_Init !\n");//I DO
+  //printf("run SDL_Init !\n");//I DO
   return NDL_Init(flags);
 }
 

@@ -16,14 +16,30 @@
 
 module ysyx_22040386_IDU (
     input wire        i_ID_clk,
+    input wire        i_ID_rst_n,
+//----------from IF---------------
     input wire [63:0] i_ID_pc,
     input wire [31:0] i_ID_inst,
+//----------from WB----------------
     input wire        i_ID_RegWrite,
     input wire [4:0]  i_ID_reg_wr_addr,
     input wire [63:0] i_ID_reg_wr_data,
 
-    output wire o_ID_unkown_code,    //仅用于前期检测未实现的指令
+    input wire        i_ID_ecall,
+    input wire        i_ID_mret,
+    input wire        i_ID_csr_wen,
+    input wire [11:0] i_ID_csr_waddr,
+    input wire [63:0] i_ID_csr_wdata,
 
+    input wire        i_ID_csr_timer_intr,
+    input wire [63:0] i_ID_csr_trap_pc,
+
+//-----------to main.cpp----------------
+    output wire o_ID_unkown_code,    //仅用于前期检测未实现的指令
+//-------------测试---------------------
+    output wire [31:0] o_ID_inst,
+
+//--------------to EX-------------------
     output reg o_ID_RegWrite,
     output wire o_ID_Word_op,
     output wire o_ID_MemRead,
@@ -33,7 +49,6 @@ module ysyx_22040386_IDU (
     output wire o_ID_Jal,
     output wire o_ID_Jalr,
     output wire o_ID_Lui,
-
     //output wire o_ID_DIV_word,
     output wire [2:0] o_ID_FUNCT3,
 
@@ -41,21 +56,44 @@ module ysyx_22040386_IDU (
     //output wire [2:0] o_ID_mem_mask,   等同于FUNCT3
     output wire [4:0] o_ID_reg_wr_addr,
     output wire [5:0] o_ID_ALUctr,
-    output reg [63:0] o_ID_imm,
+    output reg  [63:0] o_ID_imm,
     output wire [63:0] o_ID_reg_rd_data1,
     output wire [63:0] o_ID_reg_rd_data2,
     output wire [63:0] o_ID_pc,
-
+    //ABOUT CSR
     output wire o_ID_ecall,
     output wire o_ID_mret,
-    //------to CSR-------------------
-    output wire        o_ID_csr_ren,
-    output wire        o_ID_csr_wen,
-    output wire [2:0]  o_ID_csr_state,
+    output wire o_ID_csr_RegWrite,
+    output wire o_ID_csr_wen,
     output wire [11:0] o_ID_csr_waddr,
-    output wire [11:0] o_ID_csr_raddr,
-    output wire [63:0] o_ID_csr_wr_data
+    output wire [63:0] o_ID_csr_wdata,       // to csr
+    output wire [63:0] o_ID_csr_rdata,    //csr to reg or dnpc
+//---------------to Ctrl----------------------
+    output wire o_ID_mstatus_mie,
+    output wire o_ID_mie_mtie,
+    output wire [63:0] o_ID_csr_mtvec
+
+    //output wire o_ID_time_intr,
+    /*
+    //from CLINT
+    input wire         i_ID_clint_time_stop,
+    */
+    //from CSR
+    //input wire         i_ID_timer_intr,     //ID捕获到的计时器中断
+    //input wire         i_ID_csr_reg_write,
+    //input wire [63:0]  i_ID_csr_r_data,
+    //input wire [63:0]  i_ID_csr_dnpc,       
+    //------to CSR-------------------
+    //output wire        o_ID_csr_ren,
+    //output wire        o_ID_csr_wen,
+    //output wire        o_ID_csr_time_stop,
+    //output wire [2:0]  o_ID_csr_state,
+    //output wire [11:0] o_ID_csr_waddr,
+    //output wire [11:0] o_ID_csr_raddr,
+    //output wire [63:0] o_ID_csr_wr_data
 );
+//-------------测试信号----------------
+assign o_ID_inst = i_ID_inst;
 
 //初次关键标志拆分
 wire [2:0] ID_funct3;
@@ -76,7 +114,9 @@ assign o_ID_FUNCT3 = ID_funct3;
 assign o_ID_pc = i_ID_pc;
 
 //-------------------------CSR--------------------------------------------
-wire ID_csrrw, ID_csrrs, ID_csrrsi, ID_csrrwi, ID_ecall, ID_mret;
+wire ID_csrrw, ID_csrrs, ID_csrrsi, ID_csrrwi, ID_ecall, ID_mret, ID_csr_ren;
+wire [11:0] ID_csr_raddr;
+wire [63:0] ID_csr_rdata; //from csr
 wire [63:0] ID_csr_imm;
 assign ID_csr_imm = {59'd0, i_ID_inst[19:15]}; 
 
@@ -90,18 +130,50 @@ assign ID_mret   = (ID_opcode == 7'b111_0011) && (i_ID_inst[19:7] == 'd0) && (i_
 assign o_ID_ecall = ID_ecall;
 assign o_ID_mret  = ID_mret;
 
-assign o_ID_csr_raddr = i_ID_inst[31:20];
-assign o_ID_csr_waddr = i_ID_inst[31:20];
+//assign o_ID_csr_raddr = i_ID_inst[31:20];
+assign ID_csr_raddr   = (ID_ecall) ?  `CSR_MTVEC : 
+                        (ID_mret)  ?  `CSR_MEPC  :  i_ID_inst[31:20];
+assign o_ID_csr_waddr = (ID_ecall) ?  `CSR_MEPC  : i_ID_inst[31:20];
 
-assign o_ID_csr_ren = ID_csrrs || ID_csrrsi || ID_csrrw || ID_csrrwi || ID_mret || ID_ecall;
+assign ID_csr_ren   = ID_csrrs || ID_csrrsi || ID_csrrw || ID_csrrwi || ID_mret || ID_ecall;
 assign o_ID_csr_wen = ID_csrrs || ID_csrrsi || ID_csrrw || ID_csrrwi || ID_ecall;
 
+assign o_ID_csr_RegWrite = ID_csrrs || ID_csrrsi || ID_csrrw || ID_csrrwi;
+
+assign o_ID_csr_wdata = (ID_ecall) ? i_ID_pc                            :
+                        (ID_csrrs) ? (ID_csr_rdata | o_ID_reg_rd_data1) :
+                        (ID_csrrsi)? (ID_csr_rdata | ID_csr_imm)        :
+                        (ID_csrrw) ? o_ID_reg_rd_data1                  : ID_csr_imm;
+
+assign o_ID_csr_rdata = ID_csr_rdata;
+
+csr csr_inst (
+    .clk(i_ID_clk),
+    .rst_n(i_ID_rst_n),
+
+    .i_csr_timer_intr(i_ID_csr_timer_intr),
+    .i_csr_trap_pc(i_ID_csr_trap_pc),
+
+    .i_csr_ecall(i_ID_ecall),
+    .i_csr_mret(i_ID_mret),
+    .i_csr_ren(ID_csr_ren),
+    .i_csr_raddr(ID_csr_raddr),
+    .i_csr_wen(i_ID_csr_wen),
+    .i_csr_waddr(i_ID_csr_waddr),
+    .i_csr_wdata(i_ID_csr_wdata),
+
+    .o_csr_rdata(ID_csr_rdata),
+    .o_csr_mstatus_mie(o_ID_mstatus_mie),
+    .o_csr_mie_mtie(o_ID_mie_mtie),
+    .o_csr_mtvec(o_ID_csr_mtvec)
+);
+/*
 assign o_ID_csr_state = (ID_csrrs || ID_csrrsi) ? `CSR_STATE_CSRRS :
                         (ID_csrrw || ID_csrrwi) ? `CSR_STATE_CSRRW :
                         (ID_ecall)              ? `CSR_STATE_ECALL :
                         (ID_mret)               ? `CSR_STATE_MRET  : `CSR_STATE_IDLE;
-
-assign o_ID_csr_wr_data = (ID_csrrsi || ID_csrrwi) ? ID_csr_imm : o_ID_reg_rd_data1;
+*/
+//assign o_ID_csr_wr_data = (ID_csrrsi || ID_csrrwi) ? (ID_csr_imm | ID_csr_rdata) : o_ID_reg_rd_data1;
 //-----------------------------------------------------------------------
 
 /*### 数据通路控制信号生成 ###*/

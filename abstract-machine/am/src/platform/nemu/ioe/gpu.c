@@ -1,42 +1,66 @@
 #include <am.h>
 #include <nemu.h>
 //#include <string.h>  // I DO
+#include <stdio.h> //I DO
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
 
 void __am_gpu_init() {         //I DO 照着讲义补全
   int i;
-  int w = 400;  // TODO: get the correct width     I DO
-  int h = 300;  // TODO: get the correct height    I DO
+  //int w = 400;  // TODO: get the correct width     I DO
+  int w = io_read(AM_GPU_CONFIG).width;  // TODO: get the correct width
+  //int h = 300;  // TODO: get the correct height    I DO
+  int h = io_read(AM_GPU_CONFIG).height;  // TODO: get the correct height
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
   for (i = 0; i < w * h; i ++) fb[i] = i;
   outl(SYNC_ADDR, 1);
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
+  uint32_t info = inl(VGACTL_ADDR);    //I DO
+  uint16_t real_height = (uint16_t)(info & 0xFFFF); //I DO
+  uint16_t real_width  = (uint16_t)(info >> 16); //I DO
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
-    .width = 400, .height = 300,        //I DO
+    .width = real_width, .height = real_height,        //I DO
     .vmemsz = 0
   };
+  //printf("gpu_config: w = %d; h = %d\n",real_width, real_height);
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   //I DO
+  //printf("use_am_gpu_fbdraw\n");
+
+  int win_weight = io_read(AM_GPU_CONFIG).width;  // TODO: get the correct width
+
+  uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
+  uint32_t *pi = (uint32_t *)(uintptr_t)ctl->pixels;
+  // printf("(x:%d, y:%d) w=%d, h=%d", ctl->x, ctl->y, ctl->w, ctl->h);
+  for (int i = 0; i < ctl->h; ++i){
+    for (int j = 0; j < ctl->w; ++j){
+      fb[(ctl->y) * win_weight + i * win_weight + ctl->x + j] = pi[i * (ctl->w) + j];
+    }
+  }
+
+  /*
+  int width  = io_read(AM_GPU_CONFIG).width;
+  int height = io_read(AM_GPU_CONFIG).height;
   int x = ctl->x;
   int y = ctl->y;
   int w = ctl->w;
   int h = ctl->h; //I DO
-  if (w == 0 || h == 0) return;     // I DO
+  if (w == 0 || h == 0) return;     // I DO 这句话不该有
   uint32_t *fb1 = (uint32_t *)(uintptr_t)FB_ADDR; // I DO
   uint32_t *pixels_addr = ctl->pixels;
-  int cp_bytes = (w < (400 - x)) ? w : 400 - x; //I DO 一行所需的大小
-  for (int j=0; j<300 && j<h; j++){
+  int cp_bytes = (w < (width - x)) ? w : width - x; //I DO 一行所需的大小
+  for (int j=0; j<height && j<h; j++){
     for (int i=0; i<cp_bytes; i++){        //按行写入
-      fb1[(y+j)*400+x+i] = *(pixels_addr+i);
+      fb1[(y+j)*width+x+i] = *(pixels_addr+i);
     }
     pixels_addr = pixels_addr + cp_bytes;
   }
+  */
   //I DO
   
   if (ctl->sync) {

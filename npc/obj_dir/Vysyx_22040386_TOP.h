@@ -26,15 +26,10 @@ class Vysyx_22040386_TOP VL_NOT_FINAL {
     // PORTS
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
-    VL_IN8(&i_TOP_clk,0,0);
-    VL_IN8(&i_TOP_rst_n,0,0);
-    VL_OUT8(&o_TOP_unkown_code,0,0);
-    VL_OUT8(&o_TOP_Branch,0,0);
-    VL_OUT8(&o_TOP_mret,0,0);
-    VL_OUT8(&o_TOP_ecall,0,0);
-    VL_OUT(&o_TOP_inst,31,0);
-    VL_OUT64(&o_TOP_pc,63,0);
-    VL_OUT64(&o_TOP_csr_dnpc,63,0);
+    VL_IN8(&top_clk_i,0,0);
+    VL_IN8(&top_rst_n_i,0,0);
+    VL_OUT(&top_wbinst_o,31,0);
+    VL_OUT64(&top_wbpc_o,63,0);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.

@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <time.h>
 #include "syscall.h"
+//#include <stdio.h> //I DO
 
 // helper macros
 #define _concat(x, y) x ## y
@@ -65,6 +66,7 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int _write(int fd, void *buf, size_t count) {
+  //printf("navy_write, fd = %d\n",fd);
   return _syscall_(SYS_write, fd, (intptr_t)buf, count);  //I DO 触发 SYS_write
   //_exit(SYS_write);   //注释掉，不希望每次write异常后直接就退出程序了
   //return 0;
